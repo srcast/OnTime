@@ -53,8 +53,8 @@ class _HomePage extends State<HomePage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
+              onPressed: () => homeVM.openPointModal(context),
               child: Icon(Icons.add, size: 28),
-              onPressed: () {},
             ),
           ],
         ),

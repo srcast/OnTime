@@ -8,4 +8,6 @@ class Labels {
   static const hours = 'Horas';
   static const hourValue = 'Valor/Hora';
   static const profit = 'Ganhos';
+  static const cancel = 'Cancelar';
+  static const save = 'Guardar';
 }
