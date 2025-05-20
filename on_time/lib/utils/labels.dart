@@ -10,4 +10,5 @@ class Labels {
   static const profit = 'Ganhos';
   static const cancel = 'Cancelar';
   static const save = 'Guardar';
+  static const today = 'Hoje';
 }

@@ -14,4 +14,5 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color darkGray = Color(0xFF2C3E50);
   static const Color labelMediumGray = Color(0xFF7F8C8D);
+  static const Color defaultText = Color.fromARGB(255, 29, 37, 32);
 }
