@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
 import 'package:on_time/utils/colors.dart';
-import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 
@@ -93,11 +92,30 @@ class _HomePage extends State<HomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 10),
-            ActivityCard(label: Labels.getIn, value: '09:12'),
-            ActivityCard(label: Labels.getOut, value: '17:45'),
-            SizedBox(height: 10),
-            Spacer(),
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(height: 10),
+
+                  vm.pontos.isEmpty
+                      ? Expanded(
+                        child: Center(child: Text('Sem pontos registados.')),
+                      )
+                      : Expanded(
+                        child: ListView.builder(
+                          controller: vm.scrollController,
+                          itemCount: vm.pontos.length,
+                          itemBuilder: (context, index) {
+                            final ponto = vm.pontos[index];
+                            return ActivityCard(ponto: ponto, index: index);
+                          },
+                        ),
+                      ),
+
+                  SizedBox(height: 10),
+                ],
+              ),
+            ),
             DaySummary(
               minutesWorked: vm.sessionMinutes,
               hourValue: vm.hourValueBase,

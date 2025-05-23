@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:on_time/utils/labels.dart';
 
 class DatesHelper {
@@ -44,5 +45,13 @@ class DatesHelper {
     var now = DateTime.now();
 
     return DateTime(now.year, now.month, now.day);
+  }
+
+  static String getTimeFromDate(DateTime date) {
+    return DateFormat('HH:mm').format(date);
+  }
+
+  static DateTime getSessionFromDate(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
   }
 }

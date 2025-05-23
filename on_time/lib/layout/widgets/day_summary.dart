@@ -29,11 +29,11 @@ class DaySummary extends StatelessWidget {
             ),
             _summaryRow(
               Labels.hourValue,
-              '${NumberFormat.simpleCurrency().format(hourValue)}/h',
+              '${NumberFormat.simpleCurrency(locale: 'pt-Pt').format(hourValue)}/h',
             ),
             _summaryRow(
               Labels.profit,
-              NumberFormat.simpleCurrency().format(profit),
+              NumberFormat.simpleCurrency(locale: 'pt-Pt').format(profit),
             ),
           ],
         ),

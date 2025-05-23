@@ -1,8 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/services/points_service.dart';
+import 'package:on_time/viewmodel/home_page_vm.dart';
 
-GetIt db = GetIt.instance;
+GetIt locator = GetIt.instance;
 
 void setup() {
-  db.registerLazySingleton(() => AppDatabase());
+  locator.registerLazySingleton(() => AppDatabase());
+  locator.registerLazySingleton(() => PointsService(locator<AppDatabase>()));
+  locator.registerFactory(() => HomePageViewModel(locator<PointsService>()));
 }

@@ -21,7 +21,7 @@ void main() async {
           create: (context) => AppDatabase(),
           dispose: (context, AppDatabase db) => db.close(),
         ),
-        ChangeNotifierProvider(create: (_) => HomePageViewModel()),
+        ChangeNotifierProvider(create: (_) => locator<HomePageViewModel>()),
       ],
       child: DevicePreview(
         builder: (context) {
