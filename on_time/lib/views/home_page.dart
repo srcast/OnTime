@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
 import 'package:on_time/utils/colors.dart';
+import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 
@@ -75,7 +77,7 @@ class _HomePage extends State<HomePage> {
                                     ),
                                   ),
                                   child: Text(
-                                    'Hoje',
+                                    Labels.today,
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: AppColors.white,
@@ -99,16 +101,47 @@ class _HomePage extends State<HomePage> {
 
                   vm.pontos.isEmpty
                       ? Expanded(
-                        child: Center(child: Text('Sem pontos registados.')),
+                        child: Center(child: Text(Labels.noPointsDayMsg)),
                       )
                       : Expanded(
-                        child: ListView.builder(
-                          controller: vm.scrollController,
-                          itemCount: vm.pontos.length,
-                          itemBuilder: (context, index) {
-                            final ponto = vm.pontos[index];
-                            return ActivityCard(ponto: ponto, index: index);
-                          },
+                        child: SlidableAutoCloseBehavior(
+                          child: ListView.builder(
+                            controller: vm.scrollController,
+                            itemCount: vm.pontos.length,
+                            itemBuilder: (context, index) {
+                              final ponto = vm.pontos[index];
+                              return Slidable(
+                                key: ValueKey(ponto),
+                                endActionPane: ActionPane(
+                                  motion: const DrawerMotion(),
+                                  extentRatio: 0.4,
+                                  children: [
+                                    SlidableAction(
+                                      onPressed: (_) {
+                                        // lógica de editar
+                                      },
+                                      backgroundColor:
+                                          AppColors.editButtonBackground,
+                                      foregroundColor: AppColors.editButton,
+                                      icon: Icons.edit,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    SlidableAction(
+                                      onPressed:
+                                          (context) =>
+                                              vm.deletePoint(context, ponto),
+                                      backgroundColor:
+                                          AppColors.deleteButtonBackground,
+                                      foregroundColor: AppColors.deleteButton,
+                                      icon: Icons.delete_outline,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ],
+                                ),
+                                child: ActivityCard(ponto: ponto, index: index),
+                              );
+                            },
+                          ),
                         ),
                       ),
 

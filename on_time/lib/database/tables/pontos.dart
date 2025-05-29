@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 class Pontos extends Table {
-  DateTimeColumn get date => dateTime().unique()();
-  BoolColumn get getIn => boolean().withDefault(const Constant(true))();
+  IntColumn get id => integer().autoIncrement().unique()();
+  DateTimeColumn get date => dateTime()();
   DateTimeColumn get sessionId => dateTime()();
 }

@@ -12,23 +12,13 @@ class ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    /*     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        leading: Icon(
-          ponto.getIn ? Icons.login : Icons.logout,
-          color: ponto.getIn ? AppColors.softGreen : Colors.red,
-        ),
-        title: Text(ponto.getIn ? Labels.getIn : Labels.getOut),
-        trailing: Text(DatesHelper.getTimeFromDate(ponto.date)),
-      ),
-    ); */
+    bool getIn = index % 2 == 0;
 
     return Column(
       children: [
-        if (ponto.getIn && index > 0) ...[
+        if (getIn && index > 0) ...[
           SizedBox(height: 10),
-          Center(child: Text('Pausa')),
+          Center(child: Text(Labels.pause)),
           SizedBox(height: 10),
         ],
 
@@ -38,10 +28,10 @@ class ActivityCard extends StatelessWidget {
           ),
           child: ListTile(
             leading: Icon(
-              ponto.getIn ? Icons.login : Icons.logout,
-              color: ponto.getIn ? AppColors.softGreen : Colors.red,
+              getIn ? Icons.login : Icons.logout,
+              color: getIn ? AppColors.softGreen : Colors.red,
             ),
-            title: Text(ponto.getIn ? Labels.getIn : Labels.getOut),
+            title: Text(getIn ? Labels.getIn : Labels.getOut),
             trailing: Text(
               DatesHelper.getTimeFromDate(ponto.date),
               style: TextStyle(fontSize: 14),

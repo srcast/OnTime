@@ -32,4 +32,8 @@ class PointsService {
       print('Stack trace:\n $s');
     }
   }
+
+  Future<void> deletePoint(Ponto pointToDelete) async {
+    (db.delete(db.pontos)..where((p) => p.id.equals(pointToDelete.id))).go();
+  }
 }

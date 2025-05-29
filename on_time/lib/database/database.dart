@@ -9,7 +9,7 @@ import 'package:on_time/database/tables/session.dart';
 import 'package:on_time/database/tables/work.dart';
 import 'package:path_provider/path_provider.dart';
 
-part 'database.g.dart';
+part 'database.g.dart'; // flutter pub run build_runner build
 
 @DriftDatabase(
   tables: [Pontos, Session, Configurations, HourValuePolitics, Work],

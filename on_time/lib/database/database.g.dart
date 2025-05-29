@@ -8,6 +8,19 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $PontosTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
   late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
@@ -16,20 +29,6 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
-  static const VerificationMeta _getInMeta = const VerificationMeta('getIn');
-  @override
-  late final GeneratedColumn<bool> getIn = GeneratedColumn<bool>(
-    'get_in',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("get_in" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
   );
   static const VerificationMeta _sessionIdMeta = const VerificationMeta(
     'sessionId',
@@ -43,7 +42,7 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [date, getIn, sessionId];
+  List<GeneratedColumn> get $columns => [id, date, sessionId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -56,6 +55,9 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('date')) {
       context.handle(
         _dateMeta,
@@ -63,12 +65,6 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
       );
     } else if (isInserting) {
       context.missing(_dateMeta);
-    }
-    if (data.containsKey('get_in')) {
-      context.handle(
-        _getInMeta,
-        getIn.isAcceptableOrUnknown(data['get_in']!, _getInMeta),
-      );
     }
     if (data.containsKey('session_id')) {
       context.handle(
@@ -82,20 +78,20 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Ponto map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Ponto(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
       date:
           attachedDatabase.typeMapping.read(
             DriftSqlType.dateTime,
             data['${effectivePrefix}date'],
-          )!,
-      getIn:
-          attachedDatabase.typeMapping.read(
-            DriftSqlType.bool,
-            data['${effectivePrefix}get_in'],
           )!,
       sessionId:
           attachedDatabase.typeMapping.read(
@@ -112,27 +108,23 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
 }
 
 class Ponto extends DataClass implements Insertable<Ponto> {
+  final int id;
   final DateTime date;
-  final bool getIn;
   final DateTime sessionId;
-  const Ponto({
-    required this.date,
-    required this.getIn,
-    required this.sessionId,
-  });
+  const Ponto({required this.id, required this.date, required this.sessionId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
-    map['get_in'] = Variable<bool>(getIn);
     map['session_id'] = Variable<DateTime>(sessionId);
     return map;
   }
 
   PontosCompanion toCompanion(bool nullToAbsent) {
     return PontosCompanion(
+      id: Value(id),
       date: Value(date),
-      getIn: Value(getIn),
       sessionId: Value(sessionId),
     );
   }
@@ -143,8 +135,8 @@ class Ponto extends DataClass implements Insertable<Ponto> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Ponto(
+      id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
-      getIn: serializer.fromJson<bool>(json['getIn']),
       sessionId: serializer.fromJson<DateTime>(json['sessionId']),
     );
   }
@@ -152,21 +144,21 @@ class Ponto extends DataClass implements Insertable<Ponto> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
-      'getIn': serializer.toJson<bool>(getIn),
       'sessionId': serializer.toJson<DateTime>(sessionId),
     };
   }
 
-  Ponto copyWith({DateTime? date, bool? getIn, DateTime? sessionId}) => Ponto(
+  Ponto copyWith({int? id, DateTime? date, DateTime? sessionId}) => Ponto(
+    id: id ?? this.id,
     date: date ?? this.date,
-    getIn: getIn ?? this.getIn,
     sessionId: sessionId ?? this.sessionId,
   );
   Ponto copyWithCompanion(PontosCompanion data) {
     return Ponto(
+      id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
-      getIn: data.getIn.present ? data.getIn.value : this.getIn,
       sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
     );
   }
@@ -174,84 +166,74 @@ class Ponto extends DataClass implements Insertable<Ponto> {
   @override
   String toString() {
     return (StringBuffer('Ponto(')
+          ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('getIn: $getIn, ')
           ..write('sessionId: $sessionId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(date, getIn, sessionId);
+  int get hashCode => Object.hash(id, date, sessionId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Ponto &&
+          other.id == this.id &&
           other.date == this.date &&
-          other.getIn == this.getIn &&
           other.sessionId == this.sessionId);
 }
 
 class PontosCompanion extends UpdateCompanion<Ponto> {
+  final Value<int> id;
   final Value<DateTime> date;
-  final Value<bool> getIn;
   final Value<DateTime> sessionId;
-  final Value<int> rowid;
   const PontosCompanion({
+    this.id = const Value.absent(),
     this.date = const Value.absent(),
-    this.getIn = const Value.absent(),
     this.sessionId = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   PontosCompanion.insert({
+    this.id = const Value.absent(),
     required DateTime date,
-    this.getIn = const Value.absent(),
     required DateTime sessionId,
-    this.rowid = const Value.absent(),
   }) : date = Value(date),
        sessionId = Value(sessionId);
   static Insertable<Ponto> custom({
+    Expression<int>? id,
     Expression<DateTime>? date,
-    Expression<bool>? getIn,
     Expression<DateTime>? sessionId,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (date != null) 'date': date,
-      if (getIn != null) 'get_in': getIn,
       if (sessionId != null) 'session_id': sessionId,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   PontosCompanion copyWith({
+    Value<int>? id,
     Value<DateTime>? date,
-    Value<bool>? getIn,
     Value<DateTime>? sessionId,
-    Value<int>? rowid,
   }) {
     return PontosCompanion(
+      id: id ?? this.id,
       date: date ?? this.date,
-      getIn: getIn ?? this.getIn,
       sessionId: sessionId ?? this.sessionId,
-      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
     if (date.present) {
       map['date'] = Variable<DateTime>(date.value);
     }
-    if (getIn.present) {
-      map['get_in'] = Variable<bool>(getIn.value);
-    }
     if (sessionId.present) {
       map['session_id'] = Variable<DateTime>(sessionId.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -259,10 +241,9 @@ class PontosCompanion extends UpdateCompanion<Ponto> {
   @override
   String toString() {
     return (StringBuffer('PontosCompanion(')
+          ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('getIn: $getIn, ')
-          ..write('sessionId: $sessionId, ')
-          ..write('rowid: $rowid')
+          ..write('sessionId: $sessionId')
           ..write(')'))
         .toString();
   }
@@ -1702,17 +1683,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$PontosTableCreateCompanionBuilder =
     PontosCompanion Function({
+      Value<int> id,
       required DateTime date,
-      Value<bool> getIn,
       required DateTime sessionId,
-      Value<int> rowid,
     });
 typedef $$PontosTableUpdateCompanionBuilder =
     PontosCompanion Function({
+      Value<int> id,
       Value<DateTime> date,
-      Value<bool> getIn,
       Value<DateTime> sessionId,
-      Value<int> rowid,
     });
 
 class $$PontosTableFilterComposer
@@ -1724,13 +1703,13 @@ class $$PontosTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get getIn => $composableBuilder(
-    column: $table.getIn,
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1749,13 +1728,13 @@ class $$PontosTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<DateTime> get date => $composableBuilder(
-    column: $table.date,
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get getIn => $composableBuilder(
-    column: $table.getIn,
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1774,11 +1753,11 @@ class $$PontosTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
-
-  GeneratedColumn<bool> get getIn =>
-      $composableBuilder(column: $table.getIn, builder: (column) => column);
 
   GeneratedColumn<DateTime> get sessionId =>
       $composableBuilder(column: $table.sessionId, builder: (column) => column);
@@ -1812,27 +1791,19 @@ class $$PontosTableTableManager
               () => $$PontosTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<int> id = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
-                Value<bool> getIn = const Value.absent(),
                 Value<DateTime> sessionId = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => PontosCompanion(
-                date: date,
-                getIn: getIn,
-                sessionId: sessionId,
-                rowid: rowid,
-              ),
+              }) => PontosCompanion(id: id, date: date, sessionId: sessionId),
           createCompanionCallback:
               ({
+                Value<int> id = const Value.absent(),
                 required DateTime date,
-                Value<bool> getIn = const Value.absent(),
                 required DateTime sessionId,
-                Value<int> rowid = const Value.absent(),
               }) => PontosCompanion.insert(
+                id: id,
                 date: date,
-                getIn: getIn,
                 sessionId: sessionId,
-                rowid: rowid,
               ),
           withReferenceMapper:
               (p0) =>

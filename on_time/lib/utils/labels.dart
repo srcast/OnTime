@@ -11,4 +11,5 @@ class Labels {
   static const cancel = 'Cancelar';
   static const save = 'Guardar';
   static const today = 'Hoje';
+  static const noPointsDayMsg = 'Sem pontos registados.';
 }

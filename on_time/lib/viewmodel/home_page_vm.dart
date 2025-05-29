@@ -81,11 +81,6 @@ class HomePageViewModel extends ChangeNotifier {
 
     if (selectedDateTime != null) {
       _date = selectedDateTime;
-      var lastPoint = await _pointsService.getLastPointSession(
-        DatesHelper.getSessionFromDate(_date),
-      );
-      bool inState =
-          lastPoint != null ? (lastPoint.getIn ? false : true) : true;
 
       _pointsService.insertPoint(
         PontosCompanion(
@@ -98,7 +93,6 @@ class HomePageViewModel extends ChangeNotifier {
               _date.minute,
             ),
           ), // date without seconds
-          getIn: Value(inState),
           sessionId: Value(DatesHelper.getSessionFromDate(_date)),
         ),
       );
@@ -184,6 +178,32 @@ class HomePageViewModel extends ChangeNotifier {
     _sessionProfit = (_hourValueBase * _sessionMinutes) / 60;
 
     notifyListeners();
+  }
+
+  Future<void> deletePoint(BuildContext context, Ponto pointToDelete) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Apagar'),
+            content: Text('Tem a certeza que quer remover este ponto?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Remover'),
+              ),
+            ],
+          ),
+    );
+
+    if (confirm == true) {
+      _pointsService.deletePoint(pointToDelete);
+      getSessionPoints();
+    }
   }
 
   /*   @override
