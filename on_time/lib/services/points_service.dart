@@ -36,4 +36,9 @@ class PointsService {
   Future<void> deletePoint(Ponto pointToDelete) async {
     (db.delete(db.pontos)..where((p) => p.id.equals(pointToDelete.id))).go();
   }
+
+  Future<int> updatePonto(PontosCompanion pointToUpdate) async {
+    return await (db.update(db.pontos)
+      ..where((p) => p.id.equals(pointToUpdate.id.value))).write(pointToUpdate);
+  }
 }

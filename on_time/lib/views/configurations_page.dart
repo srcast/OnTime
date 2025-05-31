@@ -1,30 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:on_time/utils/colors.dart';
+import 'package:on_time/viewmodel/configurations_page_vm.dart';
 
 class ConfigurationsPage extends StatelessWidget {
-  final List<Map<String, dynamic>> settingsOptions = [
-    {'label': 'Definir valor/hora', 'icon': Icons.euro},
-    {'label': 'Valor/hora dias especiais', 'icon': Icons.star},
-    {'label': 'Gerar relatório PDF', 'icon': Icons.picture_as_pdf},
-    {'label': 'Definir horário padrão', 'icon': Icons.access_time},
-    {'label': 'Notificações', 'icon': Icons.notifications},
-    {'label': 'Sobre a app', 'icon': Icons.info},
-  ];
-
-  ConfigurationsPage({super.key});
+  const ConfigurationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final vm = ConfigurationsPageVM();
+
     return SafeArea(
+      minimum: EdgeInsets.fromLTRB(0, 20, 0, 20),
       child: ListView.separated(
-        itemCount: settingsOptions.length,
+        itemCount: vm.options.length,
         separatorBuilder: (_, __) => Divider(),
         itemBuilder: (context, index) {
-          final item = settingsOptions[index];
+          final option = vm.options[index];
           return ListTile(
-            leading: Icon(item['icon'], color: Colors.blue),
-            title: Text(item['label']),
+            leading: Icon(option.icon, color: AppColors.labelMediumGray),
+            title: Text(option.label),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
+            onTap: () => vm.openConfig(context, option.label),
           );
         },
       ),

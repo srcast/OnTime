@@ -16,12 +16,6 @@ class ActivityCard extends StatelessWidget {
 
     return Column(
       children: [
-        if (getIn && index > 0) ...[
-          SizedBox(height: 10),
-          Center(child: Text(Labels.pause)),
-          SizedBox(height: 10),
-        ],
-
         Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

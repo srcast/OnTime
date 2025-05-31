@@ -4,4 +4,5 @@ class Routes {
   static const String homePage = '/home';
   static const String analysisPage = '/analysis';
   static const String configurationsPage = '/configurations';
+  static const String configDegineHourValuePage = '/config_define_hour_value';
 }

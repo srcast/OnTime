@@ -6,8 +6,9 @@ import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
 import 'package:on_time/services/points_service.dart';
+import 'package:on_time/utils/labels.dart';
 
-class HomePageViewModel extends ChangeNotifier {
+class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
   late DateTime _date;
   late Timer _timer;
@@ -19,7 +20,7 @@ class HomePageViewModel extends ChangeNotifier {
   List<Ponto> _pontos = [];
   final ScrollController _scrollController = ScrollController();
 
-  HomePageViewModel(this._pointsService) {
+  HomePageVM(this._pointsService) {
     timerRunning(true);
     _today = DatesHelper.getDatetimeToday();
     _sessionMinutes = 0;
@@ -185,16 +186,16 @@ class HomePageViewModel extends ChangeNotifier {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('Apagar'),
-            content: Text('Tem a certeza que quer remover este ponto?'),
+            title: Text(Labels.delete),
+            content: Text(Labels.deletePointMsg),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: Text('Cancelar'),
+                child: Text(Labels.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: Text('Remover'),
+                child: Text(Labels.delete),
               ),
             ],
           ),
@@ -202,6 +203,29 @@ class HomePageViewModel extends ChangeNotifier {
 
     if (confirm == true) {
       _pointsService.deletePoint(pointToDelete);
+      getSessionPoints();
+    }
+  }
+
+  Future<void> updatePoint(BuildContext context, Ponto pointToUpdate) async {
+    final dateWithHourUpdate = await showModalBottomSheet<DateTime>(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PointModal(date: pointToUpdate.date, isUpdate: true),
+    );
+
+    if (dateWithHourUpdate != null) {
+      final updatePoint = PontosCompanion(
+        id: Value(pointToUpdate.id),
+        date: Value(dateWithHourUpdate),
+        sessionId: Value(pointToUpdate.sessionId),
+      );
+
+      _pointsService.updatePonto(updatePoint);
+
       getSessionPoints();
     }
   }

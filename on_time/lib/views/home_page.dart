@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<HomePageViewModel>();
+    final vm = context.watch<HomePageVM>();
 
     return SafeArea(
       child: Padding(
@@ -110,35 +110,71 @@ class _HomePage extends State<HomePage> {
                             itemCount: vm.pontos.length,
                             itemBuilder: (context, index) {
                               final ponto = vm.pontos[index];
-                              return Slidable(
-                                key: ValueKey(ponto),
-                                endActionPane: ActionPane(
-                                  motion: const DrawerMotion(),
-                                  extentRatio: 0.4,
-                                  children: [
-                                    SlidableAction(
-                                      onPressed: (_) {
-                                        // lógica de editar
-                                      },
-                                      backgroundColor:
-                                          AppColors.editButtonBackground,
-                                      foregroundColor: AppColors.editButton,
-                                      icon: Icons.edit,
-                                      borderRadius: BorderRadius.circular(12),
+
+                              final bool showPauseLabel =
+                                  index > 0 && index % 2 == 0;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (showPauseLabel)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0,
+                                      ),
+                                      child: Text(
+                                        Labels.pause,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontStyle: FontStyle.italic,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
                                     ),
-                                    SlidableAction(
-                                      onPressed:
-                                          (context) =>
-                                              vm.deletePoint(context, ponto),
-                                      backgroundColor:
-                                          AppColors.deleteButtonBackground,
-                                      foregroundColor: AppColors.deleteButton,
-                                      icon: Icons.delete_outline,
-                                      borderRadius: BorderRadius.circular(12),
+
+                                  Slidable(
+                                    key: ValueKey(ponto),
+                                    endActionPane: ActionPane(
+                                      motion: const DrawerMotion(),
+                                      extentRatio: 0.4,
+                                      children: [
+                                        SlidableAction(
+                                          onPressed:
+                                              (context) => vm.updatePoint(
+                                                context,
+                                                ponto,
+                                              ),
+                                          backgroundColor:
+                                              AppColors.editButtonBackground,
+                                          foregroundColor: AppColors.editButton,
+                                          icon: Icons.edit,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        SlidableAction(
+                                          onPressed:
+                                              (context) => vm.deletePoint(
+                                                context,
+                                                ponto,
+                                              ),
+                                          backgroundColor:
+                                              AppColors.deleteButtonBackground,
+                                          foregroundColor:
+                                              AppColors.deleteButton,
+                                          icon: Icons.delete_outline,
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                child: ActivityCard(ponto: ponto, index: index),
+                                    child: ActivityCard(
+                                      ponto: ponto,
+                                      index: index,
+                                    ),
+                                  ),
+                                ],
                               );
                             },
                           ),

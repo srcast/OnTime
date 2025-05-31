@@ -8,5 +8,5 @@ GetIt locator = GetIt.instance;
 void setup() {
   locator.registerLazySingleton(() => AppDatabase());
   locator.registerLazySingleton(() => PointsService(locator<AppDatabase>()));
-  locator.registerFactory(() => HomePageViewModel(locator<PointsService>()));
+  locator.registerFactory(() => HomePageVM(locator<PointsService>()));
 }

@@ -6,7 +6,8 @@ import 'package:on_time/utils/labels.dart';
 // ignore: must_be_immutable
 class PointModal extends StatefulWidget {
   DateTime date;
-  PointModal({super.key, required this.date});
+  bool isUpdate;
+  PointModal({super.key, required this.date, this.isUpdate = false});
 
   @override
   State<PointModal> createState() => _PointModal();
@@ -14,6 +15,7 @@ class PointModal extends StatefulWidget {
 
 class _PointModal extends State<PointModal> {
   late DateTime selectedDateTime = widget.date;
+  late bool isUpdate = widget.isUpdate;
 
   @override
   void initState() {
@@ -82,10 +84,13 @@ class _PointModal extends State<PointModal> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16),
-          ListTile(
-            leading: Icon(Icons.calendar_today),
-            title: Text(dateFormatted),
-            onTap: _pickDate,
+          Visibility(
+            visible: !isUpdate,
+            child: ListTile(
+              leading: Icon(Icons.calendar_today),
+              title: Text(dateFormatted),
+              onTap: _pickDate,
+            ),
           ),
           ListTile(
             leading: Icon(Icons.access_time),
