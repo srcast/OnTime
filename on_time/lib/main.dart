@@ -3,8 +3,10 @@ import 'package:device_preview/device_preview.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
 import 'package:on_time/router/app_router.dart';
+import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +16,8 @@ void main() async {
 
   setup();
 
+  await locator<ConfigsService>().ensureConfigExists();
+
   runApp(
     MultiProvider(
       providers: [
@@ -22,6 +26,9 @@ void main() async {
           dispose: (context, AppDatabase db) => db.close(),
         ),
         ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
+        ChangeNotifierProvider(
+          create: (_) => locator<DefineHourValueConfigPageVM>(),
+        ),
       ],
       child: DevicePreview(
         builder: (context) {

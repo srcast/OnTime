@@ -4,28 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
+import 'package:on_time/helpers/points_helper.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
+import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
 import 'package:on_time/utils/labels.dart';
 
 class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
+  final ConfigsService _configsService;
   late DateTime _date;
   late Timer _timer;
   bool _timerVisible = true;
   late DateTime _today;
   late int _sessionMinutes;
-  late double _hourValueBase;
+  late double _hourValue;
   late double _sessionProfit;
   List<Ponto> _pontos = [];
   final ScrollController _scrollController = ScrollController();
 
-  HomePageVM(this._pointsService) {
+  HomePageVM(this._pointsService, this._configsService) {
     timerRunning(true);
     _today = DatesHelper.getDatetimeToday();
-    _sessionMinutes = 0;
-    _hourValueBase = 25.43;
-    _sessionProfit = 0;
     getSessionPoints();
   }
 
@@ -44,7 +44,7 @@ class HomePageVM extends ChangeNotifier {
 
   int get sessionMinutes => _sessionMinutes;
 
-  double get hourValueBase => _hourValueBase;
+  double get hourValueBase => _hourValue;
 
   double get sessionProfit => _sessionProfit;
 
@@ -147,8 +147,7 @@ class HomePageVM extends ChangeNotifier {
   Future<void> getSessionPoints() async {
     DateTime session = DatesHelper.getSessionFromDate(_date);
     _pontos = await _pointsService.getPointsSession(session);
-
-    updateDaySummary();
+    await updateDaySummary(session);
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -162,7 +161,7 @@ class HomePageVM extends ChangeNotifier {
     });
   }
 
-  void updateDaySummary() {
+  Future<void> updateDaySummary(DateTime session) async {
     _sessionMinutes = 0;
 
     if (_pontos.length > 1) {
@@ -176,7 +175,33 @@ class HomePageVM extends ChangeNotifier {
       }
     }
 
-    _sessionProfit = (_hourValueBase * _sessionMinutes) / 60;
+    // get value in use
+    _hourValue =
+        (await _configsService.getHourValueInUseFromRules(
+          DateTime.now(),
+          session,
+          _pontos,
+        )) ??
+        0;
+
+    // get profit
+    var valueHourBase = await _configsService.getHourValueBase();
+    var rules = await _configsService.getHourValuePolitics();
+    _sessionProfit = PointsHelper.getSessionProfit(
+      session,
+      sessionMinutes,
+      valueHourBase ?? 0,
+      _pontos,
+      rules,
+    );
+
+    //update session values
+    _pointsService.insertUpdateSession(
+      session,
+      _sessionMinutes,
+      _hourValue,
+      _sessionProfit,
+    );
 
     notifyListeners();
   }

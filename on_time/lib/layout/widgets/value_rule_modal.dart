@@ -1,0 +1,322 @@
+import 'package:drift/drift.dart' as drift;
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/layout/widgets/numeric_keyboard.dart';
+import 'package:on_time/utils/colors.dart';
+import 'package:on_time/utils/common_objs.dart';
+import 'package:on_time/utils/labels.dart';
+
+// ignore: must_be_immutable
+class ValueRuleModal extends StatefulWidget {
+  HourValuePolitic? currentRule;
+  ValueRuleModal({super.key, this.currentRule});
+
+  @override
+  State<ValueRuleModal> createState() => _ValueRuleModal();
+}
+
+class _ValueRuleModal extends State<ValueRuleModal> {
+  late HourValuePolitic? currentRule = widget.currentRule;
+  String? ruleDescription;
+  String? ruleDay;
+  double ruleValue = 0;
+  TimeOfDay? ruleHour;
+  bool isEdit = false;
+  String? ruleValueStr = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (currentRule != null) {
+      isEdit = true;
+      ruleDescription = currentRule?.ruleDescription;
+      ruleDay = currentRule?.dayOffWeek;
+      ruleValue = currentRule!.hourValue!;
+
+      if (ruleDescription == HourValueRules.valueAfterXHoursRule) {
+        ruleHour = TimeOfDay(
+          hour: currentRule!.afterMinutesWorked! ~/ 60,
+          minute: currentRule!.afterMinutesWorked! % 60,
+        );
+      } else if (ruleDescription == HourValueRules.valueAfterXScheduleRule) {
+        ruleHour = TimeOfDay(
+          hour: currentRule!.afterSchedule!.hour,
+          minute: currentRule!.afterSchedule!.minute,
+        );
+      }
+    }
+
+    ruleValueStr = NumberFormat.simpleCurrency(
+      locale: 'pt_PT',
+    ).format(ruleValue);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void openNumericKeyboard(BuildContext context) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            top: 24,
+            left: 16,
+            right: 16,
+          ),
+          child: NumericKeyboard(
+            value: ruleValue.toString(),
+            onSetValue: (value) => setHourValueBase(value),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> setHourValueBase(double val) async {
+    setState(() {
+      ruleValue = val;
+      ruleValueStr = NumberFormat.simpleCurrency(
+        locale: 'pt_PT',
+      ).format(ruleValue);
+    });
+  }
+
+  Future<void> _pickTime(StateSetter setModalState) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: ruleHour ?? TimeOfDay(hour: 0, minute: 0),
+    );
+    if (picked != null) {
+      setModalState(() => ruleHour = picked);
+    }
+  }
+
+  void saveCurrentRule() {
+    late HourValuePoliticsCompanion savedRule;
+    bool canProceed = true;
+
+    if (!ruleDescription.isNullOrEmpty && ruleValue > 0) {
+      if (ruleDescription == HourValueRules.dayWeekRule) {
+        if (!ruleDay.isNullOrEmpty) {
+          savedRule = HourValuePoliticsCompanion(
+            ruleDescription: drift.Value(ruleDescription!),
+            hourValue: drift.Value(ruleValue),
+            dayOffWeek: drift.Value(ruleDay),
+            afterMinutesWorked: drift.Value(0),
+            afterSchedule: drift.Value(null),
+          );
+        } else {
+          canProceed = false;
+        }
+      } else if (ruleDescription == HourValueRules.valueAfterXHoursRule) {
+        if (ruleHour != null) {
+          savedRule = HourValuePoliticsCompanion(
+            ruleDescription: drift.Value(ruleDescription!),
+            hourValue: drift.Value(ruleValue),
+            dayOffWeek: drift.Value(null),
+            afterMinutesWorked: drift.Value(
+              (ruleHour!.hour * 60) + ruleHour!.minute,
+            ),
+            afterSchedule: drift.Value(null),
+          );
+        } else {
+          canProceed = false;
+        }
+      } else if (ruleDescription == HourValueRules.valueAfterXScheduleRule) {
+        if (ruleHour != null) {
+          savedRule = HourValuePoliticsCompanion(
+            ruleDescription: drift.Value(ruleDescription!),
+            hourValue: drift.Value(ruleValue),
+            dayOffWeek: drift.Value(null),
+            afterMinutesWorked: drift.Value(0),
+            afterSchedule: drift.Value(
+              DateTime(0, 1, 1, ruleHour!.hour, ruleHour!.minute),
+            ),
+          );
+        } else {
+          canProceed = false;
+        }
+      }
+    } else {
+      canProceed = false;
+    }
+
+    if (!canProceed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(HourValueRules.newEditRuleWarning),
+          backgroundColor: AppColors.searchBar,
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      Navigator.pop(context, savedRule);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 24,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+      ),
+      child: StatefulBuilder(
+        builder: (context, setModalState) {
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Text(
+                  HourValueRules.newRule,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+
+                // Regra
+                DropdownButtonFormField<String>(
+                  value: ruleDescription,
+                  decoration: InputDecoration(
+                    labelText: HourValueRules.ruleType,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  items:
+                      CommonObjs.hourValueRulesDescriptions
+                          .map(
+                            (regra) => DropdownMenuItem(
+                              value: regra,
+                              child: Text(regra),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) {
+                    setModalState(() => ruleDescription = value);
+                  },
+                ),
+                SizedBox(height: 16),
+
+                // Campo condicional
+                if (ruleDescription == HourValueRules.dayWeekRule) ...[
+                  DropdownButtonFormField<String>(
+                    value: ruleDay,
+                    decoration: InputDecoration(
+                      labelText: HourValueRules.dayOfWeek,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    items:
+                        CommonObjs.daysOfWeek.map((day) {
+                          return DropdownMenuItem(value: day, child: Text(day));
+                        }).toList(),
+                    onChanged: (value) {
+                      setModalState(() => ruleDay = value);
+                    },
+                  ),
+                ] else ...[
+                  InkWell(
+                    onTap: () => _pickTime(setModalState),
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText:
+                            ruleDescription ==
+                                    HourValueRules.valueAfterXHoursRule
+                                ? HourValueRules.afterXHours
+                                : HourValueRules.afterXSchedule,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        ruleHour != null
+                            ? ruleHour!.format(context)
+                            : HourValueRules.selectHour,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
+                SizedBox(height: 16),
+
+                GestureDetector(
+                  onTap: () => openNumericKeyboard(context),
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: HourValueRules.hourValue,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(ruleValueStr!, style: TextStyle(fontSize: 16)),
+                        const Icon(Icons.edit, color: Colors.grey),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        Labels.cancel,
+                        style: TextStyle(color: AppColors.darkGray),
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: () => saveCurrentRule(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.softGreen,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        Labels.save,
+                        style: TextStyle(color: AppColors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

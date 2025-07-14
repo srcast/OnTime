@@ -45,7 +45,7 @@ class AppRouter {
               ),
               GoRoute(
                 path: Routes.configDegineHourValuePage,
-                builder: (context, state) => DefineValorHoraPage(),
+                builder: (context, state) => DefineHourValueConfigPage(),
               ),
             ],
           ),

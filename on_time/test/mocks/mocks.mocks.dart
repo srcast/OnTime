@@ -68,4 +68,21 @@ class MockPointsService extends _i1.Mock implements _i3.PointsService {
             returnValueForMissingStub: _i4.Future<void>.value(),
           )
           as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> deletePoint(_i2.Ponto? pointToDelete) =>
+      (super.noSuchMethod(
+            Invocation.method(#deletePoint, [pointToDelete]),
+            returnValue: _i4.Future<void>.value(),
+            returnValueForMissingStub: _i4.Future<void>.value(),
+          )
+          as _i4.Future<void>);
+
+  @override
+  _i4.Future<int> updatePonto(_i2.PontosCompanion? pointToUpdate) =>
+      (super.noSuchMethod(
+            Invocation.method(#updatePonto, [pointToUpdate]),
+            returnValue: _i4.Future<int>.value(0),
+          )
+          as _i4.Future<int>);
 }

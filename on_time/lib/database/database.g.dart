@@ -1028,6 +1028,17 @@ class $HourValuePoliticsTable extends HourValuePolitics
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _ruleDescriptionMeta = const VerificationMeta(
+    'ruleDescription',
+  );
+  @override
+  late final GeneratedColumn<String> ruleDescription = GeneratedColumn<String>(
+    'rule_description',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _hourValueMeta = const VerificationMeta(
     'hourValue',
   );
@@ -1037,17 +1048,6 @@ class $HourValuePoliticsTable extends HourValuePolitics
     aliasedName,
     true,
     type: DriftSqlType.double,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _percentageMeta = const VerificationMeta(
-    'percentage',
-  );
-  @override
-  late final GeneratedColumn<int> percentage = GeneratedColumn<int>(
-    'percentage',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
   static const VerificationMeta _dayOffWeekMeta = const VerificationMeta(
@@ -1086,8 +1086,8 @@ class $HourValuePoliticsTable extends HourValuePolitics
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    ruleDescription,
     hourValue,
-    percentage,
     dayOffWeek,
     afterMinutesWorked,
     afterSchedule,
@@ -1107,16 +1107,21 @@ class $HourValuePoliticsTable extends HourValuePolitics
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
+    if (data.containsKey('rule_description')) {
+      context.handle(
+        _ruleDescriptionMeta,
+        ruleDescription.isAcceptableOrUnknown(
+          data['rule_description']!,
+          _ruleDescriptionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_ruleDescriptionMeta);
+    }
     if (data.containsKey('hour_value')) {
       context.handle(
         _hourValueMeta,
         hourValue.isAcceptableOrUnknown(data['hour_value']!, _hourValueMeta),
-      );
-    }
-    if (data.containsKey('percentage')) {
-      context.handle(
-        _percentageMeta,
-        percentage.isAcceptableOrUnknown(data['percentage']!, _percentageMeta),
       );
     }
     if (data.containsKey('day_off_week')) {
@@ -1160,13 +1165,14 @@ class $HourValuePoliticsTable extends HourValuePolitics
             DriftSqlType.int,
             data['${effectivePrefix}id'],
           )!,
+      ruleDescription:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}rule_description'],
+          )!,
       hourValue: attachedDatabase.typeMapping.read(
         DriftSqlType.double,
         data['${effectivePrefix}hour_value'],
-      ),
-      percentage: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}percentage'],
       ),
       dayOffWeek: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1192,15 +1198,15 @@ class $HourValuePoliticsTable extends HourValuePolitics
 class HourValuePolitic extends DataClass
     implements Insertable<HourValuePolitic> {
   final int id;
+  final String ruleDescription;
   final double? hourValue;
-  final int? percentage;
   final String? dayOffWeek;
   final int? afterMinutesWorked;
   final DateTime? afterSchedule;
   const HourValuePolitic({
     required this.id,
+    required this.ruleDescription,
     this.hourValue,
-    this.percentage,
     this.dayOffWeek,
     this.afterMinutesWorked,
     this.afterSchedule,
@@ -1209,11 +1215,9 @@ class HourValuePolitic extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    map['rule_description'] = Variable<String>(ruleDescription);
     if (!nullToAbsent || hourValue != null) {
       map['hour_value'] = Variable<double>(hourValue);
-    }
-    if (!nullToAbsent || percentage != null) {
-      map['percentage'] = Variable<int>(percentage);
     }
     if (!nullToAbsent || dayOffWeek != null) {
       map['day_off_week'] = Variable<String>(dayOffWeek);
@@ -1230,14 +1234,11 @@ class HourValuePolitic extends DataClass
   HourValuePoliticsCompanion toCompanion(bool nullToAbsent) {
     return HourValuePoliticsCompanion(
       id: Value(id),
+      ruleDescription: Value(ruleDescription),
       hourValue:
           hourValue == null && nullToAbsent
               ? const Value.absent()
               : Value(hourValue),
-      percentage:
-          percentage == null && nullToAbsent
-              ? const Value.absent()
-              : Value(percentage),
       dayOffWeek:
           dayOffWeek == null && nullToAbsent
               ? const Value.absent()
@@ -1260,8 +1261,8 @@ class HourValuePolitic extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HourValuePolitic(
       id: serializer.fromJson<int>(json['id']),
+      ruleDescription: serializer.fromJson<String>(json['ruleDescription']),
       hourValue: serializer.fromJson<double?>(json['hourValue']),
-      percentage: serializer.fromJson<int?>(json['percentage']),
       dayOffWeek: serializer.fromJson<String?>(json['dayOffWeek']),
       afterMinutesWorked: serializer.fromJson<int?>(json['afterMinutesWorked']),
       afterSchedule: serializer.fromJson<DateTime?>(json['afterSchedule']),
@@ -1272,8 +1273,8 @@ class HourValuePolitic extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'ruleDescription': serializer.toJson<String>(ruleDescription),
       'hourValue': serializer.toJson<double?>(hourValue),
-      'percentage': serializer.toJson<int?>(percentage),
       'dayOffWeek': serializer.toJson<String?>(dayOffWeek),
       'afterMinutesWorked': serializer.toJson<int?>(afterMinutesWorked),
       'afterSchedule': serializer.toJson<DateTime?>(afterSchedule),
@@ -1282,15 +1283,15 @@ class HourValuePolitic extends DataClass
 
   HourValuePolitic copyWith({
     int? id,
+    String? ruleDescription,
     Value<double?> hourValue = const Value.absent(),
-    Value<int?> percentage = const Value.absent(),
     Value<String?> dayOffWeek = const Value.absent(),
     Value<int?> afterMinutesWorked = const Value.absent(),
     Value<DateTime?> afterSchedule = const Value.absent(),
   }) => HourValuePolitic(
     id: id ?? this.id,
+    ruleDescription: ruleDescription ?? this.ruleDescription,
     hourValue: hourValue.present ? hourValue.value : this.hourValue,
-    percentage: percentage.present ? percentage.value : this.percentage,
     dayOffWeek: dayOffWeek.present ? dayOffWeek.value : this.dayOffWeek,
     afterMinutesWorked:
         afterMinutesWorked.present
@@ -1302,9 +1303,11 @@ class HourValuePolitic extends DataClass
   HourValuePolitic copyWithCompanion(HourValuePoliticsCompanion data) {
     return HourValuePolitic(
       id: data.id.present ? data.id.value : this.id,
+      ruleDescription:
+          data.ruleDescription.present
+              ? data.ruleDescription.value
+              : this.ruleDescription,
       hourValue: data.hourValue.present ? data.hourValue.value : this.hourValue,
-      percentage:
-          data.percentage.present ? data.percentage.value : this.percentage,
       dayOffWeek:
           data.dayOffWeek.present ? data.dayOffWeek.value : this.dayOffWeek,
       afterMinutesWorked:
@@ -1322,8 +1325,8 @@ class HourValuePolitic extends DataClass
   String toString() {
     return (StringBuffer('HourValuePolitic(')
           ..write('id: $id, ')
+          ..write('ruleDescription: $ruleDescription, ')
           ..write('hourValue: $hourValue, ')
-          ..write('percentage: $percentage, ')
           ..write('dayOffWeek: $dayOffWeek, ')
           ..write('afterMinutesWorked: $afterMinutesWorked, ')
           ..write('afterSchedule: $afterSchedule')
@@ -1334,8 +1337,8 @@ class HourValuePolitic extends DataClass
   @override
   int get hashCode => Object.hash(
     id,
+    ruleDescription,
     hourValue,
-    percentage,
     dayOffWeek,
     afterMinutesWorked,
     afterSchedule,
@@ -1345,8 +1348,8 @@ class HourValuePolitic extends DataClass
       identical(this, other) ||
       (other is HourValuePolitic &&
           other.id == this.id &&
+          other.ruleDescription == this.ruleDescription &&
           other.hourValue == this.hourValue &&
-          other.percentage == this.percentage &&
           other.dayOffWeek == this.dayOffWeek &&
           other.afterMinutesWorked == this.afterMinutesWorked &&
           other.afterSchedule == this.afterSchedule);
@@ -1354,39 +1357,39 @@ class HourValuePolitic extends DataClass
 
 class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
   final Value<int> id;
+  final Value<String> ruleDescription;
   final Value<double?> hourValue;
-  final Value<int?> percentage;
   final Value<String?> dayOffWeek;
   final Value<int?> afterMinutesWorked;
   final Value<DateTime?> afterSchedule;
   const HourValuePoliticsCompanion({
     this.id = const Value.absent(),
+    this.ruleDescription = const Value.absent(),
     this.hourValue = const Value.absent(),
-    this.percentage = const Value.absent(),
     this.dayOffWeek = const Value.absent(),
     this.afterMinutesWorked = const Value.absent(),
     this.afterSchedule = const Value.absent(),
   });
   HourValuePoliticsCompanion.insert({
     this.id = const Value.absent(),
+    required String ruleDescription,
     this.hourValue = const Value.absent(),
-    this.percentage = const Value.absent(),
     this.dayOffWeek = const Value.absent(),
     this.afterMinutesWorked = const Value.absent(),
     this.afterSchedule = const Value.absent(),
-  });
+  }) : ruleDescription = Value(ruleDescription);
   static Insertable<HourValuePolitic> custom({
     Expression<int>? id,
+    Expression<String>? ruleDescription,
     Expression<double>? hourValue,
-    Expression<int>? percentage,
     Expression<String>? dayOffWeek,
     Expression<int>? afterMinutesWorked,
     Expression<DateTime>? afterSchedule,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (ruleDescription != null) 'rule_description': ruleDescription,
       if (hourValue != null) 'hour_value': hourValue,
-      if (percentage != null) 'percentage': percentage,
       if (dayOffWeek != null) 'day_off_week': dayOffWeek,
       if (afterMinutesWorked != null)
         'after_minutes_worked': afterMinutesWorked,
@@ -1396,16 +1399,16 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
 
   HourValuePoliticsCompanion copyWith({
     Value<int>? id,
+    Value<String>? ruleDescription,
     Value<double?>? hourValue,
-    Value<int?>? percentage,
     Value<String?>? dayOffWeek,
     Value<int?>? afterMinutesWorked,
     Value<DateTime?>? afterSchedule,
   }) {
     return HourValuePoliticsCompanion(
       id: id ?? this.id,
+      ruleDescription: ruleDescription ?? this.ruleDescription,
       hourValue: hourValue ?? this.hourValue,
-      percentage: percentage ?? this.percentage,
       dayOffWeek: dayOffWeek ?? this.dayOffWeek,
       afterMinutesWorked: afterMinutesWorked ?? this.afterMinutesWorked,
       afterSchedule: afterSchedule ?? this.afterSchedule,
@@ -1418,11 +1421,11 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
+    if (ruleDescription.present) {
+      map['rule_description'] = Variable<String>(ruleDescription.value);
+    }
     if (hourValue.present) {
       map['hour_value'] = Variable<double>(hourValue.value);
-    }
-    if (percentage.present) {
-      map['percentage'] = Variable<int>(percentage.value);
     }
     if (dayOffWeek.present) {
       map['day_off_week'] = Variable<String>(dayOffWeek.value);
@@ -1440,8 +1443,8 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
   String toString() {
     return (StringBuffer('HourValuePoliticsCompanion(')
           ..write('id: $id, ')
+          ..write('ruleDescription: $ruleDescription, ')
           ..write('hourValue: $hourValue, ')
-          ..write('percentage: $percentage, ')
           ..write('dayOffWeek: $dayOffWeek, ')
           ..write('afterMinutesWorked: $afterMinutesWorked, ')
           ..write('afterSchedule: $afterSchedule')
@@ -2258,8 +2261,8 @@ typedef $$ConfigurationsTableProcessedTableManager =
 typedef $$HourValuePoliticsTableCreateCompanionBuilder =
     HourValuePoliticsCompanion Function({
       Value<int> id,
+      required String ruleDescription,
       Value<double?> hourValue,
-      Value<int?> percentage,
       Value<String?> dayOffWeek,
       Value<int?> afterMinutesWorked,
       Value<DateTime?> afterSchedule,
@@ -2267,8 +2270,8 @@ typedef $$HourValuePoliticsTableCreateCompanionBuilder =
 typedef $$HourValuePoliticsTableUpdateCompanionBuilder =
     HourValuePoliticsCompanion Function({
       Value<int> id,
+      Value<String> ruleDescription,
       Value<double?> hourValue,
-      Value<int?> percentage,
       Value<String?> dayOffWeek,
       Value<int?> afterMinutesWorked,
       Value<DateTime?> afterSchedule,
@@ -2288,13 +2291,13 @@ class $$HourValuePoliticsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get hourValue => $composableBuilder(
-    column: $table.hourValue,
+  ColumnFilters<String> get ruleDescription => $composableBuilder(
+    column: $table.ruleDescription,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get percentage => $composableBuilder(
-    column: $table.percentage,
+  ColumnFilters<double> get hourValue => $composableBuilder(
+    column: $table.hourValue,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2328,13 +2331,13 @@ class $$HourValuePoliticsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get hourValue => $composableBuilder(
-    column: $table.hourValue,
+  ColumnOrderings<String> get ruleDescription => $composableBuilder(
+    column: $table.ruleDescription,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get percentage => $composableBuilder(
-    column: $table.percentage,
+  ColumnOrderings<double> get hourValue => $composableBuilder(
+    column: $table.hourValue,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2366,13 +2369,13 @@ class $$HourValuePoliticsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<double> get hourValue =>
-      $composableBuilder(column: $table.hourValue, builder: (column) => column);
-
-  GeneratedColumn<int> get percentage => $composableBuilder(
-    column: $table.percentage,
+  GeneratedColumn<String> get ruleDescription => $composableBuilder(
+    column: $table.ruleDescription,
     builder: (column) => column,
   );
+
+  GeneratedColumn<double> get hourValue =>
+      $composableBuilder(column: $table.hourValue, builder: (column) => column);
 
   GeneratedColumn<String> get dayOffWeek => $composableBuilder(
     column: $table.dayOffWeek,
@@ -2437,15 +2440,15 @@ class $$HourValuePoliticsTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String> ruleDescription = const Value.absent(),
                 Value<double?> hourValue = const Value.absent(),
-                Value<int?> percentage = const Value.absent(),
                 Value<String?> dayOffWeek = const Value.absent(),
                 Value<int?> afterMinutesWorked = const Value.absent(),
                 Value<DateTime?> afterSchedule = const Value.absent(),
               }) => HourValuePoliticsCompanion(
                 id: id,
+                ruleDescription: ruleDescription,
                 hourValue: hourValue,
-                percentage: percentage,
                 dayOffWeek: dayOffWeek,
                 afterMinutesWorked: afterMinutesWorked,
                 afterSchedule: afterSchedule,
@@ -2453,15 +2456,15 @@ class $$HourValuePoliticsTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                required String ruleDescription,
                 Value<double?> hourValue = const Value.absent(),
-                Value<int?> percentage = const Value.absent(),
                 Value<String?> dayOffWeek = const Value.absent(),
                 Value<int?> afterMinutesWorked = const Value.absent(),
                 Value<DateTime?> afterSchedule = const Value.absent(),
               }) => HourValuePoliticsCompanion.insert(
                 id: id,
+                ruleDescription: ruleDescription,
                 hourValue: hourValue,
-                percentage: percentage,
                 dayOffWeek: dayOffWeek,
                 afterMinutesWorked: afterMinutesWorked,
                 afterSchedule: afterSchedule,

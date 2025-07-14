@@ -41,4 +41,39 @@ class PointsService {
     return await (db.update(db.pontos)
       ..where((p) => p.id.equals(pointToUpdate.id.value))).write(pointToUpdate);
   }
+
+  Future<void> insertUpdateSession(
+    DateTime sessionDay,
+    int minutesWorked,
+    double hourValue,
+    double profit,
+  ) async {
+    final existing =
+        await (db.select(db.session)
+          ..where((s) => s.day.equals(sessionDay))).get();
+
+    if (existing.isEmpty) {
+      await db
+          .into(db.session)
+          .insert(
+            SessionCompanion.insert(
+              day: sessionDay,
+              minutesWorked: minutesWorked,
+              hourValue: Value(hourValue),
+              profit: Value(profit),
+              workId: Value(''),
+            ),
+          );
+    } else {
+      await (db.update(db.session)
+        ..where((s) => s.day.equals(sessionDay))) // supondo que o id fixo é 1
+      .write(
+        SessionCompanion(
+          minutesWorked: Value(minutesWorked),
+          hourValue: Value(hourValue),
+          profit: Value(profit),
+        ),
+      );
+    }
+  }
 }
