@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/layout/widgets/day_summary.dart';
 import 'package:on_time/utils/labels.dart';
 
-class DaySummary extends StatelessWidget {
+class AnalysisSummary extends StatelessWidget {
   final int minutesWorked;
-  final double hourValue;
   final double profit;
 
-  const DaySummary({
+  const AnalysisSummary({
     super.key,
     required this.minutesWorked,
-    required this.hourValue,
     required this.profit,
   });
 
@@ -28,10 +27,6 @@ class DaySummary extends StatelessWidget {
               '${minutesWorked ~/ 60} h ${minutesWorked % 60} min',
             ),
             summaryRow(
-              Labels.hourValue,
-              '${NumberFormat.simpleCurrency(locale: 'pt-Pt').format(hourValue)}/h',
-            ),
-            summaryRow(
               Labels.profit,
               NumberFormat.simpleCurrency(locale: 'pt-Pt').format(profit),
             ),
@@ -40,14 +35,4 @@ class DaySummary extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget summaryRow(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [Text(label), Text(value)],
-    ),
-  );
 }

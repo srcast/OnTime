@@ -1,0 +1,1 @@
+enum AnalysisMapEntriesEnum { minutesWorked, profit }

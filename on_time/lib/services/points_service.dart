@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/utils/enums.dart';
+import 'package:on_time/utils/labels.dart';
 
 class PointsService {
   final AppDatabase db;
@@ -74,6 +76,104 @@ class PointsService {
           profit: Value(profit),
         ),
       );
+    }
+  }
+
+  Future<SessionData?> getSessionData(DateTime session) async =>
+      await (db.select(db.session)
+            ..where((s) => s.day.equals(session))
+            ..limit(1))
+          .getSingleOrNull();
+
+  Future<Map<DateTime, Map<Enum, dynamic>>> getProfitsAsMap(
+    String mode,
+    DateTime start,
+    DateTime end,
+  ) async {
+    switch (mode) {
+      case AnalysisViewMode.year:
+        final result =
+            await db
+                .customSelect(
+                  '''
+        SELECT strftime('%m', day) AS month, 
+               SUM(profit) AS totalProfit, 
+               SUM(minutes_worked) AS totalMinutes
+        FROM session
+        WHERE day BETWEEN ? AND ?
+        GROUP BY month
+        ORDER BY month
+        ''',
+                  variables: [
+                    Variable.withDateTime(start),
+                    Variable.withDateTime(end),
+                  ],
+                )
+                .get();
+
+        return {
+          for (final row in result)
+            DateTime(start.year, int.parse(row.data['month'] as String)): {
+              AnalysisMapEntriesEnum.profit: row.read<double>('totalProfit'),
+              AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
+                'totalMinutes',
+              ),
+            },
+        };
+
+      case AnalysisViewMode.week:
+        final result =
+            await db
+                .customSelect(
+                  '''
+        SELECT day, profit, minutes_worked
+        FROM session
+        WHERE day BETWEEN ? AND ?
+        ''',
+                  variables: [
+                    Variable.withDateTime(start),
+                    Variable.withDateTime(end),
+                  ],
+                )
+                .get();
+
+        return {
+          for (final row in result)
+            row.read<DateTime>('day'): {
+              AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
+              AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
+                'minutes_worked',
+              ),
+            },
+        };
+
+      case AnalysisViewMode.month:
+      default:
+        final result =
+            await db
+                .customSelect(
+                  '''
+        SELECT day, profit, minutes_worked
+        FROM session
+        WHERE day BETWEEN ? AND ?
+        ORDER BY day
+        ''',
+                  variables: [
+                    Variable.withDateTime(start),
+                    Variable.withDateTime(end),
+                  ],
+                )
+                .get();
+
+        return {
+          for (final row in result)
+            row.read<DateTime>('day'): {
+              AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
+              AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
+                'minutes_worked',
+              ),
+            },
+        };
     }
   }
 }

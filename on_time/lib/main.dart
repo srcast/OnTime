@@ -6,6 +6,7 @@ import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => locator<DefineHourValueConfigPageVM>(),
         ),
+        ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
       ],
       child: DevicePreview(
         builder: (context) {

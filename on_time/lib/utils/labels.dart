@@ -54,3 +54,9 @@ class DaysOfWeek {
   static const saturday = 'Sábado';
   static const sunday = 'Domingo';
 }
+
+class AnalysisViewMode {
+  static const week = 'Semana';
+  static const month = 'Mês';
+  static const year = 'Ano';
+}

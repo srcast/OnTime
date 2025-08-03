@@ -20,7 +20,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.
-  AppDatabase() : super(_openConnection());
+  AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 1;

@@ -69,7 +69,7 @@ class ConfigsService {
     List<Ponto> sessionPoints,
   ) async {
     // first by day
-    String day = CommonObjs.daysOfWeek[sessionDate.weekday];
+    String day = CommonObjs.daysOfWeek[sessionDate.weekday - 1];
     var dayValue =
         await (db.select(db.hourValuePolitics)
               ..where((r) => r.dayOffWeek.equals(day))
@@ -89,6 +89,8 @@ class ConfigsService {
           await (db.select(db.hourValuePolitics)
             ..where((r) => r.afterSchedule.isNotNull())).get();
 
+      List<HourValuePolitic> rulesApplied = [];
+
       for (int i = 0; i < rulesSchedule.length; i++) {
         DateTime regraDateTime = DateTime(
           start.year,
@@ -103,18 +105,25 @@ class ConfigsService {
         }
 
         if (regraDateTime.isAfter(start) && regraDateTime.isBefore(end)) {
-          rulesSchedule[i].copyWith(afterSchedule: Value(regraDateTime));
-        } else {
-          rulesSchedule.remove(rulesSchedule[i]);
-        }
+          //rulesSchedule[i].copyWith(afterSchedule: Value(regraDateTime));
+          rulesApplied.add(
+            HourValuePolitic(
+              id: rulesSchedule[i].id,
+              ruleDescription: rulesSchedule[i].ruleDescription,
+              afterSchedule: regraDateTime,
+            ),
+          );
+        } //else {
+        //   rulesSchedule.remove(rulesSchedule[i]);
+        // }
       }
 
       // desc order
-      if (rulesSchedule.isNotEmpty) {
-        rulesSchedule.sort(
+      if (rulesApplied.isNotEmpty) {
+        rulesApplied.sort(
           (a, b) => b.afterSchedule!.compareTo(a.afterSchedule!),
         );
-        return rulesSchedule[0].hourValue;
+        return rulesApplied[0].hourValue;
       }
     }
 
@@ -124,9 +133,11 @@ class ConfigsService {
     var afterXHours =
         await (db.select(db.hourValuePolitics)
               ..where(
-                (r) => r.afterMinutesWorked.isSmallerOrEqual(
-                  Variable(minWorkedSession),
-                ),
+                (r) =>
+                    r.afterMinutesWorked.isSmallerOrEqual(
+                      Variable(minWorkedSession),
+                    ) &
+                    r.afterMinutesWorked.isBiggerThanValue(0),
               )
               ..orderBy([
                 (r) => OrderingTerm(
@@ -137,7 +148,7 @@ class ConfigsService {
               ..limit(1))
             .getSingleOrNull();
 
-    if (afterXHours != null) return dayValue!.hourValue;
+    if (afterXHours != null) return afterXHours.hourValue;
 
     // base
     return getHourValueBase();

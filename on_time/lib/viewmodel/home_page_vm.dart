@@ -17,16 +17,16 @@ class HomePageVM extends ChangeNotifier {
   late Timer _timer;
   bool _timerVisible = true;
   late DateTime _today;
-  late int _sessionMinutes;
-  late double _hourValue;
-  late double _sessionProfit;
+  int _sessionMinutes = 0;
+  double _hourValue = 0;
+  double _sessionProfit = 0;
   List<Ponto> _pontos = [];
   final ScrollController _scrollController = ScrollController();
 
   HomePageVM(this._pointsService, this._configsService) {
     timerRunning(true);
     _today = DatesHelper.getDatetimeToday();
-    getSessionPoints();
+    getSessionPoints(dataFromSession: true);
   }
 
   // Public Properties
@@ -141,13 +141,14 @@ class HomePageVM extends ChangeNotifier {
       timerRunning(false); // already has notifyListeners
     }
 
-    getSessionPoints();
+    getSessionPoints(dataFromSession: true);
   }
 
-  Future<void> getSessionPoints() async {
-    DateTime session = DatesHelper.getSessionFromDate(_date);
-    _pontos = await _pointsService.getPointsSession(session);
-    await updateDaySummary(session);
+  // just when initializing and change data
+  Future<void> getSessionPoints({bool dataFromSession = false}) async {
+    DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
+    _pontos = await _pointsService.getPointsSession(sessionDate);
+    await updateDaySummary(sessionDate, dataFromSession);
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -161,47 +162,63 @@ class HomePageVM extends ChangeNotifier {
     });
   }
 
-  Future<void> updateDaySummary(DateTime session) async {
+  Future<void> updateDaySummary(
+    DateTime sessionDate,
+    bool dataFromSession,
+  ) async {
     _sessionMinutes = 0;
+    _hourValue = 0;
+    _sessionProfit = 0;
 
-    if (_pontos.length > 1) {
-      for (int i = 1; i < _pontos.length; i += 2) {
-        var outD = _pontos[i].date;
-        var inD = _pontos[i - 1].date;
-        var dif = outD.difference(inD).inMinutes;
+    // when initializing or when date is changed
+    if (dataFromSession) {
+      var session = await _pointsService.getSessionData(sessionDate);
 
-        _sessionMinutes += dif;
-        //_pontos[i].date.difference(_pontos[i - 1].date).inMinutes;
+      if (session != null) {
+        _sessionMinutes = session.minutesWorked;
+        _hourValue = session.hourValue;
+        _sessionProfit = session.profit;
       }
+    } else {
+      if (_pontos.length > 1) {
+        for (int i = 1; i < _pontos.length; i += 2) {
+          var outD = _pontos[i].date;
+          var inD = _pontos[i - 1].date;
+          var dif = outD.difference(inD).inMinutes;
+
+          _sessionMinutes += dif;
+        }
+      }
+
+      // get value in use
+      _hourValue =
+          (await _configsService.getHourValueInUseFromRules(
+            DateTime.now(),
+            sessionDate,
+            _pontos,
+          )) ??
+          0;
+
+      // get profit
+      var valueHourBase = await _configsService.getHourValueBase();
+      var rules = await _configsService.getHourValuePolitics();
+
+      _sessionProfit = PointsHelper.getSessionProfit(
+        sessionDate,
+        sessionMinutes,
+        valueHourBase ?? 0,
+        _pontos,
+        rules,
+      );
+
+      //update session values
+      _pointsService.insertUpdateSession(
+        sessionDate,
+        _sessionMinutes,
+        _hourValue,
+        _sessionProfit,
+      );
     }
-
-    // get value in use
-    _hourValue =
-        (await _configsService.getHourValueInUseFromRules(
-          DateTime.now(),
-          session,
-          _pontos,
-        )) ??
-        0;
-
-    // get profit
-    var valueHourBase = await _configsService.getHourValueBase();
-    var rules = await _configsService.getHourValuePolitics();
-    _sessionProfit = PointsHelper.getSessionProfit(
-      session,
-      sessionMinutes,
-      valueHourBase ?? 0,
-      _pontos,
-      rules,
-    );
-
-    //update session values
-    _pointsService.insertUpdateSession(
-      session,
-      _sessionMinutes,
-      _hourValue,
-      _sessionProfit,
-    );
 
     notifyListeners();
   }
