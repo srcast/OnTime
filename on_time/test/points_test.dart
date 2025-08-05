@@ -296,4 +296,57 @@ void main() {
 
     expect(double.parse(profit.toStringAsFixed(2)), 166.6);
   });
+
+  test('Teste lucro normal sem regras especiais', () async {
+    // depois das 23h
+
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 15, 18, 0),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 15, 21, 45),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 15, 22, 0),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 16, 2, 30),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+
+    final points = await db.select(db.pontos).get();
+    final rules = await db.select(db.hourValuePolitics).get();
+
+    final profit = PointsHelper.getSessionProfit(
+      DateTime(2025, 7, 15),
+      PointsHelper.getMinutesWorkedSession(points),
+      18.33,
+      points,
+      rules,
+    );
+
+    expect(double.parse(profit.toStringAsFixed(2)), 151.22);
+  });
 }

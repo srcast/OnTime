@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/services/points_service.dart';
+import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -16,11 +19,14 @@ class AnalysisPageVM extends ChangeNotifier {
   bool _isLoading = false;
   late DateTime _startDate;
   late DateTime _endDate;
+  List<BarChartGroupData> _barGroups = [];
+  double _maxY = 0;
+  double _stepY = 0;
 
   AnalysisPageVM(this._pointsService) {
     _focusedDate = DateTime.now();
     updateViewMode(AnalysisViewMode.month);
-    _getData();
+    getData();
   }
 
   // Public Properties
@@ -31,17 +37,21 @@ class AnalysisPageVM extends ChangeNotifier {
   String get viewModeTitle => _viewModeTitle;
   bool get isLoading => _isLoading;
   Map<DateTime, Map<Enum, dynamic>> get entries => _entries;
+  List<BarChartGroupData> get barGroups => _barGroups;
+  double get maxY => _maxY;
+  double get stepY => _stepY;
 
   //////////
 
   void updateViewMode(String mode) {
     if (mode != _viewMode) {
-      _focusedDate =
-          DateTime.now(); // better controller when advance and go back in date
+      _focusedDate = DatesHelper.getSessionFromDate(
+        DateTime.now(),
+      ); // better controller when advance and go back in date
       _viewMode = mode;
       _setViewModeTitle();
       handelsStartEndDate();
-      _getData();
+      getData();
     }
   }
 
@@ -92,7 +102,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
     _setViewModeTitle();
     handelsStartEndDate();
-    _getData();
+    getData();
   }
 
   void goBackDate() {
@@ -116,7 +126,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
     _setViewModeTitle();
     handelsStartEndDate();
-    _getData();
+    getData();
   }
 
   void handelsStartEndDate() {
@@ -144,7 +154,7 @@ class AnalysisPageVM extends ChangeNotifier {
     }
   }
 
-  Future<void> _getData() async {
+  Future<void> getData() async {
     _isLoading = true;
 
     _entries = await _pointsService.getProfitsAsMap(
@@ -152,7 +162,12 @@ class AnalysisPageVM extends ChangeNotifier {
       _startDate,
       _endDate,
     );
-    _prepareCalendarOrGraph();
+
+    if (_viewMode != AnalysisViewMode.month) {
+      _prepareGraphEmptyValues();
+      _setBarGroups();
+    }
+
     _updateDaySummary();
 
     _isLoading = false;
@@ -160,7 +175,95 @@ class AnalysisPageVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _prepareCalendarOrGraph() {}
+  void _setBarGroups() {
+    _barGroups = [];
+    _stepY = 0;
+    _maxY = 0;
+    final entriesAux = _entries.entries.toList();
+    entriesAux.sort((a, b) => a.key.compareTo(b.key)); // order by date
+
+    _barGroups = List.generate(entriesAux.length, (index) {
+      final entry = entriesAux[index];
+      final minutes = entry.value[AnalysisMapEntriesEnum.minutesWorked] ?? 0;
+      final hours = minutes / 60;
+
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: hours,
+            width: 20,
+            color: AppColors.strongBlue,
+            borderRadius: BorderRadius.circular(0),
+          ),
+        ],
+      );
+    });
+
+    final yValues = _barGroups.map((e) => e.barRods.first.toY).toList();
+
+    double maxVal =
+        yValues.isNotEmpty ? yValues.reduce((a, b) => a > b ? a : b) : 0;
+
+    _stepY = (maxVal / 5) % 1 == 0 ? maxVal / 5 : (maxVal / 5) + 1;
+    _maxY = stepY * 5;
+
+    // prevent error in graph construction
+    if (_stepY == 0) {
+      _stepY = 1;
+      _maxY = 5;
+    }
+  }
+
+  void _prepareGraphEmptyValues() {
+    var auxInitDate = _startDate;
+
+    // while aux date is before end date
+    while (!auxInitDate.isAfter(_endDate)) {
+      if (!_entries.containsKey(auxInitDate)) {
+        _entries.addAll({
+          auxInitDate: {
+            AnalysisMapEntriesEnum.minutesWorked: 0,
+            AnalysisMapEntriesEnum.profit: 0.0,
+          },
+        });
+      }
+
+      switch (_viewMode) {
+        case AnalysisViewMode.week:
+          auxInitDate = auxInitDate.add(Duration(days: 1));
+          break;
+        case AnalysisViewMode.year:
+          auxInitDate = DateTime(auxInitDate.year, auxInitDate.month + 1, 1);
+          break;
+      }
+    }
+
+    var sortedEntries =
+        _entries.entries.toList()
+          ..sort((a, b) => a.key.compareTo(b.key)); // crescente
+
+    // update entries with ordered keys
+    _entries = {for (var entry in sortedEntries) entry.key: entry.value};
+  }
+
+  String getLabelForIndex(int index) {
+    final entries = _entries.entries.toList();
+    if (index >= entries.length) return '';
+
+    final date = entries[index].key;
+
+    switch (_viewMode) {
+      case AnalysisViewMode.week:
+        // Ex: Seg, Ter, Qua...
+        return DateFormat.EEEEE('pt_PT').format(date);
+      case AnalysisViewMode.year:
+        // Ex: Jan, Fev, Mar...
+        return DateFormat.MMM('pt_PT').format(date);
+      default:
+        return DateFormat.d('pt_PT').format(date); // fallback: dia do mês
+    }
+  }
 
   void _updateDaySummary() {
     _totalMinutes = 0;

@@ -169,6 +169,6 @@ class PointsHelper {
     }
 
     // base
-    return sessionMinutes * valueHourBase;
+    return sessionMinutes * valueHourBase / 60;
   }
 }

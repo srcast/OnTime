@@ -96,7 +96,7 @@ class PointsService {
             await db
                 .customSelect(
                   '''
-        SELECT strftime('%m', day) AS month, 
+        SELECT strftime('%m', day, 'unixepoch') AS month,
                SUM(profit) AS totalProfit, 
                SUM(minutes_worked) AS totalMinutes
         FROM session
@@ -113,12 +113,13 @@ class PointsService {
 
         return {
           for (final row in result)
-            DateTime(start.year, int.parse(row.data['month'] as String)): {
-              AnalysisMapEntriesEnum.profit: row.read<double>('totalProfit'),
-              AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
-                'totalMinutes',
-              ),
-            },
+            if (row.data['month'] != null)
+              DateTime(start.year, int.parse(row.data['month'] as String)): {
+                AnalysisMapEntriesEnum.profit: row.read<double>('totalProfit'),
+                AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
+                  'totalMinutes',
+                ),
+              },
         };
 
       case AnalysisViewMode.week:
@@ -167,12 +168,13 @@ class PointsService {
 
         return {
           for (final row in result)
-            row.read<DateTime>('day'): {
-              AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
-              AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
-                'minutes_worked',
-              ),
-            },
+            if (row.read<int>('minutes_worked') > 0)
+              row.read<DateTime>('day'): {
+                AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
+                AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
+                  'minutes_worked',
+                ),
+              },
         };
     }
   }

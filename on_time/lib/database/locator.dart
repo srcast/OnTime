@@ -4,6 +4,7 @@ import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
+import 'package:on_time/viewmodel/configurations_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 
 GetIt locator = GetIt.instance;
@@ -19,4 +20,5 @@ void setup() {
     () => DefineHourValueConfigPageVM(locator<ConfigsService>()),
   );
   locator.registerFactory(() => AnalysisPageVM(locator<PointsService>()));
+  locator.registerFactory(() => ConfigurationsPageVM());
 }

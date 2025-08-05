@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/layout/widgets/analysis_summary.dart';
 import 'package:on_time/utils/colors.dart';
@@ -169,69 +170,138 @@ class _AnalysisPageState extends State<AnalysisPage> {
 
                 const SizedBox(height: 10),
 
-                if (vm.viewMode == AnalysisViewMode.month)
-                  Expanded(
-                    flex: 1,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: TableCalendar(
-                          locale: "pt-Pt",
-                          firstDay: DateTime.utc(vm.focusedDate.year - 5, 1, 1),
-                          lastDay: DateTime.utc(vm.focusedDate.year, 12, 31),
-                          focusedDay: DateTime(2025, 8, 1),
-                          calendarFormat: CalendarFormat.month,
-                          headerVisible: false,
-                          // daysOfWeekStyle: DaysOfWeekStyle(
-                          //   dowTextFormatter: (date, locale) {},
-                          // ),
-                          calendarStyle: CalendarStyle(
-                            todayDecoration: BoxDecoration(
-                              color: AppColors.softBlue,
-                              shape: BoxShape.circle,
+                vm.viewMode == AnalysisViewMode.month
+                    ? Expanded(
+                      flex: 1,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.topCenter,
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: TableCalendar(
+                            locale: "pt-Pt",
+                            firstDay: DateTime.utc(
+                              vm.focusedDate.year - 5,
+                              1,
+                              1,
                             ),
-                          ),
-                          calendarBuilders: CalendarBuilders(
-                            defaultBuilder: (context, day, _) {
-                              print(day);
-                              final key = DateTime(
-                                day.year,
-                                day.month,
-                                day.day,
-                              );
-                              final value = vm.entries[key];
-                              return Container(
-                                margin: const EdgeInsets.all(4),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 2,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${day.day}',
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    if (value != null)
+                            lastDay: DateTime.utc(vm.focusedDate.year, 12, 31),
+                            focusedDay: DateTime(2025, 8, 1),
+                            calendarFormat: CalendarFormat.month,
+                            headerVisible: false,
+                            // daysOfWeekStyle: DaysOfWeekStyle(
+                            //   dowTextFormatter: (date, locale) {},
+                            // ),
+                            calendarStyle: CalendarStyle(
+                              todayDecoration: BoxDecoration(
+                                color: AppColors.softBlue,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            calendarBuilders: CalendarBuilders(
+                              defaultBuilder: (context, day, _) {
+                                final key = DateTime(
+                                  day.year,
+                                  day.month,
+                                  day.day,
+                                );
+                                final value = vm.entries[key];
+                                return Container(
+                                  margin: const EdgeInsets.all(4),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
                                       Text(
-                                        '${value[AnalysisMapEntriesEnum.minutesWorked] ~/ 60}h${value[AnalysisMapEntriesEnum.minutesWorked] % 60}',
-                                        style: const TextStyle(
-                                          fontSize: 10,
-                                          color: AppColors.strongBlue,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                        '${day.day}',
+                                        style: TextStyle(fontSize: 16),
                                       ),
-                                  ],
-                                ),
-                              );
-                            },
+                                      if (value != null)
+                                        Text(
+                                          '${value[AnalysisMapEntriesEnum.minutesWorked] ~/ 60}h${value[AnalysisMapEntriesEnum.minutesWorked] % 60}',
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: AppColors.strongBlue,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
+                    )
+                    : // case not month
+                    // graph
+                    Expanded(
+                      flex: 1,
+                      child: BarChart(
+                        BarChartData(
+                          barGroups: vm.barGroups,
+                          maxY: vm.maxY,
+                          barTouchData: BarTouchData(
+                            enabled: true,
+                            touchTooltipData: BarTouchTooltipData(
+                              tooltipBgColor: AppColors.white,
+                              tooltipRoundedRadius: 4,
+                              getTooltipItem: (
+                                group,
+                                groupIndex,
+                                rod,
+                                rodIndex,
+                              ) {
+                                final value = rod.toY;
+                                return BarTooltipItem(
+                                  '${value ~/ 1}h${((value % 1) * 60).toStringAsFixed(0)}',
+                                  TextStyle(
+                                    color: AppColors.strongBlue,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          borderData: FlBorderData(show: false),
+                          titlesData: FlTitlesData(
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 40,
+                                interval: vm.stepY,
+                                getTitlesWidget:
+                                    (value, _) => Text('${value.toInt()}h'),
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                getTitlesWidget: (value, _) {
+                                  final index = value.toInt();
+                                  final label = vm.getLabelForIndex(index);
+                                  return Text(
+                                    label,
+                                    style: TextStyle(fontSize: 12),
+                                  );
+                                },
+                              ),
+                            ),
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                          ),
+                          gridData: FlGridData(show: false),
+                        ),
+                      ),
                     ),
-                  ),
                 const SizedBox(height: 10),
 
                 AnalysisSummary(
