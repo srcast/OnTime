@@ -171,4 +171,87 @@ class PointsHelper {
     // base
     return sessionMinutes * valueHourBase / 60;
   }
+
+  static double getHourValueInUseFromRulesTest(
+    DateTime sessionDate,
+    List<Ponto> sessionPoints,
+    List<HourValuePolitic> rules,
+    double hourValueBase,
+  ) {
+    // first by day
+    String day = CommonObjs.daysOfWeek[sessionDate.weekday - 1];
+    var dayValue =
+        (rules.where((r) => r.dayOffWeek == day).toList()
+              ..sort((a, b) => a.id.compareTo(b.id)))
+            .firstOrNull;
+
+    if (dayValue != null) return dayValue.hourValue!;
+
+    // after schedule
+
+    if (sessionPoints.isNotEmpty) {
+      final start = sessionPoints[0].date;
+      final end = sessionPoints.last.date;
+
+      final rulesSchedule =
+          rules.where((r) => r.afterSchedule != null).toList();
+
+      List<HourValuePolitic> rulesApplied = [];
+
+      for (int i = 0; i < rulesSchedule.length; i++) {
+        DateTime regraDateTime = DateTime(
+          start.year,
+          start.month,
+          start.day,
+          rulesSchedule[i].afterSchedule!.hour,
+          rulesSchedule[i].afterSchedule!.minute,
+        );
+
+        if (regraDateTime.isBefore(start)) {
+          regraDateTime = regraDateTime.add(const Duration(days: 1));
+        }
+
+        if (regraDateTime.isAfter(start) && regraDateTime.isBefore(end)) {
+          rulesApplied.add(
+            HourValuePolitic(
+              id: rulesSchedule[i].id,
+              ruleDescription: rulesSchedule[i].ruleDescription,
+              afterSchedule: regraDateTime,
+              hourValue: rulesSchedule[i].hourValue,
+            ),
+          );
+        }
+      }
+
+      // desc order
+      if (rulesApplied.isNotEmpty) {
+        rulesApplied.sort(
+          (a, b) => b.afterSchedule!.compareTo(a.afterSchedule!),
+        );
+        return rulesApplied[0].hourValue!;
+      }
+    }
+
+    // after X hours
+    int minWorkedSession = PointsHelper.getMinutesWorkedSession(sessionPoints);
+
+    var afterXHours =
+        (rules
+                .where(
+                  (r) =>
+                      r.afterMinutesWorked! <= minWorkedSession &&
+                      r.afterMinutesWorked! > 0,
+                )
+                .toList()
+              ..sort(
+                (a, b) =>
+                    b.afterMinutesWorked!.compareTo(a.afterMinutesWorked!),
+              ))
+            .firstOrNull;
+
+    if (afterXHours != null) return afterXHours.hourValue!;
+
+    // base
+    return hourValueBase;
+  }
 }

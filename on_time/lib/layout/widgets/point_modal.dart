@@ -49,7 +49,7 @@ class _PointModal extends State<PointModal> {
   Future<void> _pickTime() async {
     final pickedTime = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(DateTime.now()),
+      initialTime: TimeOfDay.fromDateTime(selectedDateTime),
     );
     if (pickedTime != null) {
       setState(() {

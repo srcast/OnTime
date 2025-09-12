@@ -85,7 +85,7 @@ class PointsService {
             ..limit(1))
           .getSingleOrNull();
 
-  Future<Map<DateTime, Map<Enum, dynamic>>> getProfitsAsMap(
+  Future<Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>>> getProfitsAsMap(
     String mode,
     DateTime start,
     DateTime end,
@@ -96,31 +96,41 @@ class PointsService {
             await db
                 .customSelect(
                   '''
-        SELECT strftime('%m', day, 'unixepoch') AS month,
-               SUM(profit) AS totalProfit, 
-               SUM(minutes_worked) AS totalMinutes
-        FROM session
-        WHERE day BETWEEN ? AND ?
-        GROUP BY month
-        ORDER BY month
-        ''',
+  SELECT day, profit, minutes_worked
+  FROM session
+  WHERE day BETWEEN ? AND ?
+  ORDER BY day
+  ''',
                   variables: [
-                    Variable.withDateTime(start),
-                    Variable.withDateTime(end),
+                    Variable.withInt(start.millisecondsSinceEpoch),
+                    Variable.withInt(end.millisecondsSinceEpoch),
                   ],
                 )
                 .get();
 
-        return {
-          for (final row in result)
-            if (row.data['month'] != null)
-              DateTime(start.year, int.parse(row.data['month'] as String)): {
-                AnalysisMapEntriesEnum.profit: row.read<double>('totalProfit'),
-                AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
-                  'totalMinutes',
-                ),
-              },
-        };
+        final Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>>
+        groupedByMonth = {};
+
+        for (final row in result) {
+          final dayMillis = row.read<int>('day');
+          final date = DateTime.fromMillisecondsSinceEpoch(dayMillis);
+          final monthKey = DateTime(date.year, date.month);
+
+          groupedByMonth.putIfAbsent(
+            monthKey,
+            () => {
+              AnalysisMapEntriesEnum.profit: 0.0,
+              AnalysisMapEntriesEnum.minutesWorked: 0,
+            },
+          );
+
+          groupedByMonth[monthKey]![AnalysisMapEntriesEnum.profit] += row
+              .read<double>('profit');
+          groupedByMonth[monthKey]![AnalysisMapEntriesEnum.minutesWorked] += row
+              .read<int>('minutes_worked');
+        }
+
+        return groupedByMonth;
 
       case AnalysisViewMode.week:
         final result =

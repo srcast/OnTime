@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
+import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
@@ -224,26 +225,16 @@ class HomePageVM extends ChangeNotifier {
   }
 
   Future<void> deletePoint(BuildContext context, Ponto pointToDelete) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(Labels.delete),
-            content: Text(Labels.deletePointMsg),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(Labels.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(Labels.delete),
-              ),
-            ],
-          ),
+    bool response = false;
+    response = await DialogPopup.show(
+      context,
+      title: Labels.delete,
+      message: Labels.deletePointMsg,
+      negativeResponse: Labels.cancel,
+      positiveResponse: Labels.delete,
     );
 
-    if (confirm == true) {
+    if (response) {
       _pointsService.deletePoint(pointToDelete);
       getSessionPoints();
     }

@@ -16,6 +16,8 @@ class Labels {
   static const warning = 'Aviso';
   static const noPointsDayMsg = 'Sem pontos registados.';
   static const deletePointMsg = 'Tem a certeza que pretende apagar este ponto?';
+  static const yes = 'Sim';
+  static const no = 'Não';
 
   static const configsListHourValue = 'Definir Valor/Hora';
   static const configsListNotifications = 'Notificações';
@@ -43,6 +45,8 @@ class HourValueRules {
   static const deleteRuleMsg = 'Tem a certeza que pretende apagar esta regra?';
   static const updateRuleMsg = 'Regra atualizada com sucesso';
   static const insertRuleMsg = 'Regra criada com sucesso';
+  static const unsavedChangesMsg =
+      'Tem dados por Guardar. Pretende continuar sem guardar?';
 }
 
 class DaysOfWeek {

@@ -349,4 +349,42 @@ void main() {
 
     expect(double.parse(profit.toStringAsFixed(2)), 151.22);
   });
+
+  test('Teste valor/hora apos 23h', () async {
+    // depois das 23h
+    await db
+        .into(db.hourValuePolitics)
+        .insert(
+          HourValuePoliticsCompanion.insert(
+            ruleDescription: HourValueRules.valueAfterXScheduleRule,
+            afterSchedule: Value(DateTime(0, 1, 1, 23, 0)),
+            hourValue: Value(20.35),
+          ),
+        );
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 15, 18, 7),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion.insert(
+            date: DateTime(2025, 7, 15, 23, 7),
+            sessionId: DateTime(2025, 7, 15),
+          ),
+        );
+    final points = await db.select(db.pontos).get();
+    final rules = await db.select(db.hourValuePolitics).get();
+    final value = PointsHelper.getHourValueInUseFromRulesTest(
+      DateTime(2025, 7, 15),
+      points,
+      rules,
+      18.33,
+    );
+    expect(20.35, value);
+  });
 }

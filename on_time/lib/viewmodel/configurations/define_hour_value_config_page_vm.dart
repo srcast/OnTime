@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/layout/widgets/value_rule_modal.dart';
 import 'package:on_time/services/configs_service.dart';
@@ -136,30 +138,41 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   }
 
   void deleteRule(BuildContext context, HourValuePolitic rule) async {
-    bool? response = false;
-    response = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(Labels.warning),
-            content: Text(HourValueRules.deleteRuleMsg),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text(Labels.cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text(Labels.delete),
-              ),
-            ],
-          ),
+    bool response = false;
+
+    response = await DialogPopup.show(
+      context,
+      title: Labels.warning,
+      message: HourValueRules.deleteRuleMsg,
+      negativeResponse: Labels.cancel,
+      positiveResponse: Labels.delete,
     );
 
-    if (response!) {
+    if (response) {
       _configsService.deleteRule(rule);
       _rules.remove(rule);
       updateUI();
     }
+  }
+
+  void goBack(BuildContext context) async {
+    if (valueHasChanged) {
+      bool response = await DialogPopup.show(
+        context,
+        title: Labels.warning,
+        message: HourValueRules.unsavedChangesMsg,
+      );
+
+      if (response) {
+        resetUnsavingChanges();
+        context.pop();
+      }
+    } else {
+      context.pop();
+    }
+  }
+
+  void resetUnsavingChanges() {
+    _baseHourValue = _originalBaseHourValue;
   }
 }

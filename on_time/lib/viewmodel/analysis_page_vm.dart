@@ -13,7 +13,7 @@ class AnalysisPageVM extends ChangeNotifier {
   late DateTime _focusedDate;
   int _totalMinutes = 0;
   double _totalProfit = 0;
-  Map<DateTime, Map<Enum, dynamic>> _entries = {};
+  Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>> _entries = {};
   String _viewMode = '';
   String _viewModeTitle = '';
   bool _isLoading = false;
@@ -36,7 +36,7 @@ class AnalysisPageVM extends ChangeNotifier {
   String get viewMode => _viewMode;
   String get viewModeTitle => _viewModeTitle;
   bool get isLoading => _isLoading;
-  Map<DateTime, Map<Enum, dynamic>> get entries => _entries;
+  Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>> get entries => _entries;
   List<BarChartGroupData> get barGroups => _barGroups;
   double get maxY => _maxY;
   double get stepY => _stepY;

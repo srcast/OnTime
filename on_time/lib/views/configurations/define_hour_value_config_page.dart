@@ -21,7 +21,10 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(Labels.configsListHourValue),
-        leading: BackButton(),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => vm.goBack(context),
+        ),
         backgroundColor: AppColors.backgroundLightGray,
         foregroundColor: AppColors.labelMediumGray,
         elevation: 0,
