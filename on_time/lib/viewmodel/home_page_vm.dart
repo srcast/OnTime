@@ -27,7 +27,7 @@ class HomePageVM extends ChangeNotifier {
   HomePageVM(this._pointsService, this._configsService) {
     timerRunning(true);
     _today = DatesHelper.getDatetimeToday();
-    getSessionPoints(dataFromSession: true);
+    getSessionPoints();
   }
 
   // Public Properties
@@ -99,7 +99,7 @@ class HomePageVM extends ChangeNotifier {
         ),
       );
 
-      getSessionPoints();
+      getSessionPoints(updateSession: true);
     }
   }
 
@@ -142,14 +142,17 @@ class HomePageVM extends ChangeNotifier {
       timerRunning(false); // already has notifyListeners
     }
 
-    getSessionPoints(dataFromSession: true);
+    getSessionPoints();
   }
 
   // just when initializing and change data
-  Future<void> getSessionPoints({bool dataFromSession = false}) async {
+  Future<void> getSessionPoints({bool updateSession = false}) async {
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
     _pontos = await _pointsService.getPointsSession(sessionDate);
-    await updateDaySummary(sessionDate, dataFromSession);
+
+    if (updateSession) await updateCurrentSessionData(sessionDate);
+
+    await updateDaySummary(sessionDate);
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -163,62 +166,32 @@ class HomePageVM extends ChangeNotifier {
     });
   }
 
-  Future<void> updateDaySummary(
-    DateTime sessionDate,
-    bool dataFromSession,
-  ) async {
+  Future<void> updateDaySummary(DateTime sessionDate) async {
     _sessionMinutes = 0;
     _hourValue = 0;
     _sessionProfit = 0;
 
-    // when initializing or when date is changed
-    if (dataFromSession) {
-      var session = await _pointsService.getSessionData(sessionDate);
+    var session = await _pointsService.getSessionData(sessionDate);
 
-      if (session != null) {
-        _sessionMinutes = session.minutesWorked;
-        _hourValue = session.hourValue;
-        _sessionProfit = session.profit;
-      }
-    } else {
-      if (_pontos.length > 1) {
-        for (int i = 1; i < _pontos.length; i += 2) {
-          var outD = _pontos[i].date;
-          var inD = _pontos[i - 1].date;
-          var dif = outD.difference(inD).inMinutes;
+    if (session != null) {
+      _sessionMinutes = session.minutesWorked;
+      _sessionProfit = session.profit;
+    }
 
-          _sessionMinutes += dif;
-        }
-      }
-
-      // get value in use
-      _hourValue =
-          (await _configsService.getHourValueInUseFromRules(
-            DateTime.now(),
-            sessionDate,
-            _pontos,
-          )) ??
-          0;
-
-      // get profit
-      var valueHourBase = await _configsService.getHourValueBase();
+    // if we update screen, hour value need to be updated even if there was no point change
+    if (sessionDate == _today) {
       var rules = await _configsService.getHourValuePolitics();
-
-      _sessionProfit = PointsHelper.getSessionProfit(
+      var hourValueBaseFromConfigs = await _configsService.getHourValueBase();
+      // get value in use
+      _hourValue = PointsHelper.getHourValueInUseFromRules(
+        DateTime.now(),
         sessionDate,
-        sessionMinutes,
-        valueHourBase ?? 0,
         _pontos,
         rules,
+        hourValueBaseFromConfigs ?? 0,
       );
-
-      //update session values
-      _pointsService.insertUpdateSession(
-        sessionDate,
-        _sessionMinutes,
-        _hourValue,
-        _sessionProfit,
-      );
+    } else if (session != null) {
+      _hourValue = session.hourValue;
     }
 
     notifyListeners();
@@ -236,7 +209,7 @@ class HomePageVM extends ChangeNotifier {
 
     if (response) {
       _pointsService.deletePoint(pointToDelete);
-      getSessionPoints();
+      getSessionPoints(updateSession: true);
     }
   }
 
@@ -259,8 +232,48 @@ class HomePageVM extends ChangeNotifier {
 
       _pointsService.updatePonto(updatePoint);
 
-      getSessionPoints();
+      getSessionPoints(updateSession: true);
     }
+  }
+
+  Future<void> updateCurrentSessionData(DateTime sessionDate) async {
+    if (_pontos.length > 1) {
+      for (int i = 1; i < _pontos.length; i += 2) {
+        var outD = _pontos[i].date;
+        var inD = _pontos[i - 1].date;
+        var dif = outD.difference(inD).inMinutes;
+
+        _sessionMinutes += dif;
+      }
+    }
+
+    // get value in use
+    var rules = await _configsService.getHourValuePolitics();
+    var hourValueBaseFromConfigs = await _configsService.getHourValueBase();
+
+    _hourValue = PointsHelper.getHourValueInUseFromRules(
+      DateTime.now(),
+      sessionDate,
+      _pontos,
+      rules,
+      hourValueBaseFromConfigs ?? 0,
+    );
+
+    // get profit
+    _sessionProfit = PointsHelper.getSessionProfit(
+      sessionDate,
+      hourValueBaseFromConfigs ?? 0,
+      _pontos,
+      rules,
+    );
+
+    //update session values
+    _pointsService.insertUpdateSession(
+      sessionDate,
+      _sessionMinutes,
+      _hourValue,
+      _sessionProfit,
+    );
   }
 
   /*   @override

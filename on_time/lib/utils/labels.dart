@@ -40,13 +40,14 @@ class HourValueRules {
   static const dayOfWeek = 'Dia da Semana';
   static const afterXSchedule = 'Após X horário';
   static const afterXHours = 'Após X horas de trabalho';
-  static const selectHour = 'Selecionar hora';
+  static const selectSchedule = 'Selecionar horário';
   static const newEditRuleWarning = 'Todos os campos têm que ser preenchidos.';
   static const deleteRuleMsg = 'Tem a certeza que pretende apagar esta regra?';
   static const updateRuleMsg = 'Regra atualizada com sucesso';
   static const insertRuleMsg = 'Regra criada com sucesso';
   static const unsavedChangesMsg =
       'Tem dados por Guardar. Pretende continuar sem guardar?';
+  static const workStartsAt = 'Início do trabalho';
 }
 
 class DaysOfWeek {

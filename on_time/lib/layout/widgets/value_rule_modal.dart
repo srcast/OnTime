@@ -23,6 +23,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
   String? ruleDay;
   double ruleValue = 0;
   TimeOfDay? ruleHour;
+  TimeOfDay? workStartAtSchedule;
   bool isEdit = false;
   String? ruleValueStr = '';
 
@@ -44,6 +45,11 @@ class _ValueRuleModal extends State<ValueRuleModal> {
         ruleHour = TimeOfDay(
           hour: currentRule!.afterSchedule!.hour,
           minute: currentRule!.afterSchedule!.minute,
+        );
+
+        workStartAtSchedule = TimeOfDay(
+          hour: currentRule!.workStartAt!.hour,
+          minute: currentRule!.workStartAt!.minute,
         );
       }
     }
@@ -92,13 +98,21 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     });
   }
 
-  Future<void> _pickTime(StateSetter setModalState) async {
+  Future<void> _pickTime(
+    StateSetter setModalState, {
+    bool isWorkStartSchedule = false,
+  }) async {
     final picked = await showTimePicker(
       context: context,
       initialTime: ruleHour ?? TimeOfDay(hour: 0, minute: 0),
     );
     if (picked != null) {
-      setModalState(() => ruleHour = picked);
+      setModalState(
+        () =>
+            isWorkStartSchedule
+                ? workStartAtSchedule = picked
+                : ruleHour = picked,
+      );
     }
   }
 
@@ -134,7 +148,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
           canProceed = false;
         }
       } else if (ruleDescription == HourValueRules.valueAfterXScheduleRule) {
-        if (ruleHour != null) {
+        if (ruleHour != null && workStartAtSchedule != null) {
           savedRule = HourValuePoliticsCompanion(
             ruleDescription: drift.Value(ruleDescription!),
             hourValue: drift.Value(ruleValue),
@@ -142,6 +156,15 @@ class _ValueRuleModal extends State<ValueRuleModal> {
             afterMinutesWorked: drift.Value(0),
             afterSchedule: drift.Value(
               DateTime(0, 1, 1, ruleHour!.hour, ruleHour!.minute),
+            ),
+            workStartAt: drift.Value(
+              DateTime(
+                0,
+                1,
+                1,
+                workStartAtSchedule!.hour,
+                workStartAtSchedule!.minute,
+              ),
             ),
           );
         } else {
@@ -201,7 +224,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
 
                 // Regra
                 DropdownButtonFormField<String>(
-                  value: ruleDescription,
+                  initialValue: ruleDescription,
                   decoration: InputDecoration(
                     labelText: HourValueRules.ruleType,
                     border: OutlineInputBorder(
@@ -226,7 +249,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                 // Campo condicional
                 if (ruleDescription == HourValueRules.dayWeekRule) ...[
                   DropdownButtonFormField<String>(
-                    value: ruleDay,
+                    initialValue: ruleDay,
                     decoration: InputDecoration(
                       labelText: HourValueRules.dayOfWeek,
                       border: OutlineInputBorder(
@@ -258,13 +281,38 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       child: Text(
                         ruleHour != null
                             ? ruleHour!.format(context)
-                            : HourValueRules.selectHour,
+                            : HourValueRules.selectSchedule,
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
                 ],
                 SizedBox(height: 16),
+
+                // if rule choosen is after schedule, we need to say at what time the work starts
+                if (ruleDescription ==
+                    HourValueRules.valueAfterXScheduleRule) ...[
+                  InkWell(
+                    onTap:
+                        () =>
+                            _pickTime(setModalState, isWorkStartSchedule: true),
+                    child: InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: HourValueRules.workStartsAt,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        ruleHour != null
+                            ? ruleHour!.format(context)
+                            : HourValueRules.selectSchedule,
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
 
                 GestureDetector(
                   onTap: () => openNumericKeyboard(context),

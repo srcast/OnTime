@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
-import 'package:on_time/helpers/points_helper.dart';
-import 'package:on_time/utils/common_objs.dart';
 
 class ConfigsService {
   final AppDatabase db;
@@ -61,96 +59,5 @@ class ConfigsService {
   Future<int> updateRule(HourValuePoliticsCompanion ruleToUpdate) async {
     return await (db.update(db.hourValuePolitics)
       ..where((p) => p.id.equals(ruleToUpdate.id.value))).write(ruleToUpdate);
-  }
-
-  Future<double?> getHourValueInUseFromRules(
-    DateTime now,
-    DateTime sessionDate,
-    List<Ponto> sessionPoints,
-  ) async {
-    // first by day
-    String day = CommonObjs.daysOfWeek[sessionDate.weekday - 1];
-    var dayValue =
-        await (db.select(db.hourValuePolitics)
-              ..where((r) => r.dayOffWeek.equals(day))
-              ..orderBy([(r) => OrderingTerm(expression: r.id)])
-              ..limit(1))
-            .getSingleOrNull();
-
-    if (dayValue != null) return dayValue.hourValue;
-
-    // after schedule
-
-    if (sessionPoints.isNotEmpty) {
-      final start = sessionPoints[0].date;
-      final end = sessionPoints.last.date;
-
-      final rulesSchedule =
-          await (db.select(db.hourValuePolitics)
-            ..where((r) => r.afterSchedule.isNotNull())).get();
-
-      List<HourValuePolitic> rulesApplied = [];
-
-      for (int i = 0; i < rulesSchedule.length; i++) {
-        DateTime regraDateTime = DateTime(
-          start.year,
-          start.month,
-          start.day,
-          rulesSchedule[i].afterSchedule!.hour,
-          rulesSchedule[i].afterSchedule!.minute,
-        );
-
-        if (regraDateTime.isBefore(start)) {
-          regraDateTime = regraDateTime.add(const Duration(days: 1));
-        }
-
-        if (regraDateTime.isAfter(start) && regraDateTime.isBefore(end)) {
-          //rulesSchedule[i].copyWith(afterSchedule: Value(regraDateTime));
-          rulesApplied.add(
-            HourValuePolitic(
-              id: rulesSchedule[i].id,
-              ruleDescription: rulesSchedule[i].ruleDescription,
-              afterSchedule: regraDateTime,
-            ),
-          );
-        } //else {
-        //   rulesSchedule.remove(rulesSchedule[i]);
-        // }
-      }
-
-      // desc order
-      if (rulesApplied.isNotEmpty) {
-        rulesApplied.sort(
-          (a, b) => b.afterSchedule!.compareTo(a.afterSchedule!),
-        );
-        return rulesApplied[0].hourValue;
-      }
-    }
-
-    // after X hours
-    int minWorkedSession = PointsHelper.getMinutesWorkedSession(sessionPoints);
-
-    var afterXHours =
-        await (db.select(db.hourValuePolitics)
-              ..where(
-                (r) =>
-                    r.afterMinutesWorked.isSmallerOrEqual(
-                      Variable(minWorkedSession),
-                    ) &
-                    r.afterMinutesWorked.isBiggerThanValue(0),
-              )
-              ..orderBy([
-                (r) => OrderingTerm(
-                  expression: r.afterMinutesWorked,
-                  mode: OrderingMode.desc,
-                ),
-              ])
-              ..limit(1))
-            .getSingleOrNull();
-
-    if (afterXHours != null) return afterXHours.hourValue;
-
-    // base
-    return getHourValueBase();
   }
 }

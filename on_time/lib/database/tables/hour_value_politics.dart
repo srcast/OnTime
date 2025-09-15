@@ -7,4 +7,6 @@ class HourValuePolitics extends Table {
   TextColumn get dayOffWeek => text().nullable()();
   IntColumn get afterMinutesWorked => integer().nullable()();
   DateTimeColumn get afterSchedule => dateTime().nullable()();
+  DateTimeColumn get workStartAt =>
+      dateTime().nullable()(); // in use with afterSchedule
 }

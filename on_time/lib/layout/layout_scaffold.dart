@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:on_time/router/routes.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
-import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
-import 'package:on_time/viewmodel/configurations_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 

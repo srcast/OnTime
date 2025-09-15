@@ -1083,6 +1083,17 @@ class $HourValuePoliticsTable extends HourValuePolitics
         type: DriftSqlType.dateTime,
         requiredDuringInsert: false,
       );
+  static const VerificationMeta _workStartAtMeta = const VerificationMeta(
+    'workStartAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> workStartAt = GeneratedColumn<DateTime>(
+    'work_start_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1091,6 +1102,7 @@ class $HourValuePoliticsTable extends HourValuePolitics
     dayOffWeek,
     afterMinutesWorked,
     afterSchedule,
+    workStartAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1151,6 +1163,15 @@ class $HourValuePoliticsTable extends HourValuePolitics
         ),
       );
     }
+    if (data.containsKey('work_start_at')) {
+      context.handle(
+        _workStartAtMeta,
+        workStartAt.isAcceptableOrUnknown(
+          data['work_start_at']!,
+          _workStartAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1186,6 +1207,10 @@ class $HourValuePoliticsTable extends HourValuePolitics
         DriftSqlType.dateTime,
         data['${effectivePrefix}after_schedule'],
       ),
+      workStartAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}work_start_at'],
+      ),
     );
   }
 
@@ -1203,6 +1228,7 @@ class HourValuePolitic extends DataClass
   final String? dayOffWeek;
   final int? afterMinutesWorked;
   final DateTime? afterSchedule;
+  final DateTime? workStartAt;
   const HourValuePolitic({
     required this.id,
     required this.ruleDescription,
@@ -1210,6 +1236,7 @@ class HourValuePolitic extends DataClass
     this.dayOffWeek,
     this.afterMinutesWorked,
     this.afterSchedule,
+    this.workStartAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1227,6 +1254,9 @@ class HourValuePolitic extends DataClass
     }
     if (!nullToAbsent || afterSchedule != null) {
       map['after_schedule'] = Variable<DateTime>(afterSchedule);
+    }
+    if (!nullToAbsent || workStartAt != null) {
+      map['work_start_at'] = Variable<DateTime>(workStartAt);
     }
     return map;
   }
@@ -1251,6 +1281,10 @@ class HourValuePolitic extends DataClass
           afterSchedule == null && nullToAbsent
               ? const Value.absent()
               : Value(afterSchedule),
+      workStartAt:
+          workStartAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(workStartAt),
     );
   }
 
@@ -1266,6 +1300,7 @@ class HourValuePolitic extends DataClass
       dayOffWeek: serializer.fromJson<String?>(json['dayOffWeek']),
       afterMinutesWorked: serializer.fromJson<int?>(json['afterMinutesWorked']),
       afterSchedule: serializer.fromJson<DateTime?>(json['afterSchedule']),
+      workStartAt: serializer.fromJson<DateTime?>(json['workStartAt']),
     );
   }
   @override
@@ -1278,6 +1313,7 @@ class HourValuePolitic extends DataClass
       'dayOffWeek': serializer.toJson<String?>(dayOffWeek),
       'afterMinutesWorked': serializer.toJson<int?>(afterMinutesWorked),
       'afterSchedule': serializer.toJson<DateTime?>(afterSchedule),
+      'workStartAt': serializer.toJson<DateTime?>(workStartAt),
     };
   }
 
@@ -1288,6 +1324,7 @@ class HourValuePolitic extends DataClass
     Value<String?> dayOffWeek = const Value.absent(),
     Value<int?> afterMinutesWorked = const Value.absent(),
     Value<DateTime?> afterSchedule = const Value.absent(),
+    Value<DateTime?> workStartAt = const Value.absent(),
   }) => HourValuePolitic(
     id: id ?? this.id,
     ruleDescription: ruleDescription ?? this.ruleDescription,
@@ -1299,6 +1336,7 @@ class HourValuePolitic extends DataClass
             : this.afterMinutesWorked,
     afterSchedule:
         afterSchedule.present ? afterSchedule.value : this.afterSchedule,
+    workStartAt: workStartAt.present ? workStartAt.value : this.workStartAt,
   );
   HourValuePolitic copyWithCompanion(HourValuePoliticsCompanion data) {
     return HourValuePolitic(
@@ -1318,6 +1356,8 @@ class HourValuePolitic extends DataClass
           data.afterSchedule.present
               ? data.afterSchedule.value
               : this.afterSchedule,
+      workStartAt:
+          data.workStartAt.present ? data.workStartAt.value : this.workStartAt,
     );
   }
 
@@ -1329,7 +1369,8 @@ class HourValuePolitic extends DataClass
           ..write('hourValue: $hourValue, ')
           ..write('dayOffWeek: $dayOffWeek, ')
           ..write('afterMinutesWorked: $afterMinutesWorked, ')
-          ..write('afterSchedule: $afterSchedule')
+          ..write('afterSchedule: $afterSchedule, ')
+          ..write('workStartAt: $workStartAt')
           ..write(')'))
         .toString();
   }
@@ -1342,6 +1383,7 @@ class HourValuePolitic extends DataClass
     dayOffWeek,
     afterMinutesWorked,
     afterSchedule,
+    workStartAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -1352,7 +1394,8 @@ class HourValuePolitic extends DataClass
           other.hourValue == this.hourValue &&
           other.dayOffWeek == this.dayOffWeek &&
           other.afterMinutesWorked == this.afterMinutesWorked &&
-          other.afterSchedule == this.afterSchedule);
+          other.afterSchedule == this.afterSchedule &&
+          other.workStartAt == this.workStartAt);
 }
 
 class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
@@ -1362,6 +1405,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
   final Value<String?> dayOffWeek;
   final Value<int?> afterMinutesWorked;
   final Value<DateTime?> afterSchedule;
+  final Value<DateTime?> workStartAt;
   const HourValuePoliticsCompanion({
     this.id = const Value.absent(),
     this.ruleDescription = const Value.absent(),
@@ -1369,6 +1413,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     this.dayOffWeek = const Value.absent(),
     this.afterMinutesWorked = const Value.absent(),
     this.afterSchedule = const Value.absent(),
+    this.workStartAt = const Value.absent(),
   });
   HourValuePoliticsCompanion.insert({
     this.id = const Value.absent(),
@@ -1377,6 +1422,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     this.dayOffWeek = const Value.absent(),
     this.afterMinutesWorked = const Value.absent(),
     this.afterSchedule = const Value.absent(),
+    this.workStartAt = const Value.absent(),
   }) : ruleDescription = Value(ruleDescription);
   static Insertable<HourValuePolitic> custom({
     Expression<int>? id,
@@ -1385,6 +1431,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     Expression<String>? dayOffWeek,
     Expression<int>? afterMinutesWorked,
     Expression<DateTime>? afterSchedule,
+    Expression<DateTime>? workStartAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1394,6 +1441,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
       if (afterMinutesWorked != null)
         'after_minutes_worked': afterMinutesWorked,
       if (afterSchedule != null) 'after_schedule': afterSchedule,
+      if (workStartAt != null) 'work_start_at': workStartAt,
     });
   }
 
@@ -1404,6 +1452,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     Value<String?>? dayOffWeek,
     Value<int?>? afterMinutesWorked,
     Value<DateTime?>? afterSchedule,
+    Value<DateTime?>? workStartAt,
   }) {
     return HourValuePoliticsCompanion(
       id: id ?? this.id,
@@ -1412,6 +1461,7 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
       dayOffWeek: dayOffWeek ?? this.dayOffWeek,
       afterMinutesWorked: afterMinutesWorked ?? this.afterMinutesWorked,
       afterSchedule: afterSchedule ?? this.afterSchedule,
+      workStartAt: workStartAt ?? this.workStartAt,
     );
   }
 
@@ -1436,6 +1486,9 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
     if (afterSchedule.present) {
       map['after_schedule'] = Variable<DateTime>(afterSchedule.value);
     }
+    if (workStartAt.present) {
+      map['work_start_at'] = Variable<DateTime>(workStartAt.value);
+    }
     return map;
   }
 
@@ -1447,7 +1500,8 @@ class HourValuePoliticsCompanion extends UpdateCompanion<HourValuePolitic> {
           ..write('hourValue: $hourValue, ')
           ..write('dayOffWeek: $dayOffWeek, ')
           ..write('afterMinutesWorked: $afterMinutesWorked, ')
-          ..write('afterSchedule: $afterSchedule')
+          ..write('afterSchedule: $afterSchedule, ')
+          ..write('workStartAt: $workStartAt')
           ..write(')'))
         .toString();
   }
@@ -2266,6 +2320,7 @@ typedef $$HourValuePoliticsTableCreateCompanionBuilder =
       Value<String?> dayOffWeek,
       Value<int?> afterMinutesWorked,
       Value<DateTime?> afterSchedule,
+      Value<DateTime?> workStartAt,
     });
 typedef $$HourValuePoliticsTableUpdateCompanionBuilder =
     HourValuePoliticsCompanion Function({
@@ -2275,6 +2330,7 @@ typedef $$HourValuePoliticsTableUpdateCompanionBuilder =
       Value<String?> dayOffWeek,
       Value<int?> afterMinutesWorked,
       Value<DateTime?> afterSchedule,
+      Value<DateTime?> workStartAt,
     });
 
 class $$HourValuePoliticsTableFilterComposer
@@ -2313,6 +2369,11 @@ class $$HourValuePoliticsTableFilterComposer
 
   ColumnFilters<DateTime> get afterSchedule => $composableBuilder(
     column: $table.afterSchedule,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get workStartAt => $composableBuilder(
+    column: $table.workStartAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2355,6 +2416,11 @@ class $$HourValuePoliticsTableOrderingComposer
     column: $table.afterSchedule,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get workStartAt => $composableBuilder(
+    column: $table.workStartAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$HourValuePoliticsTableAnnotationComposer
@@ -2389,6 +2455,11 @@ class $$HourValuePoliticsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get afterSchedule => $composableBuilder(
     column: $table.afterSchedule,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get workStartAt => $composableBuilder(
+    column: $table.workStartAt,
     builder: (column) => column,
   );
 }
@@ -2445,6 +2516,7 @@ class $$HourValuePoliticsTableTableManager
                 Value<String?> dayOffWeek = const Value.absent(),
                 Value<int?> afterMinutesWorked = const Value.absent(),
                 Value<DateTime?> afterSchedule = const Value.absent(),
+                Value<DateTime?> workStartAt = const Value.absent(),
               }) => HourValuePoliticsCompanion(
                 id: id,
                 ruleDescription: ruleDescription,
@@ -2452,6 +2524,7 @@ class $$HourValuePoliticsTableTableManager
                 dayOffWeek: dayOffWeek,
                 afterMinutesWorked: afterMinutesWorked,
                 afterSchedule: afterSchedule,
+                workStartAt: workStartAt,
               ),
           createCompanionCallback:
               ({
@@ -2461,6 +2534,7 @@ class $$HourValuePoliticsTableTableManager
                 Value<String?> dayOffWeek = const Value.absent(),
                 Value<int?> afterMinutesWorked = const Value.absent(),
                 Value<DateTime?> afterSchedule = const Value.absent(),
+                Value<DateTime?> workStartAt = const Value.absent(),
               }) => HourValuePoliticsCompanion.insert(
                 id: id,
                 ruleDescription: ruleDescription,
@@ -2468,6 +2542,7 @@ class $$HourValuePoliticsTableTableManager
                 dayOffWeek: dayOffWeek,
                 afterMinutesWorked: afterMinutesWorked,
                 afterSchedule: afterSchedule,
+                workStartAt: workStartAt,
               ),
           withReferenceMapper:
               (p0) =>
