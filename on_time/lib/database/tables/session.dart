@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 
 class Session extends Table {
-  DateTimeColumn get day => dateTime().unique()();
+  TextColumn get sessionId => text().unique()();
+  DateTimeColumn get day => dateTime()();
   IntColumn get minutesWorked => integer()();
   RealColumn get hourValue => real().withDefault(const Constant(0))();
   RealColumn get profit => real().withDefault(const Constant(0))();

@@ -21,7 +21,8 @@ class HomePageVM extends ChangeNotifier {
   int _sessionMinutes = 0;
   double _hourValue = 0;
   double _sessionProfit = 0;
-  List<Ponto> _pontos = [];
+  List<Ponto> _pointsUI = [];
+  List<Ponto> _pointsSession = [];
   final ScrollController _scrollController = ScrollController();
 
   HomePageVM(this._pointsService, this._configsService) {
@@ -49,7 +50,7 @@ class HomePageVM extends ChangeNotifier {
 
   double get sessionProfit => _sessionProfit;
 
-  List<Ponto> get pontos => _pontos;
+  List<Ponto> get points => _pointsUI;
 
   ScrollController get scrollController => _scrollController;
 
@@ -84,20 +85,7 @@ class HomePageVM extends ChangeNotifier {
     if (selectedDateTime != null) {
       _date = selectedDateTime;
 
-      _pointsService.insertPoint(
-        PontosCompanion(
-          date: Value(
-            DateTime(
-              _date.year,
-              _date.month,
-              _date.day,
-              _date.hour,
-              _date.minute,
-            ),
-          ), // date without seconds
-          sessionId: Value(DatesHelper.getSessionFromDate(_date)),
-        ),
-      );
+      await _pointsService.insertPoint(_date);
 
       getSessionPoints(updateSession: true);
     }
@@ -148,7 +136,8 @@ class HomePageVM extends ChangeNotifier {
   // just when initializing and change data
   Future<void> getSessionPoints({bool updateSession = false}) async {
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
-    _pontos = await _pointsService.getPointsSession(sessionDate);
+    _pointsSession = await _pointsService.getPointsSession(sessionDate);
+    _pointsUI = await _pointsService.getDayPointsForUI(sessionDate);
 
     if (updateSession) await updateCurrentSessionData(sessionDate);
 
@@ -186,7 +175,7 @@ class HomePageVM extends ChangeNotifier {
       _hourValue = PointsHelper.getHourValueInUseFromRules(
         DateTime.now(),
         sessionDate,
-        _pontos,
+        _pointsSession,
         rules,
         hourValueBaseFromConfigs ?? 0,
       );
@@ -208,7 +197,8 @@ class HomePageVM extends ChangeNotifier {
     );
 
     if (response) {
-      _pointsService.deletePoint(pointToDelete);
+      await _pointsService.deletePoint(pointToDelete);
+      await _pointsService.updateSessionPointsCrono(_date);
       getSessionPoints(updateSession: true);
     }
   }
@@ -230,17 +220,19 @@ class HomePageVM extends ChangeNotifier {
         sessionId: Value(pointToUpdate.sessionId),
       );
 
-      _pointsService.updatePonto(updatePoint);
+      await _pointsService.updatePonto(updatePoint);
+      await _pointsService.updateSessionPointsCrono(_date);
 
       getSessionPoints(updateSession: true);
     }
   }
 
   Future<void> updateCurrentSessionData(DateTime sessionDate) async {
-    if (_pontos.length > 1) {
-      for (int i = 1; i < _pontos.length; i += 2) {
-        var outD = _pontos[i].date;
-        var inD = _pontos[i - 1].date;
+    _sessionMinutes = 0;
+    if (_pointsSession.length > 1) {
+      for (int i = 1; i < _pointsSession.length; i += 2) {
+        var outD = _pointsSession[i].date;
+        var inD = _pointsSession[i - 1].date;
         var dif = outD.difference(inD).inMinutes;
 
         _sessionMinutes += dif;
@@ -254,7 +246,7 @@ class HomePageVM extends ChangeNotifier {
     _hourValue = PointsHelper.getHourValueInUseFromRules(
       DateTime.now(),
       sessionDate,
-      _pontos,
+      _pointsSession,
       rules,
       hourValueBaseFromConfigs ?? 0,
     );
@@ -263,12 +255,12 @@ class HomePageVM extends ChangeNotifier {
     _sessionProfit = PointsHelper.getSessionProfit(
       sessionDate,
       hourValueBaseFromConfigs ?? 0,
-      _pontos,
+      _pointsSession,
       rules,
     );
 
     //update session values
-    _pointsService.insertUpdateSession(
+    await _pointsService.insertUpdateSession(
       sessionDate,
       _sessionMinutes,
       _hourValue,

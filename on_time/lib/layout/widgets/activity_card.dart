@@ -12,7 +12,7 @@ class ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool getIn = index % 2 == 0;
+    //bool getIn = index % 2 == 0;
 
     return Column(
       children: [
@@ -22,10 +22,10 @@ class ActivityCard extends StatelessWidget {
           ),
           child: ListTile(
             leading: Icon(
-              getIn ? Icons.login : Icons.logout,
-              color: getIn ? AppColors.softGreen : Colors.red,
+              ponto.getIn ? Icons.login : Icons.logout,
+              color: ponto.getIn ? AppColors.softGreen : Colors.red,
             ),
-            title: Text(getIn ? Labels.getIn : Labels.getOut),
+            title: Text(ponto.getIn ? Labels.getIn : Labels.getOut),
             trailing: Text(
               DatesHelper.getTimeFromDate(ponto.date),
               style: TextStyle(fontSize: 14),

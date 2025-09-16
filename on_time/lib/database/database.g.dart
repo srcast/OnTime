@@ -34,15 +34,27 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
     'sessionId',
   );
   @override
-  late final GeneratedColumn<DateTime> sessionId = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
     'session_id',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _getInMeta = const VerificationMeta('getIn');
   @override
-  List<GeneratedColumn> get $columns => [id, date, sessionId];
+  late final GeneratedColumn<bool> getIn = GeneratedColumn<bool>(
+    'get_in',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("get_in" IN (0, 1))',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, date, sessionId, getIn];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -74,6 +86,14 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
     } else if (isInserting) {
       context.missing(_sessionIdMeta);
     }
+    if (data.containsKey('get_in')) {
+      context.handle(
+        _getInMeta,
+        getIn.isAcceptableOrUnknown(data['get_in']!, _getInMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_getInMeta);
+    }
     return context;
   }
 
@@ -95,8 +115,13 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
           )!,
       sessionId:
           attachedDatabase.typeMapping.read(
-            DriftSqlType.dateTime,
+            DriftSqlType.string,
             data['${effectivePrefix}session_id'],
+          )!,
+      getIn:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}get_in'],
           )!,
     );
   }
@@ -110,14 +135,21 @@ class $PontosTable extends Pontos with TableInfo<$PontosTable, Ponto> {
 class Ponto extends DataClass implements Insertable<Ponto> {
   final int id;
   final DateTime date;
-  final DateTime sessionId;
-  const Ponto({required this.id, required this.date, required this.sessionId});
+  final String sessionId;
+  final bool getIn;
+  const Ponto({
+    required this.id,
+    required this.date,
+    required this.sessionId,
+    required this.getIn,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['date'] = Variable<DateTime>(date);
-    map['session_id'] = Variable<DateTime>(sessionId);
+    map['session_id'] = Variable<String>(sessionId);
+    map['get_in'] = Variable<bool>(getIn);
     return map;
   }
 
@@ -126,6 +158,7 @@ class Ponto extends DataClass implements Insertable<Ponto> {
       id: Value(id),
       date: Value(date),
       sessionId: Value(sessionId),
+      getIn: Value(getIn),
     );
   }
 
@@ -137,7 +170,8 @@ class Ponto extends DataClass implements Insertable<Ponto> {
     return Ponto(
       id: serializer.fromJson<int>(json['id']),
       date: serializer.fromJson<DateTime>(json['date']),
-      sessionId: serializer.fromJson<DateTime>(json['sessionId']),
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      getIn: serializer.fromJson<bool>(json['getIn']),
     );
   }
   @override
@@ -146,20 +180,24 @@ class Ponto extends DataClass implements Insertable<Ponto> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'date': serializer.toJson<DateTime>(date),
-      'sessionId': serializer.toJson<DateTime>(sessionId),
+      'sessionId': serializer.toJson<String>(sessionId),
+      'getIn': serializer.toJson<bool>(getIn),
     };
   }
 
-  Ponto copyWith({int? id, DateTime? date, DateTime? sessionId}) => Ponto(
-    id: id ?? this.id,
-    date: date ?? this.date,
-    sessionId: sessionId ?? this.sessionId,
-  );
+  Ponto copyWith({int? id, DateTime? date, String? sessionId, bool? getIn}) =>
+      Ponto(
+        id: id ?? this.id,
+        date: date ?? this.date,
+        sessionId: sessionId ?? this.sessionId,
+        getIn: getIn ?? this.getIn,
+      );
   Ponto copyWithCompanion(PontosCompanion data) {
     return Ponto(
       id: data.id.present ? data.id.value : this.id,
       date: data.date.present ? data.date.value : this.date,
       sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      getIn: data.getIn.present ? data.getIn.value : this.getIn,
     );
   }
 
@@ -168,58 +206,68 @@ class Ponto extends DataClass implements Insertable<Ponto> {
     return (StringBuffer('Ponto(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('sessionId: $sessionId')
+          ..write('sessionId: $sessionId, ')
+          ..write('getIn: $getIn')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, date, sessionId);
+  int get hashCode => Object.hash(id, date, sessionId, getIn);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Ponto &&
           other.id == this.id &&
           other.date == this.date &&
-          other.sessionId == this.sessionId);
+          other.sessionId == this.sessionId &&
+          other.getIn == this.getIn);
 }
 
 class PontosCompanion extends UpdateCompanion<Ponto> {
   final Value<int> id;
   final Value<DateTime> date;
-  final Value<DateTime> sessionId;
+  final Value<String> sessionId;
+  final Value<bool> getIn;
   const PontosCompanion({
     this.id = const Value.absent(),
     this.date = const Value.absent(),
     this.sessionId = const Value.absent(),
+    this.getIn = const Value.absent(),
   });
   PontosCompanion.insert({
     this.id = const Value.absent(),
     required DateTime date,
-    required DateTime sessionId,
+    required String sessionId,
+    required bool getIn,
   }) : date = Value(date),
-       sessionId = Value(sessionId);
+       sessionId = Value(sessionId),
+       getIn = Value(getIn);
   static Insertable<Ponto> custom({
     Expression<int>? id,
     Expression<DateTime>? date,
-    Expression<DateTime>? sessionId,
+    Expression<String>? sessionId,
+    Expression<bool>? getIn,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (date != null) 'date': date,
       if (sessionId != null) 'session_id': sessionId,
+      if (getIn != null) 'get_in': getIn,
     });
   }
 
   PontosCompanion copyWith({
     Value<int>? id,
     Value<DateTime>? date,
-    Value<DateTime>? sessionId,
+    Value<String>? sessionId,
+    Value<bool>? getIn,
   }) {
     return PontosCompanion(
       id: id ?? this.id,
       date: date ?? this.date,
       sessionId: sessionId ?? this.sessionId,
+      getIn: getIn ?? this.getIn,
     );
   }
 
@@ -233,7 +281,10 @@ class PontosCompanion extends UpdateCompanion<Ponto> {
       map['date'] = Variable<DateTime>(date.value);
     }
     if (sessionId.present) {
-      map['session_id'] = Variable<DateTime>(sessionId.value);
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (getIn.present) {
+      map['get_in'] = Variable<bool>(getIn.value);
     }
     return map;
   }
@@ -243,7 +294,8 @@ class PontosCompanion extends UpdateCompanion<Ponto> {
     return (StringBuffer('PontosCompanion(')
           ..write('id: $id, ')
           ..write('date: $date, ')
-          ..write('sessionId: $sessionId')
+          ..write('sessionId: $sessionId, ')
+          ..write('getIn: $getIn')
           ..write(')'))
         .toString();
   }
@@ -254,6 +306,18 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $SessionTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
   static const VerificationMeta _dayMeta = const VerificationMeta('day');
   @override
   late final GeneratedColumn<DateTime> day = GeneratedColumn<DateTime>(
@@ -262,7 +326,6 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
   static const VerificationMeta _minutesWorkedMeta = const VerificationMeta(
     'minutesWorked',
@@ -308,6 +371,7 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
   );
   @override
   List<GeneratedColumn> get $columns => [
+    sessionId,
     day,
     minutesWorked,
     hourValue,
@@ -326,6 +390,14 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
     if (data.containsKey('day')) {
       context.handle(
         _dayMeta,
@@ -372,6 +444,11 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
   SessionData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SessionData(
+      sessionId:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}session_id'],
+          )!,
       day:
           attachedDatabase.typeMapping.read(
             DriftSqlType.dateTime,
@@ -406,12 +483,14 @@ class $SessionTable extends Session with TableInfo<$SessionTable, SessionData> {
 }
 
 class SessionData extends DataClass implements Insertable<SessionData> {
+  final String sessionId;
   final DateTime day;
   final int minutesWorked;
   final double hourValue;
   final double profit;
   final String? workId;
   const SessionData({
+    required this.sessionId,
     required this.day,
     required this.minutesWorked,
     required this.hourValue,
@@ -421,6 +500,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
     map['day'] = Variable<DateTime>(day);
     map['minutes_worked'] = Variable<int>(minutesWorked);
     map['hour_value'] = Variable<double>(hourValue);
@@ -433,6 +513,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
 
   SessionCompanion toCompanion(bool nullToAbsent) {
     return SessionCompanion(
+      sessionId: Value(sessionId),
       day: Value(day),
       minutesWorked: Value(minutesWorked),
       hourValue: Value(hourValue),
@@ -448,6 +529,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SessionData(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
       day: serializer.fromJson<DateTime>(json['day']),
       minutesWorked: serializer.fromJson<int>(json['minutesWorked']),
       hourValue: serializer.fromJson<double>(json['hourValue']),
@@ -459,6 +541,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
       'day': serializer.toJson<DateTime>(day),
       'minutesWorked': serializer.toJson<int>(minutesWorked),
       'hourValue': serializer.toJson<double>(hourValue),
@@ -468,12 +551,14 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   }
 
   SessionData copyWith({
+    String? sessionId,
     DateTime? day,
     int? minutesWorked,
     double? hourValue,
     double? profit,
     Value<String?> workId = const Value.absent(),
   }) => SessionData(
+    sessionId: sessionId ?? this.sessionId,
     day: day ?? this.day,
     minutesWorked: minutesWorked ?? this.minutesWorked,
     hourValue: hourValue ?? this.hourValue,
@@ -482,6 +567,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   );
   SessionData copyWithCompanion(SessionCompanion data) {
     return SessionData(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
       day: data.day.present ? data.day.value : this.day,
       minutesWorked:
           data.minutesWorked.present
@@ -496,6 +582,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
   @override
   String toString() {
     return (StringBuffer('SessionData(')
+          ..write('sessionId: $sessionId, ')
           ..write('day: $day, ')
           ..write('minutesWorked: $minutesWorked, ')
           ..write('hourValue: $hourValue, ')
@@ -507,11 +594,12 @@ class SessionData extends DataClass implements Insertable<SessionData> {
 
   @override
   int get hashCode =>
-      Object.hash(day, minutesWorked, hourValue, profit, workId);
+      Object.hash(sessionId, day, minutesWorked, hourValue, profit, workId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is SessionData &&
+          other.sessionId == this.sessionId &&
           other.day == this.day &&
           other.minutesWorked == this.minutesWorked &&
           other.hourValue == this.hourValue &&
@@ -520,6 +608,7 @@ class SessionData extends DataClass implements Insertable<SessionData> {
 }
 
 class SessionCompanion extends UpdateCompanion<SessionData> {
+  final Value<String> sessionId;
   final Value<DateTime> day;
   final Value<int> minutesWorked;
   final Value<double> hourValue;
@@ -527,6 +616,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
   final Value<String?> workId;
   final Value<int> rowid;
   const SessionCompanion({
+    this.sessionId = const Value.absent(),
     this.day = const Value.absent(),
     this.minutesWorked = const Value.absent(),
     this.hourValue = const Value.absent(),
@@ -535,15 +625,18 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     this.rowid = const Value.absent(),
   });
   SessionCompanion.insert({
+    required String sessionId,
     required DateTime day,
     required int minutesWorked,
     this.hourValue = const Value.absent(),
     this.profit = const Value.absent(),
     this.workId = const Value.absent(),
     this.rowid = const Value.absent(),
-  }) : day = Value(day),
+  }) : sessionId = Value(sessionId),
+       day = Value(day),
        minutesWorked = Value(minutesWorked);
   static Insertable<SessionData> custom({
+    Expression<String>? sessionId,
     Expression<DateTime>? day,
     Expression<int>? minutesWorked,
     Expression<double>? hourValue,
@@ -552,6 +645,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
       if (day != null) 'day': day,
       if (minutesWorked != null) 'minutes_worked': minutesWorked,
       if (hourValue != null) 'hour_value': hourValue,
@@ -562,6 +656,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
   }
 
   SessionCompanion copyWith({
+    Value<String>? sessionId,
     Value<DateTime>? day,
     Value<int>? minutesWorked,
     Value<double>? hourValue,
@@ -570,6 +665,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
     Value<int>? rowid,
   }) {
     return SessionCompanion(
+      sessionId: sessionId ?? this.sessionId,
       day: day ?? this.day,
       minutesWorked: minutesWorked ?? this.minutesWorked,
       hourValue: hourValue ?? this.hourValue,
@@ -582,6 +678,9 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
     if (day.present) {
       map['day'] = Variable<DateTime>(day.value);
     }
@@ -606,6 +705,7 @@ class SessionCompanion extends UpdateCompanion<SessionData> {
   @override
   String toString() {
     return (StringBuffer('SessionCompanion(')
+          ..write('sessionId: $sessionId, ')
           ..write('day: $day, ')
           ..write('minutesWorked: $minutesWorked, ')
           ..write('hourValue: $hourValue, ')
@@ -1742,13 +1842,15 @@ typedef $$PontosTableCreateCompanionBuilder =
     PontosCompanion Function({
       Value<int> id,
       required DateTime date,
-      required DateTime sessionId,
+      required String sessionId,
+      required bool getIn,
     });
 typedef $$PontosTableUpdateCompanionBuilder =
     PontosCompanion Function({
       Value<int> id,
       Value<DateTime> date,
-      Value<DateTime> sessionId,
+      Value<String> sessionId,
+      Value<bool> getIn,
     });
 
 class $$PontosTableFilterComposer
@@ -1770,8 +1872,13 @@ class $$PontosTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get sessionId => $composableBuilder(
+  ColumnFilters<String> get sessionId => $composableBuilder(
     column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get getIn => $composableBuilder(
+    column: $table.getIn,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1795,8 +1902,13 @@ class $$PontosTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get sessionId => $composableBuilder(
+  ColumnOrderings<String> get sessionId => $composableBuilder(
     column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get getIn => $composableBuilder(
+    column: $table.getIn,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -1816,8 +1928,11 @@ class $$PontosTableAnnotationComposer
   GeneratedColumn<DateTime> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get sessionId =>
+  GeneratedColumn<String> get sessionId =>
       $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
+  GeneratedColumn<bool> get getIn =>
+      $composableBuilder(column: $table.getIn, builder: (column) => column);
 }
 
 class $$PontosTableTableManager
@@ -1850,17 +1965,25 @@ class $$PontosTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
-                Value<DateTime> sessionId = const Value.absent(),
-              }) => PontosCompanion(id: id, date: date, sessionId: sessionId),
+                Value<String> sessionId = const Value.absent(),
+                Value<bool> getIn = const Value.absent(),
+              }) => PontosCompanion(
+                id: id,
+                date: date,
+                sessionId: sessionId,
+                getIn: getIn,
+              ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required DateTime date,
-                required DateTime sessionId,
+                required String sessionId,
+                required bool getIn,
               }) => PontosCompanion.insert(
                 id: id,
                 date: date,
                 sessionId: sessionId,
+                getIn: getIn,
               ),
           withReferenceMapper:
               (p0) =>
@@ -1893,6 +2016,7 @@ typedef $$PontosTableProcessedTableManager =
     >;
 typedef $$SessionTableCreateCompanionBuilder =
     SessionCompanion Function({
+      required String sessionId,
       required DateTime day,
       required int minutesWorked,
       Value<double> hourValue,
@@ -1902,6 +2026,7 @@ typedef $$SessionTableCreateCompanionBuilder =
     });
 typedef $$SessionTableUpdateCompanionBuilder =
     SessionCompanion Function({
+      Value<String> sessionId,
       Value<DateTime> day,
       Value<int> minutesWorked,
       Value<double> hourValue,
@@ -1919,6 +2044,11 @@ class $$SessionTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnFilters<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get day => $composableBuilder(
     column: $table.day,
     builder: (column) => ColumnFilters(column),
@@ -1954,6 +2084,11 @@ class $$SessionTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  ColumnOrderings<String> get sessionId => $composableBuilder(
+    column: $table.sessionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get day => $composableBuilder(
     column: $table.day,
     builder: (column) => ColumnOrderings(column),
@@ -1989,6 +2124,9 @@ class $$SessionTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+  GeneratedColumn<String> get sessionId =>
+      $composableBuilder(column: $table.sessionId, builder: (column) => column);
+
   GeneratedColumn<DateTime> get day =>
       $composableBuilder(column: $table.day, builder: (column) => column);
 
@@ -2038,6 +2176,7 @@ class $$SessionTableTableManager
               () => $$SessionTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<String> sessionId = const Value.absent(),
                 Value<DateTime> day = const Value.absent(),
                 Value<int> minutesWorked = const Value.absent(),
                 Value<double> hourValue = const Value.absent(),
@@ -2045,6 +2184,7 @@ class $$SessionTableTableManager
                 Value<String?> workId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SessionCompanion(
+                sessionId: sessionId,
                 day: day,
                 minutesWorked: minutesWorked,
                 hourValue: hourValue,
@@ -2054,6 +2194,7 @@ class $$SessionTableTableManager
               ),
           createCompanionCallback:
               ({
+                required String sessionId,
                 required DateTime day,
                 required int minutesWorked,
                 Value<double> hourValue = const Value.absent(),
@@ -2061,6 +2202,7 @@ class $$SessionTableTableManager
                 Value<String?> workId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SessionCompanion.insert(
+                sessionId: sessionId,
                 day: day,
                 minutesWorked: minutesWorked,
                 hourValue: hourValue,

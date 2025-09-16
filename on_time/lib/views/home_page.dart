@@ -99,7 +99,7 @@ class _HomePage extends State<HomePage> {
                 children: [
                   SizedBox(height: 10),
 
-                  vm.pontos.isEmpty
+                  vm.points.isEmpty
                       ? Expanded(
                         child: Center(child: Text(Labels.noPointsDayMsg)),
                       )
@@ -107,13 +107,12 @@ class _HomePage extends State<HomePage> {
                         child: SlidableAutoCloseBehavior(
                           child: ListView.builder(
                             controller: vm.scrollController,
-                            itemCount: vm.pontos.length,
+                            itemCount: vm.points.length,
                             itemBuilder: (context, index) {
-                              final ponto = vm.pontos[index];
+                              final ponto = vm.points[index];
 
-                              final bool showPauseLabel =
-                                  index > 0 && index % 2 == 0;
-
+                              final bool showPauseLabel = ponto.getIn;
+                              //aqui se for mudança de sessao acrescentar fim de dia
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
