@@ -9,11 +9,9 @@ class PointsService {
 
   PointsService(this.db);
 
-  Future<List<Ponto>> getPointsSession(DateTime sessionDate) async {
-    var id = GenericHelper.getSessionId(sessionDate);
-
+  Future<List<Ponto>> getPointsSession(String sessionId) async {
     return await (db.select(db.pontos)
-          ..where((p) => p.sessionId.equals(id))
+          ..where((p) => p.sessionId.equals(sessionId))
           ..orderBy([
             (p) => OrderingTerm(expression: p.date, mode: OrderingMode.asc),
           ]))
@@ -45,38 +43,29 @@ class PointsService {
   //       .getSingleOrNull();
   // }
 
-  Future<void> insertPoint(DateTime date) async {
+  Future<String> insertPoint(DateTime date) async {
     try {
       // verify session with last point
-      DateTime interval = date.add(Duration(hours: -6));
+      DateTime interval = date.add(Duration(hours: -10));
 
       var lastPoint =
           await (db.select(db.pontos)
+                ..where((p) => p.date.isSmallerThanValue(date))
                 ..orderBy([(t) => OrderingTerm.desc(t.date)])
                 ..limit(1))
               .getSingleOrNull();
-      bool newSession = true;
+      bool sameSession = false;
       bool getIn = true;
       var sessionId = GenericHelper.getSessionId(date);
-      if (lastPoint != null) {
-        // verify if the last point is more than 6 hours ago -> case of same day and when session goes through 00h
-        newSession = lastPoint.date.isBefore(interval);
 
-        if (newSession) {
-          //verify if last session was closed, if not close it
-          if (lastPoint.getIn) {
-            await db
-                .into(db.pontos)
-                .insert(
-                  PontosCompanion(
-                    date: Value(lastPoint.date),
-                    sessionId: Value(lastPoint.sessionId),
-                    getIn: Value(false),
-                  ),
-                );
-          }
-        } else {
-          sessionId = lastPoint.sessionId;
+      if (lastPoint != null) {
+        // verify if the last point is less than 10 hours ago ant it was get in-> case of same day and when session goes through 00h
+        sameSession =
+            lastPoint.sessionId != sessionId &&
+            !lastPoint.date.isBefore(interval);
+
+        if (sameSession) {
+          sessionId = lastPoint.sessionId; // aqui para dias diferentes
           getIn = !lastPoint.getIn;
         }
       }
@@ -85,32 +74,59 @@ class PointsService {
           .into(db.pontos)
           .insert(
             PontosCompanion(
-              date: Value(date),
+              date: Value(
+                DateTime(
+                  date.year,
+                  date.month,
+                  date.day,
+                  date.hour,
+                  date.minute,
+                ),
+              ), // ignore seconds
               sessionId: Value(sessionId),
               getIn: Value(getIn),
             ),
           );
+
+      return sessionId;
     } catch (e, s) {
       print('Exception details:\n $e');
       print('Stack trace:\n $s');
+      return '';
     }
   }
 
-  Future<void> deletePoint(Ponto pointToDelete) async {
-    (db.delete(db.pontos)..where((p) => p.id.equals(pointToDelete.id))).go();
+  Future<String> deletePoint(Ponto pointToDelete) async {
+    await (db.delete(db.pontos)
+      ..where((p) => p.id.equals(pointToDelete.id))).go();
+
+    return pointToDelete.sessionId;
   }
 
-  Future<int> updatePonto(PontosCompanion pointToUpdate) async {
-    return await (db.update(db.pontos)
-      ..where((p) => p.id.equals(pointToUpdate.id.value))).write(pointToUpdate);
+  Future<String> updatePonto(Ponto pointToUpdate, DateTime newDate) async {
+    // aqui a sessao pode nao ser a mesma -> a data pode ter mudado
+    await (db.update(db.pontos)
+      ..where((p) => p.id.equals(pointToUpdate.id))).write(
+      PontosCompanion(
+        date: Value(
+          DateTime(
+            newDate.year,
+            newDate.month,
+            newDate.day,
+            newDate.hour,
+            newDate.minute,
+          ),
+        ),
+      ),
+    );
+
+    return pointToUpdate.sessionId;
   }
 
-  Future<void> updateSessionPointsCrono(DateTime sessionDate) async {
-    var id = GenericHelper.getSessionId(sessionDate);
-
+  Future<void> updateSessionPointsCrono(String sessionId) async {
     var points =
         await (db.select(db.pontos)
-              ..where((p) => p.sessionId.equals(id))
+              ..where((p) => p.sessionId.equals(sessionId))
               ..orderBy([
                 (p) => OrderingTerm(expression: p.date, mode: OrderingMode.asc),
               ]))
@@ -128,23 +144,22 @@ class PointsService {
   }
 
   Future<void> insertUpdateSession(
+    String sessionId,
     DateTime sessionDate,
     int minutesWorked,
     double hourValue,
     double profit,
   ) async {
-    var id = GenericHelper.getSessionId(sessionDate);
-
     final existing =
         await (db.select(db.session)
-          ..where((s) => s.sessionId.equals(id))).get();
+          ..where((s) => s.sessionId.equals(sessionId))).get();
 
     if (existing.isEmpty) {
       await db
           .into(db.session)
           .insert(
             SessionCompanion.insert(
-              sessionId: id,
+              sessionId: sessionId,
               day: sessionDate,
               minutesWorked: minutesWorked,
               hourValue: Value(hourValue),
@@ -153,8 +168,9 @@ class PointsService {
             ),
           );
     } else {
-      await (db.update(db.session)
-        ..where((s) => s.sessionId.equals(id))) // supondo que o id fixo é 1
+      await (db.update(db.session)..where(
+        (s) => s.sessionId.equals(sessionId),
+      )) // supondo que o id fixo é 1
       .write(
         SessionCompanion(
           minutesWorked: Value(minutesWorked),
@@ -165,9 +181,9 @@ class PointsService {
     }
   }
 
-  Future<SessionData?> getSessionData(DateTime session) async =>
+  Future<SessionData?> getSessionData(String sessionId) async =>
       await (db.select(db.session)
-            ..where((s) => s.day.equals(session))
+            ..where((s) => s.sessionId.equals(sessionId))
             ..limit(1))
           .getSingleOrNull();
 

@@ -13,7 +13,7 @@ class ConfigurationsPage extends StatelessWidget {
       minimum: EdgeInsets.fromLTRB(0, 20, 0, 20),
       child: ListView.separated(
         itemCount: vm.options.length,
-        separatorBuilder: (_, __) => Divider(),
+        separatorBuilder: (_, _) => Divider(),
         itemBuilder: (context, index) {
           final option = vm.options[index];
           return ListTile(

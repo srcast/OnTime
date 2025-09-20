@@ -104,7 +104,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
             Expanded(
               child: ListView.separated(
                 itemCount: vm.rules.length,
-                separatorBuilder: (_, __) => SizedBox(height: 12),
+                separatorBuilder: (_, _) => SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final regra = vm.rules[index];
                   return Container(

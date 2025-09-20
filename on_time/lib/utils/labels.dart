@@ -6,6 +6,7 @@ class Labels {
   static const getOut = 'Saída';
   static const pause = 'Pausa';
   static const hours = 'Horas';
+  static const workBegins = 'Início de Trabalho';
   static const hourValue = 'Valor/Hora';
   static const profit = 'Ganhos';
   static const cancel = 'Cancelar';

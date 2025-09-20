@@ -111,18 +111,25 @@ class _HomePage extends State<HomePage> {
                             itemBuilder: (context, index) {
                               final ponto = vm.points[index];
 
-                              final bool showPauseLabel = ponto.getIn;
+                              final bool showText = ponto.getIn && index > 0;
+                              final String textToShow =
+                                  showText
+                                      ? (ponto.sessionId !=
+                                              vm.points[index - 1].sessionId
+                                          ? Labels.workBegins
+                                          : Labels.pause)
+                                      : '';
                               //aqui se for mudança de sessao acrescentar fim de dia
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  if (showPauseLabel)
+                                  if (showText)
                                     Padding(
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 8.0,
                                       ),
                                       child: Text(
-                                        Labels.pause,
+                                        textToShow,
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontStyle: FontStyle.italic,

@@ -247,8 +247,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
                           barTouchData: BarTouchData(
                             enabled: true,
                             touchTooltipData: BarTouchTooltipData(
-                              tooltipBgColor: AppColors.white,
-                              tooltipRoundedRadius: 4,
+                              // tooltipBgColor: AppColors.white,
+                              // tooltipRoundedRadius: 4,
                               getTooltipItem: (
                                 group,
                                 groupIndex,

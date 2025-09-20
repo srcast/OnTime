@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
@@ -14,15 +14,17 @@ import 'package:on_time/utils/labels.dart';
 class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
   final ConfigsService _configsService;
-  late DateTime _date;
+  late DateTime _date; // date selected in screen
   late Timer _timer;
   bool _timerVisible = true;
-  late DateTime _today;
+  late DateTime _today; // current day
   int _sessionMinutes = 0;
   double _hourValue = 0;
   double _sessionProfit = 0;
-  List<Ponto> _pointsUI = [];
-  List<Ponto> _pointsSession = [];
+  List<Ponto> _pointsUI =
+      []; // points of the day -> its used to show on screen day's points. It can has points from diferent sessions
+  List<Ponto> _pointsSession =
+      []; // points for the session -> its used to update summary
   final ScrollController _scrollController = ScrollController();
 
   HomePageVM(this._pointsService, this._configsService) {
@@ -85,9 +87,11 @@ class HomePageVM extends ChangeNotifier {
     if (selectedDateTime != null) {
       _date = selectedDateTime;
 
-      await _pointsService.insertPoint(_date);
+      var sessionIdToUpdate = await _pointsService.insertPoint(_date);
+      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+      await updateCurrentSessionData(sessionIdToUpdate);
 
-      getSessionPoints(updateSession: true);
+      getSessionPoints();
     }
   }
 
@@ -134,14 +138,13 @@ class HomePageVM extends ChangeNotifier {
   }
 
   // just when initializing and change data
-  Future<void> getSessionPoints({bool updateSession = false}) async {
+  Future<void> getSessionPoints() async {
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
-    _pointsSession = await _pointsService.getPointsSession(sessionDate);
+    String sessionId = GenericHelper.getSessionId(sessionDate);
+    _pointsSession = await _pointsService.getPointsSession(sessionId);
     _pointsUI = await _pointsService.getDayPointsForUI(sessionDate);
 
-    if (updateSession) await updateCurrentSessionData(sessionDate);
-
-    await updateDaySummary(sessionDate);
+    await updateDaySummary(sessionDate, sessionId);
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -155,12 +158,12 @@ class HomePageVM extends ChangeNotifier {
     });
   }
 
-  Future<void> updateDaySummary(DateTime sessionDate) async {
+  Future<void> updateDaySummary(DateTime sessionDate, String sessionId) async {
     _sessionMinutes = 0;
     _hourValue = 0;
     _sessionProfit = 0;
 
-    var session = await _pointsService.getSessionData(sessionDate);
+    var session = await _pointsService.getSessionData(sessionId);
 
     if (session != null) {
       _sessionMinutes = session.minutesWorked;
@@ -197,9 +200,10 @@ class HomePageVM extends ChangeNotifier {
     );
 
     if (response) {
-      await _pointsService.deletePoint(pointToDelete);
-      await _pointsService.updateSessionPointsCrono(_date);
-      getSessionPoints(updateSession: true);
+      var sessionIdToUpdate = await _pointsService.deletePoint(pointToDelete);
+      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+      await updateCurrentSessionData(sessionIdToUpdate);
+      getSessionPoints();
     }
   }
 
@@ -214,20 +218,20 @@ class HomePageVM extends ChangeNotifier {
     );
 
     if (dateWithHourUpdate != null) {
-      final updatePoint = PontosCompanion(
-        id: Value(pointToUpdate.id),
-        date: Value(dateWithHourUpdate),
-        sessionId: Value(pointToUpdate.sessionId),
+      var sessionIdToUpdate = await _pointsService.updatePonto(
+        pointToUpdate,
+        dateWithHourUpdate,
       );
-
-      await _pointsService.updatePonto(updatePoint);
-      await _pointsService.updateSessionPointsCrono(_date);
-
-      getSessionPoints(updateSession: true);
+      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+      await updateCurrentSessionData(sessionIdToUpdate);
+      getSessionPoints();
     }
   }
 
-  Future<void> updateCurrentSessionData(DateTime sessionDate) async {
+  Future<void> updateCurrentSessionData(String sessionId) async {
+    var sessionData = await _pointsService.getSessionData(sessionId);
+    _pointsSession = await _pointsService.getPointsSession(sessionId);
+
     _sessionMinutes = 0;
     if (_pointsSession.length > 1) {
       for (int i = 1; i < _pointsSession.length; i += 2) {
@@ -245,7 +249,7 @@ class HomePageVM extends ChangeNotifier {
 
     _hourValue = PointsHelper.getHourValueInUseFromRules(
       DateTime.now(),
-      sessionDate,
+      sessionData!.day,
       _pointsSession,
       rules,
       hourValueBaseFromConfigs ?? 0,
@@ -253,7 +257,7 @@ class HomePageVM extends ChangeNotifier {
 
     // get profit
     _sessionProfit = PointsHelper.getSessionProfit(
-      sessionDate,
+      sessionData.day,
       hourValueBaseFromConfigs ?? 0,
       _pointsSession,
       rules,
@@ -261,7 +265,8 @@ class HomePageVM extends ChangeNotifier {
 
     //update session values
     await _pointsService.insertUpdateSession(
-      sessionDate,
+      sessionId,
+      sessionData.day,
       _sessionMinutes,
       _hourValue,
       _sessionProfit,
