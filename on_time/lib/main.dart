@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/colors.dart';
@@ -46,15 +48,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-    locale: DevicePreview.locale(context),
+    locale: const Locale('pt', 'PT'),
+    //locale: DevicePreview.locale(context),
     builder: DevicePreview.appBuilder,
     routerConfig: AppRouter.router,
     debugShowCheckedModeBanner: false,
-    theme: ThemeData(
-      scaffoldBackgroundColor: AppColors.backgroundLightGray,
-      splashColor:
-          Colors
-              .transparent, // remove animation when clicking button on navigation bar
-    ),
+    // theme: ThemeData(
+    //   scaffoldBackgroundColor: AppColors.backgroundLightGray,
+    //   splashColor:
+    //       Colors
+    //           .transparent, // remove animation when clicking button on navigation bar
+    // ),
+    supportedLocales: const [Locale('pt', 'PT'), Locale('en')],
+    localizationsDelegates: const [
+      GlobalMaterialLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ],
+    theme: lightTheme,
+    darkTheme: darkTheme,
+    themeMode: ThemeMode.system,
   );
 }

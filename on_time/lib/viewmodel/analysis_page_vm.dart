@@ -274,6 +274,16 @@ class AnalysisPageVM extends ChangeNotifier {
     });
   }
 
+  void goToSelectedDay(BuildContext context, DateTime selectedDay) {
+    // context.go('/home', extra: selectedDay);
+
+    // final layoutState = context.findAncestorStateOfType<_LayoutScaffoldState>();
+    // layoutState?.goToTab(
+    //   0,
+    //   selectedDay: selectedDay,
+    // ); // vai para Home e foca no dia
+  }
+
   /*   @override
   void dispose() {
     _timer.cancel();

@@ -21,7 +21,11 @@ class Labels {
   static const no = 'Não';
 
   static const configsListHourValue = 'Definir Valor/Hora';
+  static const configsInfo = 'Informação';
   static const configsListNotifications = 'Notificações';
+  static const appVersion = 'Versão';
+  static const lastUpdate = 'Última atualização';
+  static const lastUpdateDate = '22/09/2025';
 
   // value hour configs
   static const valuesRuleAfterXHour = 'Valor após Hora X';

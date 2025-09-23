@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +33,13 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
     _currentIndex = widget.navigationShell.currentIndex;
   }
 
+  void goToHomePage(DateTime selectedDay) {
+    final index = destinations.indexWhere((d) => d.label == Labels.homeTab);
+    context.read<HomePageVM>().refreshDayFromCalendarAnalysis(selectedDay);
+    setState(() => _currentIndex = index);
+    widget.navigationShell.goBranch(index);
+  }
+
   void _onDestinationSelected(int index) {
     if (index == _currentIndex) {
       if (index == 2 && Navigator.canPop(context)) {
@@ -40,10 +48,7 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
       }
     } else {
       _onTabReselected[index]?.call();
-
-      setState(() {
-        _currentIndex = index;
-      });
+      setState(() => _currentIndex = index);
       widget.navigationShell.goBranch(index);
     }
   }

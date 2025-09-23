@@ -53,9 +53,13 @@ class _ValueRuleModal extends State<ValueRuleModal> {
         );
       }
     }
+  }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     ruleValueStr = NumberFormat.simpleCurrency(
-      locale: 'pt_PT',
+      locale: Localizations.localeOf(context).toString(),
     ).format(ruleValue);
   }
 
@@ -68,7 +72,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -93,7 +97,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     setState(() {
       ruleValue = val;
       ruleValueStr = NumberFormat.simpleCurrency(
-        locale: 'pt_PT',
+        locale: Localizations.localeOf(context).toString(),
       ).format(ruleValue);
     });
   }

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
@@ -200,13 +201,10 @@ class PointsService {
                   '''
   SELECT day, profit, minutes_worked
   FROM session
-  WHERE day BETWEEN ? AND ?
+  WHERE session_id LIKE ?
   ORDER BY day
   ''',
-                  variables: [
-                    Variable.withInt(start.millisecondsSinceEpoch),
-                    Variable.withInt(end.millisecondsSinceEpoch),
-                  ],
+                  variables: [Variable.withString('${start.year}%')],
                 )
                 .get();
 
@@ -214,8 +212,7 @@ class PointsService {
         groupedByMonth = {};
 
         for (final row in result) {
-          final dayMillis = row.read<int>('day');
-          final date = DateTime.fromMillisecondsSinceEpoch(dayMillis);
+          final date = row.read<DateTime>('day');
           final monthKey = DateTime(date.year, date.month);
 
           groupedByMonth.putIfAbsent(
@@ -281,7 +278,7 @@ class PointsService {
         return {
           for (final row in result)
             if (row.read<int>('minutes_worked') > 0)
-              row.read<DateTime>('day'): {
+              DatesHelper.getSessionFromDate(row.read<DateTime>('day')): {
                 AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
                 AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
                   'minutes_worked',

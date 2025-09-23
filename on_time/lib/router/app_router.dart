@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/views/configurations/define_hour_value_config_page.dart';
+import 'package:on_time/views/configurations/info_config_page.dart';
 
 import '../layout/layout_scaffold.dart';
 import '../../views/analysis_page.dart';
@@ -46,6 +47,10 @@ class AppRouter {
               GoRoute(
                 path: Routes.configDegineHourValuePage,
                 builder: (context, state) => DefineHourValueConfigPage(),
+              ),
+              GoRoute(
+                path: Routes.configInfoPage,
+                builder: (context, state) => InfoConfigPage(),
               ),
             ],
           ),

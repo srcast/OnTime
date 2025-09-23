@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:on_time/utils/labels.dart';
 
 class DatesHelper {
   static Future<DateTime> pickDate(BuildContext context, DateTime date) async {
@@ -12,10 +11,8 @@ class DatesHelper {
         DateTime.now().year,
         DateTime.now().month,
         DateTime.now().day,
-        date.hour,
-        date.minute,
       ),
-      cancelText: Labels.cancel,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
     );
     if (pickedDate != null) {
       date = DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
@@ -24,11 +21,10 @@ class DatesHelper {
     return date;
   }
 
-  static Future<void> pickTime(BuildContext context, DateTime date) async {
+  static Future<DateTime> pickTime(BuildContext context, DateTime date) async {
     final pickedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(date),
-      cancelText: Labels.cancel,
     );
     if (pickedTime != null) {
       date = DateTime(
@@ -39,6 +35,8 @@ class DatesHelper {
         pickedTime.minute,
       );
     }
+
+    return date;
   }
 
   static DateTime getDatetimeToday() {

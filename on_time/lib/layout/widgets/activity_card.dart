@@ -23,7 +23,7 @@ class ActivityCard extends StatelessWidget {
           child: ListTile(
             leading: Icon(
               ponto.getIn ? Icons.login : Icons.logout,
-              color: ponto.getIn ? AppColors.softGreen : Colors.red,
+              color: ponto.getIn ? AppColors.softGreen : AppColors.red,
             ),
             title: Text(ponto.getIn ? Labels.getIn : Labels.getOut),
             trailing: Text(

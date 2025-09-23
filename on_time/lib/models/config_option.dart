@@ -10,8 +10,9 @@ class ConfigOption {
 
 const configs = [
   ConfigOption(label: Labels.configsListHourValue, icon: Icons.euro),
-  ConfigOption(
-    label: Labels.configsListNotifications,
-    icon: Icons.notifications,
-  ),
+  ConfigOption(label: Labels.configsInfo, icon: Icons.info_outline),
+  // ConfigOption(
+  //   label: Labels.configsListNotifications,
+  //   icon: Icons.notifications,
+  // ),
 ];

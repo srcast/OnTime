@@ -25,6 +25,11 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
   void initState() {
     super.initState();
     _value = widget.value == '0.0' ? '' : widget.value;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _updateValueStr();
   }
 
@@ -52,7 +57,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
       _valueStr = _value;
     } else {
       _valueStr = NumberFormat.simpleCurrency(
-        locale: 'pt_PT',
+        locale: Localizations.localeOf(context).toString(),
       ).format(double.tryParse(_value));
     }
   }
@@ -73,7 +78,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white, // ⬅️ Altera aqui para a cor que quiseres
+        color: AppColors.white, // ⬅️ Altera aqui para a cor que quiseres
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.all(16),
@@ -108,7 +113,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.backgroundLightGray,
-                  foregroundColor: Colors.black,
+                  foregroundColor: AppColors.defaultText,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

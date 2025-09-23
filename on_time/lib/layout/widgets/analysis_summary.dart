@@ -15,6 +15,7 @@ class AnalysisSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int min = minutesWorked % 60;
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: Padding(
@@ -24,11 +25,13 @@ class AnalysisSummary extends StatelessWidget {
           children: [
             summaryRow(
               Labels.hours,
-              '${minutesWorked ~/ 60} h ${minutesWorked % 60} min',
+              '${minutesWorked ~/ 60}h ${min < 10 ? '0' : ''}${min}min',
             ),
             summaryRow(
               Labels.profit,
-              NumberFormat.simpleCurrency(locale: 'pt-Pt').format(profit),
+              NumberFormat.simpleCurrency(
+                locale: Localizations.localeOf(context).toString(),
+              ).format(profit),
             ),
           ],
         ),

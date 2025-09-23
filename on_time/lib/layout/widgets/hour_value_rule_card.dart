@@ -27,7 +27,7 @@ class HourValueRuleCard extends StatelessWidget {
           child: ListTile(
             leading: Icon(
               getIn ? Icons.login : Icons.logout,
-              color: getIn ? AppColors.softGreen : Colors.red,
+              color: getIn ? AppColors.softGreen : AppColors.red,
             ),
             title: Text(getIn ? Labels.getIn : Labels.getOut),
             trailing: Text(

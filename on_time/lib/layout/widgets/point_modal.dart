@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -23,16 +24,7 @@ class _PointModal extends State<PointModal> {
   }
 
   Future<void> _pickDate() async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDateTime,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(
-        DateTime.now().year,
-        DateTime.now().month,
-        DateTime.now().day,
-      ),
-    );
+    final pickedDate = await DatesHelper.pickDate(context, selectedDateTime);
     if (pickedDate != null) {
       setState(() {
         selectedDateTime = DateTime(
@@ -47,10 +39,8 @@ class _PointModal extends State<PointModal> {
   }
 
   Future<void> _pickTime() async {
-    final pickedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedDateTime),
-    );
+    final pickedTime = await DatesHelper.pickTime(context, selectedDateTime);
+
     if (pickedTime != null) {
       setState(() {
         selectedDateTime = DateTime(

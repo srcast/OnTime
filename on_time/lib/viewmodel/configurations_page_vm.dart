@@ -18,6 +18,10 @@ class ConfigurationsPageVM {
         context.push(Routes.configDegineHourValuePage);
         break;
 
+      case Labels.configsInfo:
+        context.push(Routes.configInfoPage);
+        break;
+
       case Labels.configsListNotifications:
         break;
 

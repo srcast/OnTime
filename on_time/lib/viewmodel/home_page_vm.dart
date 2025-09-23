@@ -218,6 +218,7 @@ class HomePageVM extends ChangeNotifier {
     );
 
     if (dateWithHourUpdate != null) {
+      _date = dateWithHourUpdate;
       var sessionIdToUpdate = await _pointsService.updatePonto(
         pointToUpdate,
         dateWithHourUpdate,
@@ -231,6 +232,7 @@ class HomePageVM extends ChangeNotifier {
   Future<void> updateCurrentSessionData(String sessionId) async {
     var sessionData = await _pointsService.getSessionData(sessionId);
     _pointsSession = await _pointsService.getPointsSession(sessionId);
+    DateTime day = sessionData != null ? sessionData.day : _date;
 
     _sessionMinutes = 0;
     if (_pointsSession.length > 1) {
@@ -249,7 +251,7 @@ class HomePageVM extends ChangeNotifier {
 
     _hourValue = PointsHelper.getHourValueInUseFromRules(
       DateTime.now(),
-      sessionData!.day,
+      day,
       _pointsSession,
       rules,
       hourValueBaseFromConfigs ?? 0,
@@ -257,7 +259,7 @@ class HomePageVM extends ChangeNotifier {
 
     // get profit
     _sessionProfit = PointsHelper.getSessionProfit(
-      sessionData.day,
+      day,
       hourValueBaseFromConfigs ?? 0,
       _pointsSession,
       rules,
@@ -266,11 +268,16 @@ class HomePageVM extends ChangeNotifier {
     //update session values
     await _pointsService.insertUpdateSession(
       sessionId,
-      sessionData.day,
+      day,
       _sessionMinutes,
       _hourValue,
       _sessionProfit,
     );
+  }
+
+  void refreshDayFromCalendarAnalysis(DateTime selectedDay) {
+    _date = selectedDay;
+    verifyDate();
   }
 
   /*   @override

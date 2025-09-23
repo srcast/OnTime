@@ -110,7 +110,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                   return Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
                     ),
@@ -135,12 +135,12 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                               Text(
                                 regra.ruleDescription ==
                                         HourValueRules.dayWeekRule
-                                    ? 'Dia: ${regra.dayOffWeek}\nValor: ${NumberFormat.simpleCurrency(locale: 'pt_PT').format(regra.hourValue)}'
+                                    ? 'Dia: ${regra.dayOffWeek}\nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'
                                     : (regra.ruleDescription ==
                                             HourValueRules
                                                 .valueAfterXScheduleRule
-                                        ? 'Após horário: ${regra.afterSchedule!.hour}h${regra.afterSchedule!.minute} \nValor: ${NumberFormat.simpleCurrency(locale: 'pt_PT').format(regra.hourValue)}'
-                                        : 'Após X horas: ${regra.afterMinutesWorked! ~/ 60}h${regra.afterMinutesWorked! % 60} \nValor: ${NumberFormat.simpleCurrency(locale: 'pt_PT').format(regra.hourValue)}'),
+                                        ? 'Após horário: ${regra.afterSchedule!.hour}h ${regra.afterSchedule!.minute < 10 ? '0' : ''}${regra.afterSchedule!.minute}min \nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'
+                                        : 'Após X horas: ${regra.afterMinutesWorked! ~/ 60}h ${regra.afterMinutesWorked! % 60 < 10 ? '0' : ''}${regra.afterMinutesWorked! % 60}min \nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'),
                               ),
                             ],
                           ),

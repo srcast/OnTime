@@ -1,23 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:on_time/utils/colors.dart';
+import 'package:on_time/layout/app_styles.dart';
 
-// Theme.of(context).textTheme.headlineSmall chamar assim na app
+extension AppTheme on BuildContext {
+  AppStyles get colors => Theme.of(this).extension<AppStyles>()!;
+}
 
-ThemeData lightMode = ThemeData(
+final lightTheme = ThemeData(
   brightness: Brightness.light,
-  textTheme: TextTheme(
-    titleMedium: TextStyle(fontSize: 16, color: AppColors.defaultText),
-    titleLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(fontSize: 16, color: AppColors.white),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      backgroundColor: AppColors.softGreen,
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      side: BorderSide(
-        color: AppColors.softGreen, // cor do contorno
-      ),
+  scaffoldBackgroundColor: Colors.white,
+  splashColor: Colors.transparent,
+  primaryColor: Colors.blue,
+  extensions: <ThemeExtension<AppStyles>>[
+    AppStyles(
+      insertButton: Colors.green,
+      deleteButton: Colors.red,
+      cancelButton: Colors.grey,
+      saveButton: Colors.blue,
+      bodyText: Colors.black,
+      titleText: Colors.blueAccent,
+      scaffoldBackground: Colors.pink,
+      cardBackground: Colors.grey,
     ),
-  ),
+  ],
+);
+
+final darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  scaffoldBackgroundColor: Colors.black,
+  splashColor: Colors.transparent,
+  primaryColor: Colors.blueAccent,
+  extensions: <ThemeExtension<AppStyles>>[
+    const AppStyles(
+      insertButton: Colors.greenAccent,
+      deleteButton: Colors.redAccent,
+      cancelButton: Colors.grey,
+      saveButton: Colors.blueAccent,
+      bodyText: Colors.white,
+      titleText: Colors.lightBlue,
+      scaffoldBackground: Colors.orange,
+      cardBackground: Color(0xFF1E1E1E),
+    ),
+  ],
 );
