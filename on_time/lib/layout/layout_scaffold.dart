@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/tabs/destinations.dart';
-import '../../utils/colors.dart';
 
 class LayoutScaffold extends StatefulWidget {
   const LayoutScaffold({required this.navigationShell, Key? key})
@@ -56,26 +56,26 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: context.colors.scaffoldBackground,
       body: widget.navigationShell,
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
           indicatorColor: Colors.transparent,
-          backgroundColor: AppColors.white,
+          backgroundColor: context.colors.tabBarBackground,
           labelTextStyle: WidgetStateProperty.resolveWith<TextStyle>((states) {
             if (states.contains(WidgetState.selected)) {
               return TextStyle(
-                color: AppColors.strongBlue,
+                color: context.colors.focusColor,
                 fontWeight: FontWeight.w600,
               );
             }
-            return const TextStyle(color: AppColors.labelMediumGray);
+            return TextStyle(color: context.colors.titleText);
           }),
           iconTheme: WidgetStateProperty.resolveWith<IconThemeData>((states) {
             if (states.contains(WidgetState.selected)) {
-              return const IconThemeData(color: AppColors.strongBlue);
+              return IconThemeData(color: context.colors.focusColor);
             }
-            return const IconThemeData(color: AppColors.labelMediumGray);
+            return IconThemeData(color: context.colors.titleText);
           }),
         ),
         child: NavigationBar(
@@ -89,7 +89,7 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
                       label: destination.label,
                       selectedIcon: Icon(
                         destination.icon,
-                        color: AppColors.strongBlue,
+                        color: context.colors.focusColor,
                       ),
                     ),
                   )

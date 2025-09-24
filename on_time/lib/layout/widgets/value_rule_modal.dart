@@ -183,7 +183,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(HourValueRules.newEditRuleWarning),
-          backgroundColor: AppColors.searchBar,
+          backgroundColor: AppColors.snackBarLight,
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 3),
         ),
@@ -345,7 +345,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         Labels.cancel,
-                        style: TextStyle(color: AppColors.darkGray),
+                        style: TextStyle(color: AppColors.darkGrayLight),
                       ),
                     ),
                     SizedBox(width: 8),

@@ -193,7 +193,7 @@ class AnalysisPageVM extends ChangeNotifier {
           BarChartRodData(
             toY: hours,
             width: 20,
-            color: AppColors.strongBlue,
+            color: AppColors.strongBlueLight,
             borderRadius: BorderRadius.circular(0),
           ),
         ],

@@ -6,7 +6,6 @@ import 'package:on_time/database/locator.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
-import 'package:on_time/utils/colors.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
@@ -53,12 +52,6 @@ class MyApp extends StatelessWidget {
     builder: DevicePreview.appBuilder,
     routerConfig: AppRouter.router,
     debugShowCheckedModeBanner: false,
-    // theme: ThemeData(
-    //   scaffoldBackgroundColor: AppColors.backgroundLightGray,
-    //   splashColor:
-    //       Colors
-    //           .transparent, // remove animation when clicking button on navigation bar
-    // ),
     supportedLocales: const [Locale('pt', 'PT'), Locale('en')],
     localizationsDelegates: const [
       GlobalMaterialLocalizations.delegate,

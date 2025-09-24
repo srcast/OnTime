@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/analysis_summary.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
@@ -34,7 +35,10 @@ class _AnalysisPageState extends State<AnalysisPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 24),
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE7ECE7), // Fundo claro
+                    color:
+                        context
+                            .colors
+                            .analysisSelectorBackground, // Fundo claro
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Row(
@@ -140,7 +144,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                         onPressed: () => vm.goBackDate(),
                         icon: Icon(
                           Icons.arrow_back_ios,
-                          color: AppColors.strongBlue,
+                          color: context.colors.focusColor,
                         ),
                       ),
                       Expanded(
@@ -161,7 +165,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                         onPressed: () => vm.advanceDate(),
                         icon: Icon(
                           Icons.arrow_forward_ios,
-                          color: AppColors.strongBlue,
+                          color: context.colors.focusColor,
                         ),
                       ),
                     ],
@@ -240,7 +244,8 @@ class _AnalysisPageState extends State<AnalysisPage> {
                                               style: const TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
-                                                color: AppColors.strongBlue,
+                                                color:
+                                                    AppColors.strongBlueLight,
                                               ),
                                             )
                                             : const SizedBox(
@@ -339,13 +344,13 @@ class _AnalysisPageState extends State<AnalysisPage> {
 
             // Overlay de loading
             if (vm.isLoading)
-              const Center(
+              Center(
                 child: SizedBox(
                   width: 60,
                   height: 60,
                   child: CircularProgressIndicator(
                     strokeWidth: 6,
-                    color: AppColors.strongBlue,
+                    color: context.colors.focusColor,
                   ),
                 ),
               ),

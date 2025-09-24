@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -78,7 +79,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white, // ⬅️ Altera aqui para a cor que quiseres
+        color: AppColors.white,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.all(16),
@@ -112,8 +113,8 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.backgroundLightGray,
-                  foregroundColor: AppColors.defaultText,
+                  backgroundColor: context.colors.scaffoldBackground,
+                  foregroundColor: context.colors.defaultText,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:on_time/layout/app_styles.dart';
+import 'package:on_time/utils/colors.dart';
 
 extension AppTheme on BuildContext {
   AppStyles get colors => Theme.of(this).extension<AppStyles>()!;
@@ -7,19 +8,20 @@ extension AppTheme on BuildContext {
 
 final lightTheme = ThemeData(
   brightness: Brightness.light,
-  scaffoldBackgroundColor: Colors.white,
+  scaffoldBackgroundColor: AppColors.backgroundGrayLight,
   splashColor: Colors.transparent,
-  primaryColor: Colors.blue,
   extensions: <ThemeExtension<AppStyles>>[
     AppStyles(
-      insertButton: Colors.green,
-      deleteButton: Colors.red,
-      cancelButton: Colors.grey,
-      saveButton: Colors.blue,
-      bodyText: Colors.black,
-      titleText: Colors.blueAccent,
-      scaffoldBackground: Colors.pink,
+      editPointButton: AppColors.editButtonBackground,
+      deletePointButton: AppColors.deleteButtonBackground,
+      focusColor: AppColors.strongBlueLight,
+      defaultText: AppColors.defaultTextLight,
+      actionsText: AppColors.darkGrayLight,
+      titleText: AppColors.labelMediumGrayLight,
+      scaffoldBackground: AppColors.backgroundGrayLight,
       cardBackground: Colors.grey,
+      tabBarBackground: AppColors.white,
+      analysisSelectorBackground: AppColors.analysisSelectorBackgroundLight,
     ),
   ],
 );
@@ -31,14 +33,16 @@ final darkTheme = ThemeData(
   primaryColor: Colors.blueAccent,
   extensions: <ThemeExtension<AppStyles>>[
     const AppStyles(
-      insertButton: Colors.greenAccent,
-      deleteButton: Colors.redAccent,
-      cancelButton: Colors.grey,
-      saveButton: Colors.blueAccent,
-      bodyText: Colors.white,
-      titleText: Colors.lightBlue,
-      scaffoldBackground: Colors.orange,
-      cardBackground: Color(0xFF1E1E1E),
+      editPointButton: AppColors.backgroundCardDark,
+      deletePointButton: AppColors.backgroundCardDark,
+      focusColor: AppColors.strongBlueDark,
+      defaultText: AppColors.white,
+      actionsText: AppColors.white,
+      titleText: AppColors.labelMediumDark,
+      scaffoldBackground: AppColors.backgroundDark,
+      cardBackground: AppColors.backgroundCardDark,
+      tabBarBackground: AppColors.backgroundCardDark,
+      analysisSelectorBackground: AppColors.backgroundCardDark,
     ),
   ],
 );

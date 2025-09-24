@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:on_time/utils/colors.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -36,39 +36,39 @@ class _InfoConfigPage extends State<InfoConfigPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: AppColors.backgroundLightGray,
-        foregroundColor: AppColors.labelMediumGray,
+        backgroundColor: context.colors.scaffoldBackground,
+        foregroundColor: context.colors.titleText,
         elevation: 0,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               Labels.appVersion,
-              style: TextStyle(fontSize: 22, color: AppColors.labelMediumGray),
+              style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
             const SizedBox(height: 6),
             Text(
               _version.isEmpty ? "..." : "v$_version",
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
-                color: AppColors.strongBlue,
+                color: context.colors.focusColor,
               ),
             ),
             const SizedBox(height: 30),
-            const Text(
+            Text(
               Labels.lastUpdate,
-              style: TextStyle(fontSize: 22, color: AppColors.labelMediumGray),
+              style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               Labels.lastUpdateDate,
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
-                color: AppColors.strongBlue,
+                color: context.colors.focusColor,
               ),
             ),
           ],

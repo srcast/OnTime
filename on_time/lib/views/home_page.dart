@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
 import 'package:on_time/utils/colors.dart';
@@ -44,7 +45,7 @@ class _HomePage extends State<HomePage> {
                           vm.formatedDate,
                           style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.defaultText,
+                            color: context.colors.defaultText,
                           ),
                         ),
                       ),
@@ -89,7 +90,12 @@ class _HomePage extends State<HomePage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () => vm.changeDate('+'),
+                  onPressed:
+                      vm.timerVisible
+                          ? null
+                          : () => vm.changeDate(
+                            '+',
+                          ), // timer visible, is today, cant go further on date
                   icon: Icon(Icons.arrow_forward_ios),
                 ),
               ],
@@ -151,7 +157,7 @@ class _HomePage extends State<HomePage> {
                                                 ponto,
                                               ),
                                           backgroundColor:
-                                              AppColors.editButtonBackground,
+                                              context.colors.editPointButton,
                                           foregroundColor: AppColors.editButton,
                                           icon: Icons.edit,
                                           borderRadius: BorderRadius.circular(
@@ -165,7 +171,7 @@ class _HomePage extends State<HomePage> {
                                                 ponto,
                                               ),
                                           backgroundColor:
-                                              AppColors.deleteButtonBackground,
+                                              context.colors.deletePointButton,
                                           foregroundColor:
                                               AppColors.deleteButton,
                                           icon: Icons.delete_outline,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/helpers/dates_helper.dart';
-import 'package:on_time/utils/colors.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
 
 // ignore: must_be_immutable
@@ -70,7 +70,7 @@ class _PointModal extends State<PointModal> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "Ponto",
+            Labels.homeTab,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16),
@@ -94,14 +94,14 @@ class _PointModal extends State<PointModal> {
                 onPressed: () => Navigator.pop(context),
                 child: Text(
                   Labels.cancel,
-                  style: TextStyle(color: AppColors.darkGray),
+                  style: TextStyle(color: context.colors.actionsText),
                 ),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, selectedDateTime),
                 child: Text(
                   Labels.save,
-                  style: TextStyle(color: AppColors.strongBlue),
+                  style: TextStyle(color: context.colors.focusColor),
                 ),
               ),
             ],

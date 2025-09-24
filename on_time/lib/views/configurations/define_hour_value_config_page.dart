@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
@@ -25,11 +26,11 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
           icon: Icon(Icons.arrow_back),
           onPressed: () => vm.goBack(context),
         ),
-        backgroundColor: AppColors.backgroundLightGray,
-        foregroundColor: AppColors.labelMediumGray,
+        backgroundColor: context.colors.scaffoldBackground,
+        foregroundColor: context.colors.titleText,
         elevation: 0,
       ),
-      backgroundColor: AppColors.backgroundLightGray, // cor de fundo clara
+      backgroundColor: context.colors.scaffoldBackground,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -39,7 +40,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
               Labels.defineBaseValueHour,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: AppColors.defaultText,
+                color: context.colors.defaultText,
               ),
             ),
             SizedBox(height: 8),
@@ -84,7 +85,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
               Labels.specialRules,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: AppColors.defaultText,
+                color: context.colors.defaultText,
               ),
             ),
             SizedBox(height: 8),
@@ -110,7 +111,6 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                   return Container(
                     padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppColors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.grey.shade300),
                     ),

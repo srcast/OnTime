@@ -17,7 +17,7 @@ class ConfigurationsPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final option = vm.options[index];
           return ListTile(
-            leading: Icon(option.icon, color: AppColors.labelMediumGray),
+            leading: Icon(option.icon, color: AppColors.labelMediumGrayLight),
             title: Text(option.label),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => vm.openConfig(context, option.label),
