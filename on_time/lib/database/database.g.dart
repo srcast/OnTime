@@ -747,47 +747,19 @@ class $ConfigurationsTable extends Configurations
     type: DriftSqlType.double,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _taxesPercentageMeta = const VerificationMeta(
-    'taxesPercentage',
+  static const VerificationMeta _themeModeMeta = const VerificationMeta(
+    'themeMode',
   );
   @override
-  late final GeneratedColumn<double> taxesPercentage = GeneratedColumn<double>(
-    'taxes_percentage',
+  late final GeneratedColumn<String> themeMode = GeneratedColumn<String>(
+    'theme_mode',
     aliasedName,
     true,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _valuesNotTaxableMeta = const VerificationMeta(
-    'valuesNotTaxable',
-  );
-  @override
-  late final GeneratedColumn<double> valuesNotTaxable = GeneratedColumn<double>(
-    'values_not_taxable',
-    aliasedName,
-    true,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _extraValueMeta = const VerificationMeta(
-    'extraValue',
-  );
-  @override
-  late final GeneratedColumn<double> extraValue = GeneratedColumn<double>(
-    'extra_value',
-    aliasedName,
-    true,
-    type: DriftSqlType.double,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    hourValueBase,
-    taxesPercentage,
-    valuesNotTaxable,
-    extraValue,
-  ];
+  List<GeneratedColumn> get $columns => [id, hourValueBase, themeMode];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -812,28 +784,10 @@ class $ConfigurationsTable extends Configurations
         ),
       );
     }
-    if (data.containsKey('taxes_percentage')) {
+    if (data.containsKey('theme_mode')) {
       context.handle(
-        _taxesPercentageMeta,
-        taxesPercentage.isAcceptableOrUnknown(
-          data['taxes_percentage']!,
-          _taxesPercentageMeta,
-        ),
-      );
-    }
-    if (data.containsKey('values_not_taxable')) {
-      context.handle(
-        _valuesNotTaxableMeta,
-        valuesNotTaxable.isAcceptableOrUnknown(
-          data['values_not_taxable']!,
-          _valuesNotTaxableMeta,
-        ),
-      );
-    }
-    if (data.containsKey('extra_value')) {
-      context.handle(
-        _extraValueMeta,
-        extraValue.isAcceptableOrUnknown(data['extra_value']!, _extraValueMeta),
+        _themeModeMeta,
+        themeMode.isAcceptableOrUnknown(data['theme_mode']!, _themeModeMeta),
       );
     }
     return context;
@@ -854,17 +808,9 @@ class $ConfigurationsTable extends Configurations
         DriftSqlType.double,
         data['${effectivePrefix}hour_value_base'],
       ),
-      taxesPercentage: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}taxes_percentage'],
-      ),
-      valuesNotTaxable: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}values_not_taxable'],
-      ),
-      extraValue: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}extra_value'],
+      themeMode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}theme_mode'],
       ),
     );
   }
@@ -878,16 +824,8 @@ class $ConfigurationsTable extends Configurations
 class Configuration extends DataClass implements Insertable<Configuration> {
   final int id;
   final double? hourValueBase;
-  final double? taxesPercentage;
-  final double? valuesNotTaxable;
-  final double? extraValue;
-  const Configuration({
-    required this.id,
-    this.hourValueBase,
-    this.taxesPercentage,
-    this.valuesNotTaxable,
-    this.extraValue,
-  });
+  final String? themeMode;
+  const Configuration({required this.id, this.hourValueBase, this.themeMode});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -895,14 +833,8 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     if (!nullToAbsent || hourValueBase != null) {
       map['hour_value_base'] = Variable<double>(hourValueBase);
     }
-    if (!nullToAbsent || taxesPercentage != null) {
-      map['taxes_percentage'] = Variable<double>(taxesPercentage);
-    }
-    if (!nullToAbsent || valuesNotTaxable != null) {
-      map['values_not_taxable'] = Variable<double>(valuesNotTaxable);
-    }
-    if (!nullToAbsent || extraValue != null) {
-      map['extra_value'] = Variable<double>(extraValue);
+    if (!nullToAbsent || themeMode != null) {
+      map['theme_mode'] = Variable<String>(themeMode);
     }
     return map;
   }
@@ -914,18 +846,10 @@ class Configuration extends DataClass implements Insertable<Configuration> {
           hourValueBase == null && nullToAbsent
               ? const Value.absent()
               : Value(hourValueBase),
-      taxesPercentage:
-          taxesPercentage == null && nullToAbsent
+      themeMode:
+          themeMode == null && nullToAbsent
               ? const Value.absent()
-              : Value(taxesPercentage),
-      valuesNotTaxable:
-          valuesNotTaxable == null && nullToAbsent
-              ? const Value.absent()
-              : Value(valuesNotTaxable),
-      extraValue:
-          extraValue == null && nullToAbsent
-              ? const Value.absent()
-              : Value(extraValue),
+              : Value(themeMode),
     );
   }
 
@@ -937,9 +861,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     return Configuration(
       id: serializer.fromJson<int>(json['id']),
       hourValueBase: serializer.fromJson<double?>(json['hourValueBase']),
-      taxesPercentage: serializer.fromJson<double?>(json['taxesPercentage']),
-      valuesNotTaxable: serializer.fromJson<double?>(json['valuesNotTaxable']),
-      extraValue: serializer.fromJson<double?>(json['extraValue']),
+      themeMode: serializer.fromJson<String?>(json['themeMode']),
     );
   }
   @override
@@ -948,29 +870,19 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'hourValueBase': serializer.toJson<double?>(hourValueBase),
-      'taxesPercentage': serializer.toJson<double?>(taxesPercentage),
-      'valuesNotTaxable': serializer.toJson<double?>(valuesNotTaxable),
-      'extraValue': serializer.toJson<double?>(extraValue),
+      'themeMode': serializer.toJson<String?>(themeMode),
     };
   }
 
   Configuration copyWith({
     int? id,
     Value<double?> hourValueBase = const Value.absent(),
-    Value<double?> taxesPercentage = const Value.absent(),
-    Value<double?> valuesNotTaxable = const Value.absent(),
-    Value<double?> extraValue = const Value.absent(),
+    Value<String?> themeMode = const Value.absent(),
   }) => Configuration(
     id: id ?? this.id,
     hourValueBase:
         hourValueBase.present ? hourValueBase.value : this.hourValueBase,
-    taxesPercentage:
-        taxesPercentage.present ? taxesPercentage.value : this.taxesPercentage,
-    valuesNotTaxable:
-        valuesNotTaxable.present
-            ? valuesNotTaxable.value
-            : this.valuesNotTaxable,
-    extraValue: extraValue.present ? extraValue.value : this.extraValue,
+    themeMode: themeMode.present ? themeMode.value : this.themeMode,
   );
   Configuration copyWithCompanion(ConfigurationsCompanion data) {
     return Configuration(
@@ -979,16 +891,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
           data.hourValueBase.present
               ? data.hourValueBase.value
               : this.hourValueBase,
-      taxesPercentage:
-          data.taxesPercentage.present
-              ? data.taxesPercentage.value
-              : this.taxesPercentage,
-      valuesNotTaxable:
-          data.valuesNotTaxable.present
-              ? data.valuesNotTaxable.value
-              : this.valuesNotTaxable,
-      extraValue:
-          data.extraValue.present ? data.extraValue.value : this.extraValue,
+      themeMode: data.themeMode.present ? data.themeMode.value : this.themeMode,
     );
   }
 
@@ -997,81 +900,57 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     return (StringBuffer('Configuration(')
           ..write('id: $id, ')
           ..write('hourValueBase: $hourValueBase, ')
-          ..write('taxesPercentage: $taxesPercentage, ')
-          ..write('valuesNotTaxable: $valuesNotTaxable, ')
-          ..write('extraValue: $extraValue')
+          ..write('themeMode: $themeMode')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    id,
-    hourValueBase,
-    taxesPercentage,
-    valuesNotTaxable,
-    extraValue,
-  );
+  int get hashCode => Object.hash(id, hourValueBase, themeMode);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Configuration &&
           other.id == this.id &&
           other.hourValueBase == this.hourValueBase &&
-          other.taxesPercentage == this.taxesPercentage &&
-          other.valuesNotTaxable == this.valuesNotTaxable &&
-          other.extraValue == this.extraValue);
+          other.themeMode == this.themeMode);
 }
 
 class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
   final Value<int> id;
   final Value<double?> hourValueBase;
-  final Value<double?> taxesPercentage;
-  final Value<double?> valuesNotTaxable;
-  final Value<double?> extraValue;
+  final Value<String?> themeMode;
   const ConfigurationsCompanion({
     this.id = const Value.absent(),
     this.hourValueBase = const Value.absent(),
-    this.taxesPercentage = const Value.absent(),
-    this.valuesNotTaxable = const Value.absent(),
-    this.extraValue = const Value.absent(),
+    this.themeMode = const Value.absent(),
   });
   ConfigurationsCompanion.insert({
     this.id = const Value.absent(),
     this.hourValueBase = const Value.absent(),
-    this.taxesPercentage = const Value.absent(),
-    this.valuesNotTaxable = const Value.absent(),
-    this.extraValue = const Value.absent(),
+    this.themeMode = const Value.absent(),
   });
   static Insertable<Configuration> custom({
     Expression<int>? id,
     Expression<double>? hourValueBase,
-    Expression<double>? taxesPercentage,
-    Expression<double>? valuesNotTaxable,
-    Expression<double>? extraValue,
+    Expression<String>? themeMode,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (hourValueBase != null) 'hour_value_base': hourValueBase,
-      if (taxesPercentage != null) 'taxes_percentage': taxesPercentage,
-      if (valuesNotTaxable != null) 'values_not_taxable': valuesNotTaxable,
-      if (extraValue != null) 'extra_value': extraValue,
+      if (themeMode != null) 'theme_mode': themeMode,
     });
   }
 
   ConfigurationsCompanion copyWith({
     Value<int>? id,
     Value<double?>? hourValueBase,
-    Value<double?>? taxesPercentage,
-    Value<double?>? valuesNotTaxable,
-    Value<double?>? extraValue,
+    Value<String?>? themeMode,
   }) {
     return ConfigurationsCompanion(
       id: id ?? this.id,
       hourValueBase: hourValueBase ?? this.hourValueBase,
-      taxesPercentage: taxesPercentage ?? this.taxesPercentage,
-      valuesNotTaxable: valuesNotTaxable ?? this.valuesNotTaxable,
-      extraValue: extraValue ?? this.extraValue,
+      themeMode: themeMode ?? this.themeMode,
     );
   }
 
@@ -1084,14 +963,8 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     if (hourValueBase.present) {
       map['hour_value_base'] = Variable<double>(hourValueBase.value);
     }
-    if (taxesPercentage.present) {
-      map['taxes_percentage'] = Variable<double>(taxesPercentage.value);
-    }
-    if (valuesNotTaxable.present) {
-      map['values_not_taxable'] = Variable<double>(valuesNotTaxable.value);
-    }
-    if (extraValue.present) {
-      map['extra_value'] = Variable<double>(extraValue.value);
+    if (themeMode.present) {
+      map['theme_mode'] = Variable<String>(themeMode.value);
     }
     return map;
   }
@@ -1101,9 +974,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     return (StringBuffer('ConfigurationsCompanion(')
           ..write('id: $id, ')
           ..write('hourValueBase: $hourValueBase, ')
-          ..write('taxesPercentage: $taxesPercentage, ')
-          ..write('valuesNotTaxable: $valuesNotTaxable, ')
-          ..write('extraValue: $extraValue')
+          ..write('themeMode: $themeMode')
           ..write(')'))
         .toString();
   }
@@ -2243,17 +2114,13 @@ typedef $$ConfigurationsTableCreateCompanionBuilder =
     ConfigurationsCompanion Function({
       Value<int> id,
       Value<double?> hourValueBase,
-      Value<double?> taxesPercentage,
-      Value<double?> valuesNotTaxable,
-      Value<double?> extraValue,
+      Value<String?> themeMode,
     });
 typedef $$ConfigurationsTableUpdateCompanionBuilder =
     ConfigurationsCompanion Function({
       Value<int> id,
       Value<double?> hourValueBase,
-      Value<double?> taxesPercentage,
-      Value<double?> valuesNotTaxable,
-      Value<double?> extraValue,
+      Value<String?> themeMode,
     });
 
 class $$ConfigurationsTableFilterComposer
@@ -2275,18 +2142,8 @@ class $$ConfigurationsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<double> get taxesPercentage => $composableBuilder(
-    column: $table.taxesPercentage,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get valuesNotTaxable => $composableBuilder(
-    column: $table.valuesNotTaxable,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get extraValue => $composableBuilder(
-    column: $table.extraValue,
+  ColumnFilters<String> get themeMode => $composableBuilder(
+    column: $table.themeMode,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2310,18 +2167,8 @@ class $$ConfigurationsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<double> get taxesPercentage => $composableBuilder(
-    column: $table.taxesPercentage,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get valuesNotTaxable => $composableBuilder(
-    column: $table.valuesNotTaxable,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get extraValue => $composableBuilder(
-    column: $table.extraValue,
+  ColumnOrderings<String> get themeMode => $composableBuilder(
+    column: $table.themeMode,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -2343,20 +2190,8 @@ class $$ConfigurationsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<double> get taxesPercentage => $composableBuilder(
-    column: $table.taxesPercentage,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get valuesNotTaxable => $composableBuilder(
-    column: $table.valuesNotTaxable,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get extraValue => $composableBuilder(
-    column: $table.extraValue,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get themeMode =>
+      $composableBuilder(column: $table.themeMode, builder: (column) => column);
 }
 
 class $$ConfigurationsTableTableManager
@@ -2398,29 +2233,21 @@ class $$ConfigurationsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<double?> hourValueBase = const Value.absent(),
-                Value<double?> taxesPercentage = const Value.absent(),
-                Value<double?> valuesNotTaxable = const Value.absent(),
-                Value<double?> extraValue = const Value.absent(),
+                Value<String?> themeMode = const Value.absent(),
               }) => ConfigurationsCompanion(
                 id: id,
                 hourValueBase: hourValueBase,
-                taxesPercentage: taxesPercentage,
-                valuesNotTaxable: valuesNotTaxable,
-                extraValue: extraValue,
+                themeMode: themeMode,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<double?> hourValueBase = const Value.absent(),
-                Value<double?> taxesPercentage = const Value.absent(),
-                Value<double?> valuesNotTaxable = const Value.absent(),
-                Value<double?> extraValue = const Value.absent(),
+                Value<String?> themeMode = const Value.absent(),
               }) => ConfigurationsCompanion.insert(
                 id: id,
                 hourValueBase: hourValueBase,
-                taxesPercentage: taxesPercentage,
-                valuesNotTaxable: valuesNotTaxable,
-                extraValue: extraValue,
+                themeMode: themeMode,
               ),
           withReferenceMapper:
               (p0) =>

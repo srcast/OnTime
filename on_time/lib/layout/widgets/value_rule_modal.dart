@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/common_objs.dart';
@@ -69,31 +70,17 @@ class _ValueRuleModal extends State<ValueRuleModal> {
   }
 
   void openNumericKeyboard(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            top: 24,
-            left: 16,
-            right: 16,
-          ),
-          child: NumericKeyboard(
-            value: ruleValue.toString(),
-            onSetValue: (value) => setHourValueBase(value),
-          ),
-        );
-      },
+    final result = await NumericKeyboard.show(
+      context,
+      value: ruleValue.toString(),
     );
+
+    if (result != null) {
+      setHourValueRule(result);
+    }
   }
 
-  Future<void> setHourValueBase(double val) async {
+  Future<void> setHourValueRule(double val) async {
     setState(() {
       ruleValue = val;
       ruleValueStr = NumberFormat.simpleCurrency(
@@ -345,7 +332,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       onPressed: () => Navigator.pop(context),
                       child: Text(
                         Labels.cancel,
-                        style: TextStyle(color: AppColors.darkGrayLight),
+                        style: TextStyle(color: context.colors.actionsText),
                       ),
                     ),
                     SizedBox(width: 8),

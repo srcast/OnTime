@@ -1,18 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/layout/themes.dart';
-import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 
 class NumericKeyboard extends StatefulWidget {
   final String value;
-  final Function(double value) onSetValue;
 
-  const NumericKeyboard({
-    super.key,
-    required this.value,
-    required this.onSetValue,
-  });
+  const NumericKeyboard({super.key, required this.value});
+
+  static Future<double?> show(BuildContext context, {required String value}) {
+    return showModalBottomSheet<double>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: context.colors.tabBarBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            top: 24,
+            left: 16,
+            right: 16,
+          ),
+          child: NumericKeyboard(value: value),
+        );
+      },
+    );
+  }
 
   @override
   State<NumericKeyboard> createState() => _NumericKeyboardState();
@@ -69,8 +85,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
 
   void _onSubmit() {
     var parsedVal = double.tryParse(_value);
-    widget.onSetValue(parsedVal ?? 0);
-    Navigator.pop(context);
+    Navigator.pop(context, parsedVal ?? 0);
   }
 
   @override
@@ -79,7 +94,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: context.colors.tabBarBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.all(16),
@@ -131,13 +146,19 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
               Expanded(
                 child: TextButton(
                   onPressed: () => _onCancel(), //widget.onCancel,
-                  child: const Text(Labels.cancel),
+                  child: Text(
+                    Labels.cancel,
+                    style: TextStyle(color: context.colors.actionsText),
+                  ),
                 ),
               ),
               Expanded(
                 child: TextButton(
                   onPressed: () => _onSubmit(), //widget.onCancel,
-                  child: const Text(Labels.ok),
+                  child: Text(
+                    Labels.ok,
+                    style: TextStyle(color: context.colors.actionsText),
+                  ),
                 ),
               ),
             ],

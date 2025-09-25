@@ -10,6 +10,7 @@ class ConfigOption {
 
 const configs = [
   ConfigOption(label: Labels.configsListHourValue, icon: Icons.euro),
+  ConfigOption(label: Labels.configurationsTab, icon: Icons.settings),
   ConfigOption(label: Labels.configsInfo, icon: Icons.info_outline),
   // ConfigOption(
   //   label: Labels.configsListNotifications,

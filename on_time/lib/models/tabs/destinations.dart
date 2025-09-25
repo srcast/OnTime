@@ -11,5 +11,5 @@ class Destination {
 const destinations = [
   Destination(label: Labels.homeTab, icon: Icons.home),
   Destination(label: Labels.analysisTab, icon: Icons.bar_chart),
-  Destination(label: Labels.consigurationsTab, icon: Icons.settings),
+  Destination(label: Labels.configurationsTab, icon: Icons.settings),
 ];

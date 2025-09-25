@@ -1,7 +1,9 @@
+import 'package:drift/src/runtime/query_builder/query_builder.dart';
+
 class Labels {
   static const homeTab = 'Ponto';
   static const analysisTab = 'Análises';
-  static const consigurationsTab = 'Configurações';
+  static const configurationsTab = 'Configurações';
   static const getIn = 'Entrada';
   static const getOut = 'Saída';
   static const pause = 'Pausa';
@@ -33,6 +35,8 @@ class Labels {
   static const specialRules = 'Regras Especiais';
   static const addNewRule = 'Adicionar Regra';
   static const valueSaved = 'Valor guardado com sucesso';
+
+  static const theme = 'Tema';
 }
 
 class HourValueRules {
@@ -69,4 +73,10 @@ class AnalysisViewMode {
   static const week = 'Semana';
   static const month = 'Mês';
   static const year = 'Ano';
+}
+
+class AppThemeOptions {
+  static const automatic = 'Automático';
+  static const dark = 'Escuro';
+  static const light = 'Claro';
 }

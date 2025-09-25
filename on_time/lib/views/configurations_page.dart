@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:on_time/utils/colors.dart';
+import 'package:on_time/layout/themes.dart';
 import 'package:on_time/viewmodel/configurations_page_vm.dart';
 
 class ConfigurationsPage extends StatelessWidget {
@@ -17,7 +17,7 @@ class ConfigurationsPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final option = vm.options[index];
           return ListTile(
-            leading: Icon(option.icon, color: AppColors.labelMediumGrayLight),
+            leading: Icon(option.icon, color: context.colors.titleText),
             title: Text(option.label),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => vm.openConfig(context, option.label),

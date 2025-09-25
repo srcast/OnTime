@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/utils/enums.dart';
 
 class ConfigsService {
   final AppDatabase db;
@@ -16,9 +18,9 @@ class ConfigsService {
             ConfigurationsCompanion.insert(
               id: Value(1),
               hourValueBase: Value(0),
-              extraValue: Value(0),
-              taxesPercentage: Value(0),
-              valuesNotTaxable: Value(0),
+              themeMode: Value(
+                GenericHelper.getAppThemeAsString(AppThemeMode.system),
+              ),
             ),
           );
     }
@@ -59,5 +61,21 @@ class ConfigsService {
   Future<int> updateRule(HourValuePoliticsCompanion ruleToUpdate) async {
     return await (db.update(db.hourValuePolitics)
       ..where((p) => p.id.equals(ruleToUpdate.id.value))).write(ruleToUpdate);
+  }
+
+  Future<AppThemeMode> getTheme() async {
+    final config = await db.select(db.configurations).getSingleOrNull();
+    var theme = GenericHelper.getAppThemefromString(config?.themeMode);
+    return theme;
+  }
+
+  Future<void> setTheme(AppThemeMode themeMode) async {
+    var theme = GenericHelper.getAppThemeAsString(themeMode);
+    final config = await db.select(db.configurations).getSingleOrNull();
+    if (config != null) {
+      await (db.update(db.configurations)..where(
+        (c) => c.id.equals(config.id),
+      )).write(ConfigurationsCompanion(themeMode: Value(theme)));
+    }
   }
 }

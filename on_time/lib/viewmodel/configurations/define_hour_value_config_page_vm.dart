@@ -72,28 +72,14 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   }
 
   void openNumericKeyboard(BuildContext context) async {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            top: 24,
-            left: 16,
-            right: 16,
-          ),
-          child: NumericKeyboard(
-            value: baseHourValueToSet,
-            onSetValue: (value) => setHourValueBase(value),
-          ),
-        );
-      },
+    final result = await NumericKeyboard.show(
+      context,
+      value: baseHourValueToSet,
     );
+
+    if (result != null) {
+      setHourValueBase(result);
+    }
   }
 
   Future<void> openRuleModal(
