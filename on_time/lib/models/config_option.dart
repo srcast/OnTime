@@ -8,7 +8,7 @@ class ConfigOption {
   final IconData icon;
 }
 
-const configs = [
+final configs = [
   ConfigOption(label: Labels.configsListHourValue, icon: Icons.euro),
   ConfigOption(label: Labels.configurationsTab, icon: Icons.settings),
   ConfigOption(label: Labels.configsInfo, icon: Icons.info_outline),

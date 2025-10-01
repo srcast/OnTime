@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/viewmodel/configurations_page_vm.dart';
@@ -18,7 +19,7 @@ class ConfigurationsPage extends StatelessWidget {
           final option = vm.options[index];
           return ListTile(
             leading: Icon(option.icon, color: context.colors.titleText),
-            title: Text(option.label),
+            title: Text(option.label.tr()),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () => vm.openConfig(context, option.label),
           );

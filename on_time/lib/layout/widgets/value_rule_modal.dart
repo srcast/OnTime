@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart' as drift;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
@@ -169,7 +170,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     if (!canProceed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(HourValueRules.newEditRuleWarning),
+          content: Text(HourValueRules.newEditRuleWarning.tr()),
           backgroundColor: AppColors.snackBarLight,
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 3),
@@ -208,7 +209,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                   ),
                 ),
                 Text(
-                  HourValueRules.newRule,
+                  HourValueRules.newRule.tr(),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 16),
@@ -217,7 +218,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                 DropdownButtonFormField<String>(
                   initialValue: ruleDescription,
                   decoration: InputDecoration(
-                    labelText: HourValueRules.ruleType,
+                    labelText: HourValueRules.ruleType.tr(),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -227,7 +228,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                           .map(
                             (regra) => DropdownMenuItem(
                               value: regra,
-                              child: Text(regra),
+                              child: Text(regra.tr()),
                             ),
                           )
                           .toList(),
@@ -242,14 +243,17 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                   DropdownButtonFormField<String>(
                     initialValue: ruleDay,
                     decoration: InputDecoration(
-                      labelText: HourValueRules.dayOfWeek,
+                      labelText: HourValueRules.dayOfWeek.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     items:
                         CommonObjs.daysOfWeek.map((day) {
-                          return DropdownMenuItem(value: day, child: Text(day));
+                          return DropdownMenuItem(
+                            value: day,
+                            child: Text(day.tr()),
+                          );
                         }).toList(),
                     onChanged: (value) {
                       setModalState(() => ruleDay = value);
@@ -263,8 +267,8 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                         labelText:
                             ruleDescription ==
                                     HourValueRules.valueAfterXHoursRule
-                                ? HourValueRules.afterXHours
-                                : HourValueRules.afterXSchedule,
+                                ? HourValueRules.afterXHours.tr()
+                                : HourValueRules.afterXSchedule.tr(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -272,7 +276,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       child: Text(
                         ruleHour != null
                             ? ruleHour!.format(context)
-                            : HourValueRules.selectSchedule,
+                            : HourValueRules.selectSchedule.tr(),
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -289,7 +293,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                             _pickTime(setModalState, isWorkStartSchedule: true),
                     child: InputDecorator(
                       decoration: InputDecoration(
-                        labelText: HourValueRules.workStartsAt,
+                        labelText: HourValueRules.workStartsAt.tr(),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -297,7 +301,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       child: Text(
                         ruleHour != null
                             ? ruleHour!.format(context)
-                            : HourValueRules.selectSchedule,
+                            : HourValueRules.selectSchedule.tr(),
                         style: TextStyle(fontSize: 16),
                       ),
                     ),
@@ -331,7 +335,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: Text(
-                        Labels.cancel,
+                        Labels.cancel.tr(),
                         style: TextStyle(color: context.colors.actionsText),
                       ),
                     ),
@@ -345,7 +349,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                         ),
                       ),
                       child: Text(
-                        Labels.save,
+                        Labels.save.tr(),
                         style: TextStyle(color: AppColors.white),
                       ),
                     ),

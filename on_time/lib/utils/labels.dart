@@ -1,82 +1,86 @@
-import 'package:drift/src/runtime/query_builder/query_builder.dart';
-
 class Labels {
-  static const homeTab = 'Ponto';
-  static const analysisTab = 'Análises';
-  static const configurationsTab = 'Configurações';
-  static const getIn = 'Entrada';
-  static const getOut = 'Saída';
-  static const pause = 'Pausa';
-  static const hours = 'Horas';
-  static const workBegins = 'Início de Trabalho';
-  static const hourValue = 'Valor/Hora';
-  static const profit = 'Ganhos';
-  static const cancel = 'Cancelar';
-  static const delete = 'Apagar';
-  static const save = 'Guardar';
-  static const today = 'Hoje';
-  static const ok = 'OK';
-  static const warning = 'Aviso';
-  static const noPointsDayMsg = 'Sem pontos registados.';
-  static const deletePointMsg = 'Tem a certeza que pretende apagar este ponto?';
-  static const yes = 'Sim';
-  static const no = 'Não';
+  static const homeTab = 'home_tab';
+  static const analysisTab = 'analysis_tab';
+  static const configurationsTab = 'configurations_tab';
+  static const getIn = 'get_in';
+  static const getOut = 'get_out';
+  static const pause = 'pause';
+  static const hours = 'hours';
+  static const workBegins = 'work_begins';
+  static const hourValue = 'hour_value';
+  static const profit = 'profit';
+  static const cancel = 'cancel';
+  static const delete = 'delete';
+  static const save = 'save';
+  static const today = 'today';
+  static const ok = 'ok';
+  static const warning = 'warning';
+  static const noPointsDayMsg = 'no_points_day_msg';
+  static const deletePointMsg = 'delete_point_msg';
+  static const yes = 'yes';
+  static const no = 'no';
 
-  static const configsListHourValue = 'Definir Valor/Hora';
-  static const configsInfo = 'Informação';
-  static const configsListNotifications = 'Notificações';
-  static const appVersion = 'Versão';
-  static const lastUpdate = 'Última atualização';
-  static const lastUpdateDate = '22/09/2025';
+  static const configsListHourValue = 'configs_list_hour_value';
+  static const configsInfo = 'configs_info';
+  static const configsListNotifications = 'configs_list_notifications';
+  static const appVersion = 'app_version';
+  static const lastUpdate = 'last_update';
+  static const lastUpdateDate = 'last_update_date';
 
   // value hour configs
-  static const valuesRuleAfterXHour = 'Valor após Hora X';
-  static const defineBaseValueHour = 'Valor Base por Hora';
-  static const specialRules = 'Regras Especiais';
-  static const addNewRule = 'Adicionar Regra';
-  static const valueSaved = 'Valor guardado com sucesso';
+  static const valuesRuleAfterXHour = 'values_rule_after_x_hour';
+  static const defineBaseValueHour = 'define_base_value_hour';
+  static const specialRules = 'special_rules';
+  static const addNewRule = 'add_new_rule';
+  static const valueSaved = 'value_saved';
 
-  static const theme = 'Tema';
+  static const theme = 'theme';
+  static const language = 'language';
 }
 
 class HourValueRules {
-  static const dayWeekRule = 'Valor/hora no dia da semana';
-  static const valueAfterXHoursRule = 'Valor/hora após X horas de trabalho';
-  static const valueAfterXScheduleRule = 'Valor/hora após X horário';
-  static const newRule = 'Nova Regra';
-  static const ruleType = 'Tipo de Regra';
-  static const hourValue = 'Valor/Hora';
-  static const dayOfWeek = 'Dia da Semana';
-  static const afterXSchedule = 'Após X horário';
-  static const afterXHours = 'Após X horas de trabalho';
-  static const selectSchedule = 'Selecionar horário';
-  static const newEditRuleWarning = 'Todos os campos têm que ser preenchidos.';
-  static const deleteRuleMsg = 'Tem a certeza que pretende apagar esta regra?';
-  static const updateRuleMsg = 'Regra atualizada com sucesso';
-  static const insertRuleMsg = 'Regra criada com sucesso';
-  static const unsavedChangesMsg =
-      'Tem dados por Guardar. Pretende continuar sem guardar?';
-  static const workStartsAt = 'Início do trabalho';
+  static const dayWeekRule = 'day_week_rule';
+  static const valueAfterXHoursRule = 'value_after_x_hours_rule';
+  static const valueAfterXScheduleRule = 'value_after_x_schedule_rule';
+  static const newRule = 'new_rule';
+  static const ruleType = 'rule_type';
+  static const hourValue = 'hour_value';
+  static const dayOfWeek = 'day_of_week';
+  static const afterXSchedule = 'after_x_schedule';
+  static const afterXHours = 'after_x_hours';
+  static const selectSchedule = 'select_schedule';
+  static const newEditRuleWarning = 'new_edit_rule_warning';
+  static const deleteRuleMsg = 'delete_rule_msg';
+  static const updateRuleMsg = 'update_rule_msg';
+  static const insertRuleMsg = 'insert_rule_msg';
+  static const unsavedChangesMsg = 'unsaved_changes_msg';
+  static const workStartsAt = 'work_starts_at';
 }
 
 class DaysOfWeek {
-  static const monday = 'Segunda';
-  static const tuesday = 'Terça';
-  static const wednesday = 'Quarta';
-  static const thursday = 'Quinta';
-  static const friday = 'Sexta';
-  static const saturday = 'Sábado';
-  static const sunday = 'Domingo';
+  static const monday = 'monday';
+  static const tuesday = 'tuesday';
+  static const wednesday = 'wednesday';
+  static const thursday = 'thursday';
+  static const friday = 'friday';
+  static const saturday = 'saturday';
+  static const sunday = 'sunday';
 }
 
 class AnalysisViewMode {
-  static const week = 'Semana';
-  static const month = 'Mês';
-  static const year = 'Ano';
+  static const week = 'analysis_week';
+  static const month = 'analysis_month';
+  static const year = 'analysis_year';
 }
 
 class AppThemeOptions {
-  static const automatic = 'Automático';
-  static const dark = 'Escuro';
-  static const light = 'Claro';
+  static const automatic = 'theme_automatic';
+  static const dark = 'theme_dark';
+  static const light = 'theme_light';
+}
+
+class AppLanguageOptions {
+  static const english = 'language_english';
+  static const portuguese = 'language_portuguese';
+  static const french = 'language_french';
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -22,11 +23,11 @@ class DialogPopup {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(negativeResponse),
+              child: Text(negativeResponse.tr()),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(positiveResponse),
+              child: Text(positiveResponse.tr()),
             ),
           ],
         );

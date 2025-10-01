@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
@@ -29,7 +30,7 @@ class HourValueRuleCard extends StatelessWidget {
               getIn ? Icons.login : Icons.logout,
               color: getIn ? AppColors.softGreen : AppColors.red,
             ),
-            title: Text(getIn ? Labels.getIn : Labels.getOut),
+            title: Text(getIn ? Labels.getIn.tr() : Labels.getOut.tr()),
             trailing: Text(
               DatesHelper.getTimeFromDate(ponto.date),
               style: TextStyle(fontSize: 14),

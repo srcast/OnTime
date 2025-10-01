@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/layout/themes.dart';
@@ -59,7 +60,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Text(
-                              AnalysisViewMode.week,
+                              AnalysisViewMode.week.tr(),
                               style: TextStyle(
                                 color:
                                     vm.viewMode == AnalysisViewMode.week
@@ -88,7 +89,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Text(
-                              AnalysisViewMode.month,
+                              AnalysisViewMode.month.tr(),
                               style: TextStyle(
                                 color:
                                     vm.viewMode == AnalysisViewMode.month
@@ -116,7 +117,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                             child: Text(
-                              AnalysisViewMode.year,
+                              AnalysisViewMode.year.tr(),
                               style: TextStyle(
                                 color:
                                     vm.viewMode == AnalysisViewMode.year

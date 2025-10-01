@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/layout/themes.dart';
@@ -86,7 +87,7 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
                   .map(
                     (destination) => NavigationDestination(
                       icon: Icon(destination.icon),
-                      label: destination.label,
+                      label: destination.label.tr(),
                       selectedIcon: Icon(
                         destination.icon,
                         color: context.colors.focusColor,

@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
 import 'package:on_time/layout/themes.dart';
@@ -15,6 +15,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await initializeDateFormatting('pt_PT', null);
 
   setup();
@@ -22,25 +23,32 @@ void main() async {
   await locator<ConfigsService>().ensureConfigExists();
 
   runApp(
-    MultiProvider(
-      providers: [
-        Provider(
-          create: (context) => AppDatabase(),
-          dispose: (context, AppDatabase db) => db.close(),
+    EasyLocalization(
+      supportedLocales: const [Locale('pt', 'PT'), Locale('en'), Locale('fr')],
+      path:
+          'assets/translations', // cria pasta assets/translations/en.json, pt-PT.json, etc.
+      fallbackLocale: const Locale('en'),
+      saveLocale: false, // false porque tu vais gerir pelo ConfigsService
+      child: MultiProvider(
+        providers: [
+          Provider(
+            create: (context) => AppDatabase(),
+            dispose: (context, AppDatabase db) => db.close(),
+          ),
+          ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
+          ChangeNotifierProvider(
+            create: (_) => locator<DefineHourValueConfigPageVM>(),
+          ),
+          ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
+          ChangeNotifierProvider(
+            create: (_) => locator<ConfigConfigurationsPageVM>(),
+          ),
+        ],
+        child: DevicePreview(
+          builder: (context) {
+            return MyApp();
+          },
         ),
-        ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
-        ChangeNotifierProvider(
-          create: (_) => locator<DefineHourValueConfigPageVM>(),
-        ),
-        ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
-        ChangeNotifierProvider(
-          create: (_) => locator<ConfigConfigurationsPageVM>(),
-        ),
-      ],
-      child: DevicePreview(
-        builder: (context) {
-          return MyApp();
-        },
       ),
     ),
   );
@@ -51,44 +59,33 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp.router(
-    //   locale: const Locale('pt', 'PT'),
-    //   //locale: DevicePreview.locale(context),
-    //   builder: DevicePreview.appBuilder,
-    //   routerConfig: AppRouter.router,
-    //   debugShowCheckedModeBanner: false,
-    //   supportedLocales: const [Locale('pt', 'PT'), Locale('en')],
-    //   localizationsDelegates: const [
-    //     GlobalMaterialLocalizations.delegate,
-    //     GlobalCupertinoLocalizations.delegate,
-    //     GlobalWidgetsLocalizations.delegate,
-    //   ],
-    //   theme: lightTheme,
-    //   darkTheme: darkTheme,
-    //   themeMode: ThemeMode.system,
-    // );
-
     return ChangeNotifierProvider(
       create: (context) {
-        final vm = ConfigConfigurationsPageVM(
-          locator<ConfigsService>(),
-        ); // ensures that we can change theme mode in runtime
+        final vm = ConfigConfigurationsPageVM(locator<ConfigsService>());
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (vm.appLanguage != null && context.locale != vm.appLanguage) {
+            context.setLocale(vm.appLanguage);
+          }
+        });
+
         return vm;
       },
       child: Consumer<ConfigConfigurationsPageVM>(
         builder: (context, vm, _) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (vm.appLanguage != null && context.locale != vm.appLanguage) {
+              context.setLocale(vm.appLanguage);
+            }
+          });
+
           return MaterialApp.router(
-            locale: const Locale('pt', 'PT'),
-            //locale: DevicePreview.locale(context),
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
             builder: DevicePreview.appBuilder,
             routerConfig: AppRouter.router,
             debugShowCheckedModeBanner: false,
-            supportedLocales: const [Locale('pt', 'PT'), Locale('en')],
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-            ],
             theme: lightTheme,
             darkTheme: darkTheme,
             themeMode: vm.flutterThemeMode,

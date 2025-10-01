@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/layout/themes.dart';
@@ -31,7 +32,7 @@ class _InfoConfigPage extends State<InfoConfigPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Labels.configsInfo),
+        title: Text(Labels.configsInfo.tr()),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -45,7 +46,7 @@ class _InfoConfigPage extends State<InfoConfigPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              Labels.appVersion,
+              Labels.appVersion.tr(),
               style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
             const SizedBox(height: 6),
@@ -59,12 +60,12 @@ class _InfoConfigPage extends State<InfoConfigPage> {
             ),
             const SizedBox(height: 30),
             Text(
-              Labels.lastUpdate,
+              Labels.lastUpdate.tr(),
               style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
             const SizedBox(height: 6),
             Text(
-              Labels.lastUpdateDate,
+              Labels.lastUpdateDate.tr(),
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,

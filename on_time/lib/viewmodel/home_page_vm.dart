@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
@@ -193,10 +194,10 @@ class HomePageVM extends ChangeNotifier {
     bool response = false;
     response = await DialogPopup.show(
       context,
-      title: Labels.delete,
-      message: Labels.deletePointMsg,
-      negativeResponse: Labels.cancel,
-      positiveResponse: Labels.delete,
+      title: Labels.delete.tr(),
+      message: Labels.deletePointMsg.tr(),
+      negativeResponse: Labels.cancel.tr(),
+      positiveResponse: Labels.delete.tr(),
     );
 
     if (response) {

@@ -758,8 +758,24 @@ class $ConfigurationsTable extends Configurations
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _languageMeta = const VerificationMeta(
+    'language',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, hourValueBase, themeMode];
+  late final GeneratedColumn<String> language = GeneratedColumn<String>(
+    'language',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    hourValueBase,
+    themeMode,
+    language,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -790,6 +806,12 @@ class $ConfigurationsTable extends Configurations
         themeMode.isAcceptableOrUnknown(data['theme_mode']!, _themeModeMeta),
       );
     }
+    if (data.containsKey('language')) {
+      context.handle(
+        _languageMeta,
+        language.isAcceptableOrUnknown(data['language']!, _languageMeta),
+      );
+    }
     return context;
   }
 
@@ -812,6 +834,10 @@ class $ConfigurationsTable extends Configurations
         DriftSqlType.string,
         data['${effectivePrefix}theme_mode'],
       ),
+      language: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      ),
     );
   }
 
@@ -825,7 +851,13 @@ class Configuration extends DataClass implements Insertable<Configuration> {
   final int id;
   final double? hourValueBase;
   final String? themeMode;
-  const Configuration({required this.id, this.hourValueBase, this.themeMode});
+  final String? language;
+  const Configuration({
+    required this.id,
+    this.hourValueBase,
+    this.themeMode,
+    this.language,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -835,6 +867,9 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     }
     if (!nullToAbsent || themeMode != null) {
       map['theme_mode'] = Variable<String>(themeMode);
+    }
+    if (!nullToAbsent || language != null) {
+      map['language'] = Variable<String>(language);
     }
     return map;
   }
@@ -850,6 +885,10 @@ class Configuration extends DataClass implements Insertable<Configuration> {
           themeMode == null && nullToAbsent
               ? const Value.absent()
               : Value(themeMode),
+      language:
+          language == null && nullToAbsent
+              ? const Value.absent()
+              : Value(language),
     );
   }
 
@@ -862,6 +901,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
       id: serializer.fromJson<int>(json['id']),
       hourValueBase: serializer.fromJson<double?>(json['hourValueBase']),
       themeMode: serializer.fromJson<String?>(json['themeMode']),
+      language: serializer.fromJson<String?>(json['language']),
     );
   }
   @override
@@ -871,6 +911,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
       'id': serializer.toJson<int>(id),
       'hourValueBase': serializer.toJson<double?>(hourValueBase),
       'themeMode': serializer.toJson<String?>(themeMode),
+      'language': serializer.toJson<String?>(language),
     };
   }
 
@@ -878,11 +919,13 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     int? id,
     Value<double?> hourValueBase = const Value.absent(),
     Value<String?> themeMode = const Value.absent(),
+    Value<String?> language = const Value.absent(),
   }) => Configuration(
     id: id ?? this.id,
     hourValueBase:
         hourValueBase.present ? hourValueBase.value : this.hourValueBase,
     themeMode: themeMode.present ? themeMode.value : this.themeMode,
+    language: language.present ? language.value : this.language,
   );
   Configuration copyWithCompanion(ConfigurationsCompanion data) {
     return Configuration(
@@ -892,6 +935,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
               ? data.hourValueBase.value
               : this.hourValueBase,
       themeMode: data.themeMode.present ? data.themeMode.value : this.themeMode,
+      language: data.language.present ? data.language.value : this.language,
     );
   }
 
@@ -900,45 +944,52 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     return (StringBuffer('Configuration(')
           ..write('id: $id, ')
           ..write('hourValueBase: $hourValueBase, ')
-          ..write('themeMode: $themeMode')
+          ..write('themeMode: $themeMode, ')
+          ..write('language: $language')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, hourValueBase, themeMode);
+  int get hashCode => Object.hash(id, hourValueBase, themeMode, language);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Configuration &&
           other.id == this.id &&
           other.hourValueBase == this.hourValueBase &&
-          other.themeMode == this.themeMode);
+          other.themeMode == this.themeMode &&
+          other.language == this.language);
 }
 
 class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
   final Value<int> id;
   final Value<double?> hourValueBase;
   final Value<String?> themeMode;
+  final Value<String?> language;
   const ConfigurationsCompanion({
     this.id = const Value.absent(),
     this.hourValueBase = const Value.absent(),
     this.themeMode = const Value.absent(),
+    this.language = const Value.absent(),
   });
   ConfigurationsCompanion.insert({
     this.id = const Value.absent(),
     this.hourValueBase = const Value.absent(),
     this.themeMode = const Value.absent(),
+    this.language = const Value.absent(),
   });
   static Insertable<Configuration> custom({
     Expression<int>? id,
     Expression<double>? hourValueBase,
     Expression<String>? themeMode,
+    Expression<String>? language,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (hourValueBase != null) 'hour_value_base': hourValueBase,
       if (themeMode != null) 'theme_mode': themeMode,
+      if (language != null) 'language': language,
     });
   }
 
@@ -946,11 +997,13 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     Value<int>? id,
     Value<double?>? hourValueBase,
     Value<String?>? themeMode,
+    Value<String?>? language,
   }) {
     return ConfigurationsCompanion(
       id: id ?? this.id,
       hourValueBase: hourValueBase ?? this.hourValueBase,
       themeMode: themeMode ?? this.themeMode,
+      language: language ?? this.language,
     );
   }
 
@@ -966,6 +1019,9 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     if (themeMode.present) {
       map['theme_mode'] = Variable<String>(themeMode.value);
     }
+    if (language.present) {
+      map['language'] = Variable<String>(language.value);
+    }
     return map;
   }
 
@@ -974,7 +1030,8 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     return (StringBuffer('ConfigurationsCompanion(')
           ..write('id: $id, ')
           ..write('hourValueBase: $hourValueBase, ')
-          ..write('themeMode: $themeMode')
+          ..write('themeMode: $themeMode, ')
+          ..write('language: $language')
           ..write(')'))
         .toString();
   }
@@ -2115,12 +2172,14 @@ typedef $$ConfigurationsTableCreateCompanionBuilder =
       Value<int> id,
       Value<double?> hourValueBase,
       Value<String?> themeMode,
+      Value<String?> language,
     });
 typedef $$ConfigurationsTableUpdateCompanionBuilder =
     ConfigurationsCompanion Function({
       Value<int> id,
       Value<double?> hourValueBase,
       Value<String?> themeMode,
+      Value<String?> language,
     });
 
 class $$ConfigurationsTableFilterComposer
@@ -2144,6 +2203,11 @@ class $$ConfigurationsTableFilterComposer
 
   ColumnFilters<String> get themeMode => $composableBuilder(
     column: $table.themeMode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get language => $composableBuilder(
+    column: $table.language,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2171,6 +2235,11 @@ class $$ConfigurationsTableOrderingComposer
     column: $table.themeMode,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get language => $composableBuilder(
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ConfigurationsTableAnnotationComposer
@@ -2192,6 +2261,9 @@ class $$ConfigurationsTableAnnotationComposer
 
   GeneratedColumn<String> get themeMode =>
       $composableBuilder(column: $table.themeMode, builder: (column) => column);
+
+  GeneratedColumn<String> get language =>
+      $composableBuilder(column: $table.language, builder: (column) => column);
 }
 
 class $$ConfigurationsTableTableManager
@@ -2234,20 +2306,24 @@ class $$ConfigurationsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<double?> hourValueBase = const Value.absent(),
                 Value<String?> themeMode = const Value.absent(),
+                Value<String?> language = const Value.absent(),
               }) => ConfigurationsCompanion(
                 id: id,
                 hourValueBase: hourValueBase,
                 themeMode: themeMode,
+                language: language,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 Value<double?> hourValueBase = const Value.absent(),
                 Value<String?> themeMode = const Value.absent(),
+                Value<String?> language = const Value.absent(),
               }) => ConfigurationsCompanion.insert(
                 id: id,
                 hourValueBase: hourValueBase,
                 themeMode: themeMode,
+                language: language,
               ),
           withReferenceMapper:
               (p0) =>

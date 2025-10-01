@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/layout/themes.dart';
@@ -147,7 +148,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                 child: TextButton(
                   onPressed: () => _onCancel(), //widget.onCancel,
                   child: Text(
-                    Labels.cancel,
+                    Labels.cancel.tr(),
                     style: TextStyle(color: context.colors.actionsText),
                   ),
                 ),
@@ -156,7 +157,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
                 child: TextButton(
                   onPressed: () => _onSubmit(), //widget.onCancel,
                   child: Text(
-                    Labels.ok,
+                    Labels.ok.tr(),
                     style: TextStyle(color: context.colors.actionsText),
                   ),
                 ),

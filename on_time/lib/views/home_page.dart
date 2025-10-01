@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:on_time/layout/themes.dart';
@@ -78,7 +79,7 @@ class _HomePage extends State<HomePage> {
                                     ),
                                   ),
                                   child: Text(
-                                    Labels.today,
+                                    Labels.today.tr(),
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: AppColors.white,
@@ -107,7 +108,7 @@ class _HomePage extends State<HomePage> {
 
                   vm.points.isEmpty
                       ? Expanded(
-                        child: Center(child: Text(Labels.noPointsDayMsg)),
+                        child: Center(child: Text(Labels.noPointsDayMsg.tr())),
                       )
                       : Expanded(
                         child: SlidableAutoCloseBehavior(
@@ -122,8 +123,8 @@ class _HomePage extends State<HomePage> {
                                   showText
                                       ? (ponto.sessionId !=
                                               vm.points[index - 1].sessionId
-                                          ? Labels.workBegins
-                                          : Labels.pause)
+                                          ? Labels.workBegins.tr()
+                                          : Labels.pause.tr())
                                       : '';
                               //aqui se for mudança de sessao acrescentar fim de dia
                               return Column(

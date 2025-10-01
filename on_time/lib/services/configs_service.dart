@@ -21,6 +21,9 @@ class ConfigsService {
               themeMode: Value(
                 GenericHelper.getAppThemeAsString(AppThemeMode.system),
               ),
+              language: Value(
+                GenericHelper.getLanguageOptAsString(LanguageOptions.english),
+              ),
             ),
           );
     }
@@ -63,10 +66,8 @@ class ConfigsService {
       ..where((p) => p.id.equals(ruleToUpdate.id.value))).write(ruleToUpdate);
   }
 
-  Future<AppThemeMode> getTheme() async {
-    final config = await db.select(db.configurations).getSingleOrNull();
-    var theme = GenericHelper.getAppThemefromString(config?.themeMode);
-    return theme;
+  Future<Configuration?> getConfigs() async {
+    return await db.select(db.configurations).getSingleOrNull();
   }
 
   Future<void> setTheme(AppThemeMode themeMode) async {
@@ -76,6 +77,16 @@ class ConfigsService {
       await (db.update(db.configurations)..where(
         (c) => c.id.equals(config.id),
       )).write(ConfigurationsCompanion(themeMode: Value(theme)));
+    }
+  }
+
+  Future<void> setLanguage(LanguageOptions lang) async {
+    var language = GenericHelper.getLanguageOptAsString(lang);
+    final config = await db.select(db.configurations).getSingleOrNull();
+    if (config != null) {
+      await (db.update(db.configurations)..where(
+        (c) => c.id.equals(config.id),
+      )).write(ConfigurationsCompanion(language: Value(language)));
     }
   }
 }

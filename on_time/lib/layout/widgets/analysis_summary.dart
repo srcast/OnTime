@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
@@ -24,11 +25,11 @@ class AnalysisSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             summaryRow(
-              Labels.hours,
+              Labels.hours.tr(),
               '${minutesWorked ~/ 60}h ${min < 10 ? '0' : ''}${min}min',
             ),
             summaryRow(
-              Labels.profit,
+              Labels.profit.tr(),
               NumberFormat.simpleCurrency(
                 locale: Localizations.localeOf(context).toString(),
               ).format(profit),

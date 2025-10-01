@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/helpers/dates_helper.dart';
@@ -70,7 +71,7 @@ class _PointModal extends State<PointModal> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            Labels.homeTab,
+            Labels.homeTab.tr(),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 16),
@@ -93,14 +94,14 @@ class _PointModal extends State<PointModal> {
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
-                  Labels.cancel,
+                  Labels.cancel.tr(),
                   style: TextStyle(color: context.colors.actionsText),
                 ),
               ),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, selectedDateTime),
                 child: Text(
-                  Labels.save,
+                  Labels.save.tr(),
                   style: TextStyle(color: context.colors.focusColor),
                 ),
               ),

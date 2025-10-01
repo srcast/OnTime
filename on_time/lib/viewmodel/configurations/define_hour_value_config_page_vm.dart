@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -47,7 +48,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(Labels.valueSaved),
+          content: Text(Labels.valueSaved.tr()),
           backgroundColor: AppColors.greenDisabled,
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 2),
@@ -101,12 +102,12 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
       // update
       if (currentRule != null) {
         _configsService.updateRule(rule);
-        message = HourValueRules.updateRuleMsg;
+        message = HourValueRules.updateRuleMsg.tr();
       }
       // insert
       else {
         _configsService.insertRule(rule);
-        message = HourValueRules.insertRuleMsg;
+        message = HourValueRules.insertRuleMsg.tr();
       }
 
       getHourValuePoliticRules();
@@ -128,10 +129,10 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
 
     response = await DialogPopup.show(
       context,
-      title: Labels.warning,
-      message: HourValueRules.deleteRuleMsg,
-      negativeResponse: Labels.cancel,
-      positiveResponse: Labels.delete,
+      title: Labels.warning.tr(),
+      message: HourValueRules.deleteRuleMsg.tr(),
+      negativeResponse: Labels.cancel.tr(),
+      positiveResponse: Labels.delete.tr(),
     );
 
     if (response) {
@@ -145,8 +146,8 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     if (valueHasChanged) {
       bool response = await DialogPopup.show(
         context,
-        title: Labels.warning,
-        message: HourValueRules.unsavedChangesMsg,
+        title: Labels.warning.tr(),
+        message: HourValueRules.unsavedChangesMsg.tr(),
       );
 
       if (response) {

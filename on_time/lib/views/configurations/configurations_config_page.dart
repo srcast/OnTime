@@ -1,7 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/layout/themes.dart';
-import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
@@ -16,7 +16,7 @@ class ConfigsConfigurationsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Labels.configurationsTab),
+        title: Text(Labels.configurationsTab.tr()),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -30,7 +30,7 @@ class ConfigsConfigurationsPage extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           Text(
-            Labels.theme,
+            Labels.theme.tr(),
             style: TextStyle(fontSize: 22, color: context.colors.titleText),
           ),
           SizedBox(height: 10),
@@ -51,24 +51,69 @@ class ConfigsConfigurationsPage extends StatelessWidget {
               children: [
                 _buildThemeOption(
                   context,
-                  title: AppThemeOptions.automatic,
+                  title: AppThemeOptions.automatic.tr(),
                   value: AppThemeMode.system,
                   groupValue: vm.themeMode,
                   onChanged: vm.setTheme,
                 ),
                 _buildThemeOption(
                   context,
-                  title: AppThemeOptions.light,
+                  title: AppThemeOptions.light.tr(),
                   value: AppThemeMode.light,
                   groupValue: vm.themeMode,
                   onChanged: vm.setTheme,
                 ),
                 _buildThemeOption(
                   context,
-                  title: AppThemeOptions.dark,
+                  title: AppThemeOptions.dark.tr(),
                   value: AppThemeMode.dark,
                   groupValue: vm.themeMode,
                   onChanged: vm.setTheme,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            Labels.language.tr(),
+            style: TextStyle(fontSize: 22, color: context.colors.titleText),
+          ),
+          SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+              color: context.colors.scaffoldBackground,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                _buildLanguageOption(
+                  context,
+                  title: AppLanguageOptions.english.tr(),
+                  value: LanguageOptions.english,
+                  groupValue: vm.language,
+                  onChanged: vm.setLanguage,
+                ),
+                _buildLanguageOption(
+                  context,
+                  title: AppLanguageOptions.portuguese.tr(),
+                  value: LanguageOptions.portuguese,
+                  groupValue: vm.language,
+                  onChanged: vm.setLanguage,
+                ),
+                _buildLanguageOption(
+                  context,
+                  title: AppLanguageOptions.french.tr(),
+                  value: LanguageOptions.french,
+                  groupValue: vm.language,
+                  onChanged: vm.setLanguage,
                 ),
               ],
             ),
@@ -86,6 +131,31 @@ class ConfigsConfigurationsPage extends StatelessWidget {
     required Function(AppThemeMode) onChanged,
   }) {
     return RadioListTile<AppThemeMode>(
+      value: value,
+      groupValue: groupValue,
+      onChanged: (val) {
+        if (val != null) onChanged(val);
+      },
+      title: Text(
+        title,
+        style: TextStyle(
+          color: context.colors.defaultText,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      activeColor: context.colors.focusColor,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context, {
+    required String title,
+    required LanguageOptions value,
+    required LanguageOptions groupValue,
+    required Function(LanguageOptions) onChanged,
+  }) {
+    return RadioListTile<LanguageOptions>(
       value: value,
       groupValue: groupValue,
       onChanged: (val) {

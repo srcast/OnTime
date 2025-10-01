@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/layout/themes.dart';
@@ -21,7 +22,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(Labels.configsListHourValue),
+        title: Text(Labels.configsListHourValue.tr()),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => vm.goBack(context),
@@ -37,7 +38,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              Labels.defineBaseValueHour,
+              Labels.defineBaseValueHour.tr(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: context.colors.defaultText,
@@ -78,11 +79,11 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(Labels.save),
+              child: Text(Labels.save.tr()),
             ),
             SizedBox(height: 24),
             Text(
-              Labels.specialRules,
+              Labels.specialRules.tr(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: context.colors.defaultText,
@@ -99,7 +100,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Text(Labels.addNewRule),
+              child: Text(Labels.addNewRule.tr()),
             ),
             SizedBox(height: 16),
             Expanded(
@@ -128,7 +129,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                regra.ruleDescription,
+                                regra.ruleDescription.tr(),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 4),
