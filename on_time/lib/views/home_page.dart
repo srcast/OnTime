@@ -43,7 +43,13 @@ class _HomePage extends State<HomePage> {
                       TextButton(
                         onPressed: () => vm.openCalendar(context),
                         child: Text(
-                          vm.formatedDate,
+                          toBeginningOfSentenceCase(
+                                DateFormat(
+                                  "E, d MMMM y",
+                                  Localizations.localeOf(context).toString(),
+                                ).format(vm.date),
+                              ) ??
+                              '',
                           style: TextStyle(
                             fontSize: 16,
                             color: context.colors.defaultText,

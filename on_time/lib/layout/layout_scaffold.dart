@@ -20,10 +20,10 @@ class LayoutScaffold extends StatefulWidget {
 }
 
 class _LayoutScaffoldState extends State<LayoutScaffold> {
-  int _currentIndex = 0;
+  //int _currentIndex = 0;
 
   late final Map<int, VoidCallback> _onTabReselected = {
-    0: () => context.read<HomePageVM>().getSessionPoints(),
+    0: () => context.read<HomePageVM>().verifyDate(),
     1: () => context.read<AnalysisPageVM>().getData(),
     //2: () => context.read<ConfigurationsPageVM>().cleanSubPagesStack(),
   };
@@ -31,25 +31,30 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.navigationShell.currentIndex;
+    //_currentIndex = widget.navigationShell.currentIndex;
   }
 
   void goToHomePage(DateTime selectedDay) {
     final index = destinations.indexWhere((d) => d.label == Labels.homeTab);
     context.read<HomePageVM>().refreshDayFromCalendarAnalysis(selectedDay);
-    setState(() => _currentIndex = index);
+    //setState(() => _currentIndex = index);
     widget.navigationShell.goBranch(index);
   }
 
   void _onDestinationSelected(int index) {
-    if (index == _currentIndex) {
+    if (index == widget.navigationShell.currentIndex) {
       if (index == 2 && Navigator.canPop(context)) {
         // configurations tab
         context.pop();
       }
     } else {
+      if (widget.navigationShell.currentIndex == 0) {
+        // is leaving home page
+        // set timer false
+        context.read<HomePageVM>().timerRunning(false);
+      }
       _onTabReselected[index]?.call();
-      setState(() => _currentIndex = index);
+      //setState(() => _currentIndex = index);
       widget.navigationShell.goBranch(index);
     }
   }

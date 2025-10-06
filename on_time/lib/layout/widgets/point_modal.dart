@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
@@ -57,7 +56,9 @@ class _PointModal extends State<PointModal> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFormatted = DateFormat.yMMMMd("pt_PT").format(selectedDateTime);
+    final dateFormatted = DateFormat.yMMMMd(
+      Localizations.localeOf(context).toString(),
+    ).format(selectedDateTime);
     final timeFormatted = DateFormat.Hm().format(selectedDateTime);
 
     return Padding(

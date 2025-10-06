@@ -8,8 +8,8 @@ class ConfigsService {
 
   ConfigsService(this.db);
 
-  Future<void> ensureConfigExists() async {
-    final existing = await db.select(db.configurations).get();
+  Future<Configuration> ensureConfigExists() async {
+    var existing = await db.select(db.configurations).get();
 
     if (existing.isEmpty) {
       await db
@@ -27,6 +27,10 @@ class ConfigsService {
             ),
           );
     }
+
+    existing = await db.select(db.configurations).get();
+
+    return existing.first;
   }
 
   Future<double?> getHourValueBase() async {

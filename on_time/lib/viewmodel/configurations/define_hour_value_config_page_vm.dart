@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
@@ -23,8 +22,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   }
 
   // Public Properties
-  String get baseHourValue =>
-      NumberFormat.simpleCurrency(locale: 'pt_PT').format(_baseHourValue);
+  double? get baseHourValue => _baseHourValue;
 
   String get baseHourValueToSet => _baseHourValue.toString();
 

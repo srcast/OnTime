@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:on_time/helpers/dates_helper.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/services/points_service.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
+import 'package:on_time/viewmodel/home_page_vm.dart';
+import 'package:provider/provider.dart';
 
 class AnalysisPageVM extends ChangeNotifier {
   final PointsService _pointsService;
@@ -49,28 +53,32 @@ class AnalysisPageVM extends ChangeNotifier {
         DateTime.now(),
       ); // better controller when advance and go back in date
       _viewMode = mode;
-      _setViewModeTitle();
+      //_setViewModeTitle();
       handelsStartEndDate();
       getData();
     }
   }
 
-  void _setViewModeTitle() {
+  String getViewModeTitle(BuildContext context) {
+    var title = '';
+
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        _viewModeTitle = _getWeekRange(
-          _focusedDate,
-        ); // handles enddate and startdate
+        title = _getWeekRange(_focusedDate); // handles enddate and startdate
         break;
 
       case AnalysisViewMode.month:
-        _viewModeTitle = DateFormat.yMMMM('pt_PT').format(_focusedDate);
+        title = DateFormat.yMMMM(
+          Localizations.localeOf(context).toString(),
+        ).format(_focusedDate);
         break;
 
       case AnalysisViewMode.year:
-        _viewModeTitle = _focusedDate.year.toString();
+        title = _focusedDate.year.toString();
         break;
     }
+
+    return title;
   }
 
   String _getWeekRange(DateTime date) {
@@ -78,7 +86,7 @@ class AnalysisPageVM extends ChangeNotifier {
     final DateTime sunday = date.subtract(Duration(days: weekday % 7));
     final DateTime saturday = sunday.add(const Duration(days: 6));
 
-    return '${DateFormat('dd/MM/yyyy', 'pt_PT').format(sunday)} - ${DateFormat('dd/MM/yyyy', 'pt_PT').format(saturday)}';
+    return '${DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale()).format(sunday)} - ${DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale()).format(saturday)}';
   }
 
   void advanceDate() {
@@ -100,7 +108,7 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    _setViewModeTitle();
+    //_setViewModeTitle();
     handelsStartEndDate();
     getData();
   }
@@ -124,7 +132,7 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    _setViewModeTitle();
+    //_setViewModeTitle();
     handelsStartEndDate();
     getData();
   }
@@ -247,7 +255,7 @@ class AnalysisPageVM extends ChangeNotifier {
     _entries = {for (var entry in sortedEntries) entry.key: entry.value};
   }
 
-  String getLabelForIndex(int index) {
+  String getLabelForIndex(int index, BuildContext context) {
     final entries = _entries.entries.toList();
     if (index >= entries.length) return '';
 
@@ -256,12 +264,18 @@ class AnalysisPageVM extends ChangeNotifier {
     switch (_viewMode) {
       case AnalysisViewMode.week:
         // Ex: Seg, Ter, Qua...
-        return DateFormat.EEEEE('pt_PT').format(date);
+        return DateFormat.EEEEE(
+          Localizations.localeOf(context).toString(),
+        ).format(date);
       case AnalysisViewMode.year:
         // Ex: Jan, Fev, Mar...
-        return DateFormat.MMM('pt_PT').format(date);
+        return DateFormat.MMM(
+          Localizations.localeOf(context).toString(),
+        ).format(date);
       default:
-        return DateFormat.d('pt_PT').format(date); // fallback: dia do mês
+        return DateFormat.d(
+          Localizations.localeOf(context).toString(),
+        ).format(date); // fallback: dia do mês
     }
   }
 
@@ -275,13 +289,17 @@ class AnalysisPageVM extends ChangeNotifier {
   }
 
   void goToSelectedDay(BuildContext context, DateTime selectedDay) {
-    // context.go('/home', extra: selectedDay);
+    context.read<HomePageVM>().refreshDayFromCalendarAnalysis(selectedDay);
 
-    // final layoutState = context.findAncestorStateOfType<_LayoutScaffoldState>();
-    // layoutState?.goToTab(
-    //   0,
-    //   selectedDay: selectedDay,
-    // ); // vai para Home e foca no dia
+    // 2) troca para a aba Home (index 0)
+    final shell = StatefulNavigationShell.of(context);
+    shell.goBranch(0);
+
+    // GoRouter.of(context).go(Routes.homePage);
+    // Future.delayed(
+    //   const Duration(milliseconds: 100),
+    //   () => GoRouter.of(context).go(Routes.homePage),
+    // );
   }
 
   /*   @override

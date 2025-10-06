@@ -153,7 +153,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              vm.viewModeTitle,
+                              vm.getViewModeTitle(context),
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -184,7 +184,7 @@ class _AnalysisPageState extends State<AnalysisPage> {
                         child: SizedBox(
                           width: MediaQuery.of(context).size.width,
                           child: TableCalendar(
-                            locale: "pt-PT",
+                            locale: Localizations.localeOf(context).toString(),
                             firstDay: DateTime.utc(
                               vm.focusedDate.year - 5,
                               1,
@@ -314,10 +314,13 @@ class _AnalysisPageState extends State<AnalysisPage> {
                                   showTitles: true,
                                   getTitlesWidget: (value, _) {
                                     final index = value.toInt();
-                                    final label = vm.getLabelForIndex(index);
+                                    final label = vm.getLabelForIndex(
+                                      index,
+                                      context,
+                                    );
                                     return Text(
                                       label,
-                                      style: TextStyle(fontSize: 12),
+                                      style: TextStyle(fontSize: 10),
                                     );
                                   },
                                 ),

@@ -26,11 +26,7 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   }
 
   Locale get appLanguage {
-    return switch (_language) {
-      LanguageOptions.english => Locale('en'),
-      LanguageOptions.portuguese => Locale('pt', 'PT'),
-      LanguageOptions.french => Locale('fr'),
-    };
+    return GenericHelper.getLocaleFromDBLang(_language);
   }
   //
 

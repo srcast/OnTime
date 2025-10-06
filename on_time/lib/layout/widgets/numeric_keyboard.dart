@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -37,47 +37,56 @@ class NumericKeyboard extends StatefulWidget {
 
 class _NumericKeyboardState extends State<NumericKeyboard> {
   late String _value;
-  String _valueStr = '';
+  int decPoints = 0;
+  bool insertPoint = false;
 
   @override
   void initState() {
     super.initState();
-    _value = widget.value == '0.0' ? '' : widget.value;
+    _value = widget.value;
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _updateValueStr();
+    if (_value != '0.0') {
+      var decimals = _value.split('.');
+
+      decPoints = decimals.length > 1 ? decimals[1].length : 0;
+    }
   }
 
   void _onKeyTap(String key) {
     setState(() {
-      if (key == '.') {
-        if (!_value.contains('.')) _value += '.';
-      } else {
-        _value += key;
+      if (decPoints < 2) {
+        if (key == '.') {
+          if (!_value.contains('.')) {
+            insertPoint = true;
+          }
+        } else {
+          if (_value == '0.0') {
+            _value = key;
+          } else {
+            if (insertPoint) {
+              ++decPoints;
+              _value += '.$key';
+              insertPoint = false;
+            } else {
+              decPoints = decPoints > 0 ? ++decPoints : decPoints;
+              _value += key;
+            }
+          }
+        }
       }
-
-      _updateValueStr();
     });
   }
 
   void _onClear() {
     setState(() {
-      _value = '';
-      _updateValueStr();
+      _value = '0.0';
+      decPoints = 0;
+      insertPoint = false;
     });
-  }
-
-  void _updateValueStr() {
-    if (_value == '') {
-      _valueStr = _value;
-    } else {
-      _valueStr = NumberFormat.simpleCurrency(
-        locale: Localizations.localeOf(context).toString(),
-      ).format(double.tryParse(_value));
-    }
   }
 
   void _onCancel() {
@@ -103,7 +112,10 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _valueStr,
+            NumberFormat.simpleCurrency(
+              locale: GenericHelper.getDeviceLocale(),
+              decimalDigits: decPoints,
+            ).format(double.tryParse(_value)),
             style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),

@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/layout/themes.dart';
@@ -27,7 +26,6 @@ class _ValueRuleModal extends State<ValueRuleModal> {
   TimeOfDay? ruleHour;
   TimeOfDay? workStartAtSchedule;
   bool isEdit = false;
-  String? ruleValueStr = '';
 
   @override
   void initState() {
@@ -60,9 +58,6 @@ class _ValueRuleModal extends State<ValueRuleModal> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    ruleValueStr = NumberFormat.simpleCurrency(
-      locale: Localizations.localeOf(context).toString(),
-    ).format(ruleValue);
   }
 
   @override
@@ -84,9 +79,6 @@ class _ValueRuleModal extends State<ValueRuleModal> {
   Future<void> setHourValueRule(double val) async {
     setState(() {
       ruleValue = val;
-      ruleValueStr = NumberFormat.simpleCurrency(
-        locale: Localizations.localeOf(context).toString(),
-      ).format(ruleValue);
     });
   }
 
@@ -321,7 +313,12 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(ruleValueStr!, style: TextStyle(fontSize: 16)),
+                        Text(
+                          NumberFormat.simpleCurrency(
+                            locale: GenericHelper.getDeviceLocale(),
+                          ).format(ruleValue),
+                          style: TextStyle(fontSize: 16),
+                        ),
                         const Icon(Icons.edit, color: Colors.grey),
                       ],
                     ),

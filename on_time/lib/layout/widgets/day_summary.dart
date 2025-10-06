@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/utils/labels.dart';
 
 class DaySummary extends StatelessWidget {
@@ -31,12 +31,12 @@ class DaySummary extends StatelessWidget {
             ),
             summaryRow(
               Labels.hourValue.tr(),
-              '${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(hourValue)}/h',
+              '${NumberFormat.simpleCurrency(locale: GenericHelper.getDeviceLocale()).format(hourValue)}/h',
             ),
             summaryRow(
               Labels.profit.tr(),
               NumberFormat.simpleCurrency(
-                locale: Localizations.localeOf(context).toString(),
+                locale: GenericHelper.getDeviceLocale(),
               ).format(profit),
             ),
           ],

@@ -242,14 +242,16 @@ class PointsService {
         ''',
                   variables: [
                     Variable.withDateTime(start),
-                    Variable.withDateTime(end),
+                    Variable.withDateTime(
+                      end.add(Duration(days: 1)).add(Duration(seconds: -1)),
+                    ), // end of the day
                   ],
                 )
                 .get();
 
         return {
           for (final row in result)
-            row.read<DateTime>('day'): {
+            DatesHelper.getSessionFromDate(row.read<DateTime>('day')): {
               AnalysisMapEntriesEnum.profit: row.read<double>('profit'),
               AnalysisMapEntriesEnum.minutesWorked: row.read<int>(
                 'minutes_worked',
@@ -270,7 +272,9 @@ class PointsService {
         ''',
                   variables: [
                     Variable.withDateTime(start),
-                    Variable.withDateTime(end),
+                    Variable.withDateTime(
+                      end.add(Duration(days: 1)).add(Duration(seconds: -1)),
+                    ), // end of the day
                   ],
                 )
                 .get();

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
@@ -38,12 +37,6 @@ class HomePageVM extends ChangeNotifier {
   DateTime get date => _date;
 
   String get hour => DateFormat('HH:mm:ss').format(_date);
-
-  String get formatedDate =>
-      toBeginningOfSentenceCase(
-        DateFormat("E, d 'de' MMM 'de' y", "pt_PT").format(_date),
-      ) ??
-      '';
 
   bool get timerVisible => _timerVisible;
 
@@ -281,9 +274,9 @@ class HomePageVM extends ChangeNotifier {
     verifyDate();
   }
 
-  /*   @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  } */
+  // @override
+  // void dispose() {
+  //   _timer.cancel();
+  //   super.dispose();
+  // }
 }

@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
@@ -59,7 +59,12 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(vm.baseHourValue, style: TextStyle(fontSize: 16)),
+                    Text(
+                      NumberFormat.simpleCurrency(
+                        locale: GenericHelper.getDeviceLocale(),
+                      ).format(vm.baseHourValue),
+                      style: TextStyle(fontSize: 16),
+                    ),
                     const Icon(Icons.edit, color: Colors.grey),
                   ],
                 ),
