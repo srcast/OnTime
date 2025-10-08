@@ -19,7 +19,7 @@ class ConfigsService {
               id: Value(1),
               hourValueBase: Value(0),
               themeMode: Value(
-                GenericHelper.getAppThemeAsString(AppThemeMode.system),
+                GenericHelper.getAppThemeAsString(AppThemeMode.light),
               ),
               language: Value(
                 GenericHelper.getLanguageOptAsString(LanguageOptions.english),

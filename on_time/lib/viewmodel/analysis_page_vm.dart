@@ -19,7 +19,6 @@ class AnalysisPageVM extends ChangeNotifier {
   double _totalProfit = 0;
   Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>> _entries = {};
   String _viewMode = '';
-  String _viewModeTitle = '';
   bool _isLoading = false;
   late DateTime _startDate;
   late DateTime _endDate;
@@ -38,7 +37,6 @@ class AnalysisPageVM extends ChangeNotifier {
   int get totalMinutes => _totalMinutes;
   double get totalProfit => _totalProfit;
   String get viewMode => _viewMode;
-  String get viewModeTitle => _viewModeTitle;
   bool get isLoading => _isLoading;
   Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>> get entries => _entries;
   List<BarChartGroupData> get barGroups => _barGroups;
@@ -53,7 +51,6 @@ class AnalysisPageVM extends ChangeNotifier {
         DateTime.now(),
       ); // better controller when advance and go back in date
       _viewMode = mode;
-      //_setViewModeTitle();
       handelsStartEndDate();
       getData();
     }
@@ -108,7 +105,6 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    //_setViewModeTitle();
     handelsStartEndDate();
     getData();
   }
@@ -132,7 +128,6 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    //_setViewModeTitle();
     handelsStartEndDate();
     getData();
   }

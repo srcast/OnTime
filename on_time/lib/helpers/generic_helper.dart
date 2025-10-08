@@ -1,6 +1,4 @@
 import 'dart:ui';
-
-import 'package:flutter/material.dart';
 import 'package:on_time/utils/enums.dart';
 
 extension StringExtensions on String? {

@@ -6,7 +6,7 @@ import 'package:on_time/utils/enums.dart';
 class ConfigConfigurationsPageVM extends ChangeNotifier {
   AppThemeMode _themeMode = AppThemeMode.system;
   LanguageOptions _language = LanguageOptions.english;
-  late ConfigsService _configsService;
+  final ConfigsService _configsService;
 
   ConfigConfigurationsPageVM(this._configsService) {
     getConfigs();
