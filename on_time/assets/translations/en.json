@@ -61,6 +61,15 @@
     "theme_dark": "Dark",
     "theme_light": "Light",
     "language_english": "English",
-    "language_portuguese": "Portuguese",
-    "language_french": "French"
+    "language_portuguese": "Português",
+    "language_french": "Français",
+    "tutorial_skip": "Skip",
+    "tutorial_point": "Make a record.",
+    "tutorial_point_list": "Record completed. Swipe left on the record to edit or delete it.",
+    "tutorial_point_edit": "Edit record.",
+    "tutorial_point_delete": "Delete record.",
+    "tutorial_config_hour_value_option": "Configure the base hourly rate and special rules such as day of the week, overtime, etc.",
+    "tutorial_hour_Value_input": "Here you can set your hourly rate to estimate the accumulated value based on your working hours.",
+    "tutorial_save_hour_Value": "If you set an hourly rate, you need to save it.",
+    "tutorial_special_rules": "Here you can define special rules for the hourly rate, such as on specific weekdays, after certain hours, or after a given work duration."
 }

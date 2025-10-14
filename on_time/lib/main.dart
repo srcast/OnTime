@@ -10,7 +10,9 @@ import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
+import 'package:on_time/viewmodel/configurations_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
+import 'package:on_time/views/configurations_page.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -38,10 +40,10 @@ void main() async {
             dispose: (context, AppDatabase db) => db.close(),
           ),
           ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
+          ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
           ChangeNotifierProvider(
             create: (_) => locator<DefineHourValueConfigPageVM>(),
           ),
-          ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
           ChangeNotifierProvider(
             create: (_) => locator<ConfigConfigurationsPageVM>(),
           ),

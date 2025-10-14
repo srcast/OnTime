@@ -84,3 +84,15 @@ class AppLanguageOptions {
   static const portuguese = 'language_portuguese';
   static const french = 'language_french';
 }
+
+class TutorialLabels {
+  static const skip = 'tutorial_skip';
+  static const point = 'tutorial_point';
+  static const pointList = 'tutorial_point_list';
+  static const pointEdit = 'tutorial_point_edit';
+  static const pointDelete = 'tutorial_point_delete';
+  static const configHourValueOption = "tutorial_config_hour_value_option";
+  static const configHourValueInput = "tutorial_hour_Value_input";
+  static const configSaveHourValue = "tutorial_save_hour_Value";
+  static const configSpecialRules = "tutorial_special_rules";
+}

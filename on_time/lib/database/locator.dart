@@ -12,17 +12,19 @@ GetIt locator = GetIt.instance;
 
 void setup() {
   locator.registerLazySingleton(() => AppDatabase());
-  locator.registerLazySingleton(() => PointsService(locator<AppDatabase>()));
   locator.registerFactory(
     () => HomePageVM(locator<PointsService>(), locator<ConfigsService>()),
   );
-  locator.registerLazySingleton(() => ConfigsService(locator<AppDatabase>()));
   locator.registerFactory(
     () => DefineHourValueConfigPageVM(locator<ConfigsService>()),
   );
   locator.registerFactory(() => AnalysisPageVM(locator<PointsService>()));
-  locator.registerFactory(() => ConfigurationsPageVM());
+  locator.registerLazySingleton(
+    () => ConfigurationsPageVM(),
+  ); // singleton in order to not loststate when navigating to another pages (important to tutorial)
   locator.registerFactory(
     () => ConfigConfigurationsPageVM(locator<ConfigsService>()),
   );
+  locator.registerLazySingleton(() => PointsService(locator<AppDatabase>()));
+  locator.registerLazySingleton(() => ConfigsService(locator<AppDatabase>()));
 }

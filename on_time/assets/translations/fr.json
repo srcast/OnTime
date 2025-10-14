@@ -60,7 +60,16 @@
     "theme_automatic": "Automatique",
     "theme_dark": "Sombre",
     "theme_light": "Clair",
-    "language_english": "Anglais",
-    "language_portuguese": "Portugais",
-    "language_french": "Français"
+    "language_english": "English",
+    "language_portuguese": "Português",
+    "language_french": "Français",
+    "tutorial_skip": "Passer",
+    "tutorial_point": "Enregistrement de pointage.",
+    "tutorial_point_list": "Pointage effectué. Faites glisser l’enregistrement vers la gauche pour le modifier ou le supprimer.",
+    "tutorial_point_edit": "Modifier l’enregistrement.",
+    "tutorial_point_delete": "Supprimer l’enregistrement.",
+    "tutorial_config_hour_value_option": "Configurer le taux horaire de base et certaines règles spéciales, comme le jour de la semaine, les heures supplémentaires, etc.",
+    "tutorial_hour_Value_input": "Ici, vous pouvez définir votre taux horaire pour estimer la valeur cumulée en fonction de vos heures travaillées.",
+    "tutorial_save_hour_Value": "Si vous définissez un taux horaire, vous devez l’enregistrer.",
+    "tutorial_special_rules": "Ici, vous pouvez définir des règles spéciales pour le taux horaire, telles que selon le jour de la semaine, après certaines heures ou après une certaine durée de travail."
 }

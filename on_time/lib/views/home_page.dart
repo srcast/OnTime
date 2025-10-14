@@ -1,94 +1,27 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:go_router/go_router.dart';
-import 'package:on_time/database/locator.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
-import 'package:on_time/router/routes.dart';
-import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() {
-    return _HomePage();
-  }
-}
-
-class _HomePage extends State<HomePage> {
-  List<TargetFocus> targets = [];
-  final GlobalKey keyCheckIn = GlobalKey();
-  final GlobalKey keySummary = GlobalKey();
-  final GlobalKey keyPointButtons = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkTutorial());
-  }
-
-  Future<void> _checkTutorial() async {
-    final vm = context.read<HomePageVM>();
-    final configs = locator<ConfigsService>();
-
-    // final hasSeenTutorial = configs.hasSeenFullTutorial;
-
-    // if (!hasSeenTutorial) {
-    _initTargets();
-    _showTutorial();
-    //}
-  }
-
-  void _initTargets() {
-    targets = [
-      TargetFocus(
-        identify: "checkIn",
-        keyTarget: keyCheckIn,
-        shape: ShapeLightFocus.RRect,
-        radius: 16,
-        alignSkip: Alignment.topRight,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            child: const Text(
-              "Aqui fazes o check-in para começar o dia.",
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
-          ),
-        ],
-      ),
-    ];
-  }
-
-  void _showTutorial() {
-    final overlay = Overlay.of(context).context;
-
-    TutorialCoachMark(
-      targets: targets,
-      colorShadow: Colors.black54,
-      textSkip: "Saltar",
-      opacityShadow: 0.6,
-      onFinish: () => _navigateToConfigPage(),
-      onSkip: () => _navigateToConfigPage(),
-    ).show(context: overlay);
-  }
-
-  bool _navigateToConfigPage() {
-    context.go(Routes.configurationsPage);
-    return false;
-  }
 
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<HomePageVM>();
+
+    if (vm.isLoading) {
+      // control to await for configs from db
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    vm.checkTutorial(context);
 
     return SafeArea(
       child: Padding(
@@ -219,12 +152,13 @@ class _HomePage extends State<HomePage> {
                                     ),
 
                                   Slidable(
-                                    key: ValueKey(ponto),
+                                    key: vm.keyListItem,
                                     endActionPane: ActionPane(
                                       motion: const DrawerMotion(),
                                       extentRatio: 0.4,
                                       children: [
                                         SlidableAction(
+                                          key: vm.keyPointEdit,
                                           onPressed:
                                               (context) => vm.updatePoint(
                                                 context,
@@ -239,6 +173,7 @@ class _HomePage extends State<HomePage> {
                                           ),
                                         ),
                                         SlidableAction(
+                                          key: vm.keyPointDelete,
                                           onPressed:
                                               (context) => vm.deletePoint(
                                                 context,
@@ -256,6 +191,7 @@ class _HomePage extends State<HomePage> {
                                       ],
                                     ),
                                     child: ActivityCard(
+                                      key: vm.keyListItemContent,
                                       ponto: ponto,
                                       index: index,
                                     ),
@@ -278,7 +214,7 @@ class _HomePage extends State<HomePage> {
             ),
             SizedBox(height: 10),
             FloatingActionButton(
-              key: keyCheckIn,
+              key: vm.keyCheckIn,
               backgroundColor: AppColors.softGreen, // verde suave, do design
               foregroundColor: AppColors.white,
               elevation: 4,

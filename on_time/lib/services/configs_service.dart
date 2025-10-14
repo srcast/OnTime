@@ -93,4 +93,16 @@ class ConfigsService {
       )).write(ConfigurationsCompanion(language: Value(language)));
     }
   }
+
+  Future<bool> hasSeenTutorial() async {
+    final config = await db.select(db.configurations).getSingleOrNull();
+
+    return config != null ? config.hasSeenTutorial : false;
+  }
+
+  Future<void> updateHasSeenTutorial(bool hasSeenTutorial) async {
+    await (db.update(db.configurations)..where(
+      (c) => c.id.equals(1),
+    )).write(ConfigurationsCompanion(hasSeenTutorial: Value(hasSeenTutorial)));
+  }
 }

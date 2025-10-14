@@ -7,18 +7,13 @@ import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
 import 'package:provider/provider.dart';
 
-class DefineHourValueConfigPage extends StatefulWidget {
+class DefineHourValueConfigPage extends StatelessWidget {
   const DefineHourValueConfigPage({super.key});
 
   @override
-  State<DefineHourValueConfigPage> createState() =>
-      _DefineHourValueConfigPage();
-}
-
-class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
-  @override
   Widget build(BuildContext context) {
     final vm = context.watch<DefineHourValueConfigPageVM>();
+    vm.checkTutorial(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -48,6 +43,8 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
             GestureDetector(
               onTap: () => vm.openNumericKeyboard(context),
               child: Container(
+                key: vm.keyHourValueInput,
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
@@ -72,6 +69,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
             ),
             SizedBox(height: 16),
             ElevatedButton(
+              key: vm.keySaveHourValue,
               onPressed: () => vm.saveHourValueBase(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor:
@@ -96,6 +94,7 @@ class _DefineHourValueConfigPage extends State<DefineHourValueConfigPage> {
             ),
             SizedBox(height: 8),
             ElevatedButton(
+              key: vm.keySpecialRules,
               onPressed: () => vm.openRuleModal(context, null),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.softGreen,

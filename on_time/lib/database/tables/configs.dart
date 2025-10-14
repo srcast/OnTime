@@ -5,4 +5,6 @@ class Configurations extends Table {
   RealColumn get hourValueBase => real().nullable()();
   TextColumn get themeMode => text().nullable()();
   TextColumn get language => text().nullable()();
+  BoolColumn get hasSeenTutorial =>
+      boolean().withDefault(const Constant(false))();
 }

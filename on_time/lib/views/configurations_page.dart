@@ -9,6 +9,7 @@ class ConfigurationsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = ConfigurationsPageVM();
+    vm.checkTutorial(context);
 
     return SafeArea(
       minimum: EdgeInsets.fromLTRB(0, 20, 0, 20),
@@ -18,6 +19,7 @@ class ConfigurationsPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final option = vm.options[index];
           return ListTile(
+            key: index == 0 ? vm.keyConfigs : null,
             leading: Icon(option.icon, color: context.colors.titleText),
             title: Text(option.label.tr()),
             trailing: Icon(Icons.arrow_forward_ios, size: 16),

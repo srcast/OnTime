@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
+import 'package:on_time/router/routes.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
+import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
@@ -26,11 +31,15 @@ class HomePageVM extends ChangeNotifier {
   List<Ponto> _pointsSession =
       []; // points for the session -> its used to update summary
   final ScrollController _scrollController = ScrollController();
+  bool _hasSeenTutorial = false;
+  bool _tutorialOngoing = false;
+  bool _isLoading = false;
 
   HomePageVM(this._pointsService, this._configsService) {
-    timerRunning(true);
+    getHasSeenTutorialConfig();
     _today = DatesHelper.getDatetimeToday();
-    getSessionPoints();
+    timerRunning(true);
+    _getSessionPoints();
   }
 
   // Public Properties
@@ -49,6 +58,14 @@ class HomePageVM extends ChangeNotifier {
   List<Ponto> get points => _pointsUI;
 
   ScrollController get scrollController => _scrollController;
+
+  bool get isLoading => _isLoading;
+
+  final GlobalKey keyCheckIn = GlobalKey();
+  final GlobalKey keyListItem = GlobalKey();
+  final GlobalKey keyListItemContent = GlobalKey();
+  final GlobalKey keyPointEdit = GlobalKey();
+  final GlobalKey keyPointDelete = GlobalKey();
 
   //////////
 
@@ -83,9 +100,9 @@ class HomePageVM extends ChangeNotifier {
 
       var sessionIdToUpdate = await _pointsService.insertPoint(_date);
       await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await updateCurrentSessionData(sessionIdToUpdate);
+      await _updateCurrentSessionData(sessionIdToUpdate);
 
-      getSessionPoints();
+      _getSessionPoints();
     }
   }
 
@@ -110,7 +127,7 @@ class HomePageVM extends ChangeNotifier {
 
   void goToToday() {
     timerRunning(true); // already has notifyListeners
-    getSessionPoints();
+    _getSessionPoints();
   }
 
   void openCalendar(BuildContext context) async {
@@ -128,17 +145,19 @@ class HomePageVM extends ChangeNotifier {
       timerRunning(false); // already has notifyListeners
     }
 
-    getSessionPoints();
+    _getSessionPoints();
   }
 
   // just when initializing and change data
-  Future<void> getSessionPoints() async {
+  Future<void> _getSessionPoints() async {
+    if (!_hasSeenTutorial) return;
+
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
     String sessionId = GenericHelper.getSessionId(sessionDate);
     _pointsSession = await _pointsService.getPointsSession(sessionId);
     _pointsUI = await _pointsService.getDayPointsForUI(sessionDate);
 
-    await updateDaySummary(sessionDate, sessionId);
+    await _updateDaySummary(sessionDate, sessionId);
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -152,7 +171,7 @@ class HomePageVM extends ChangeNotifier {
     });
   }
 
-  Future<void> updateDaySummary(DateTime sessionDate, String sessionId) async {
+  Future<void> _updateDaySummary(DateTime sessionDate, String sessionId) async {
     _sessionMinutes = 0;
     _hourValue = 0;
     _sessionProfit = 0;
@@ -196,8 +215,8 @@ class HomePageVM extends ChangeNotifier {
     if (response) {
       var sessionIdToUpdate = await _pointsService.deletePoint(pointToDelete);
       await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await updateCurrentSessionData(sessionIdToUpdate);
-      getSessionPoints();
+      await _updateCurrentSessionData(sessionIdToUpdate);
+      _getSessionPoints();
     }
   }
 
@@ -218,12 +237,12 @@ class HomePageVM extends ChangeNotifier {
         dateWithHourUpdate,
       );
       await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await updateCurrentSessionData(sessionIdToUpdate);
-      getSessionPoints();
+      await _updateCurrentSessionData(sessionIdToUpdate);
+      _getSessionPoints();
     }
   }
 
-  Future<void> updateCurrentSessionData(String sessionId) async {
+  Future<void> _updateCurrentSessionData(String sessionId) async {
     var sessionData = await _pointsService.getSessionData(sessionId);
     _pointsSession = await _pointsService.getPointsSession(sessionId);
     DateTime day = sessionData != null ? sessionData.day : _date;
@@ -272,6 +291,182 @@ class HomePageVM extends ChangeNotifier {
   void refreshDayFromCalendarAnalysis(DateTime selectedDay) {
     _date = selectedDay;
     verifyDate();
+  }
+
+  void getHasSeenTutorialConfig() async {
+    _isLoading = true;
+    _hasSeenTutorial = await _configsService.hasSeenTutorial();
+    _hasSeenTutorial = false;
+    _isLoading = false;
+    if (!_hasSeenTutorial) {
+      _preparePointsTutorial();
+    }
+  }
+
+  void checkTutorial(BuildContext context) async {
+    if (!_hasSeenTutorial && !_tutorialOngoing) {
+      _tutorialOngoing = true;
+      _prepareFirstFaseTutorial(context);
+    }
+  }
+
+  void _preparePointsTutorial() {
+    _pointsUI.add(
+      Ponto(
+        id: 1,
+        date: DateTime(
+          DateTime.now().year,
+          DateTime.now().month,
+          DateTime.now().day,
+          10,
+          0,
+        ),
+        sessionId: "1",
+        getIn: true,
+      ),
+    );
+
+    notifyListeners();
+  }
+
+  void _prepareFirstFaseTutorial(BuildContext context) {
+    TutorialCoachMark(
+      targets: [
+        TargetFocus(
+          identify: TutorialIdentifiers.checkIn,
+          keyTarget: keyCheckIn,
+          shape: ShapeLightFocus.RRect,
+          radius: 16,
+          alignSkip: Alignment.topRight,
+          contents: [
+            TargetContent(
+              align: ContentAlign.top,
+              child: Text(
+                TutorialLabels.point.tr(),
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        TargetFocus(
+          identify: TutorialIdentifiers.listItem,
+          keyTarget: keyListItem,
+          shape: ShapeLightFocus.RRect,
+          radius: 16,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: Text(
+                TutorialLabels.pointList.tr(),
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ],
+      colorShadow: Colors.black54,
+      textSkip: TutorialLabels.skip.tr(),
+      opacityShadow: 0.6,
+      onFinish: () => _openSlidableAndShowActions(context),
+      onSkip: () {
+        _cancelTutorial();
+        return true;
+      },
+    ).show(context: Overlay.of(context).context);
+  }
+
+  Future<void> _openSlidableAndShowActions(BuildContext context) async {
+    if (keyListItem.currentContext != null) {
+      await Scrollable.ensureVisible(
+        keyListItem.currentContext!,
+        duration: const Duration(milliseconds: 300),
+        alignment: 0.4,
+      );
+    }
+
+    await Future.delayed(const Duration(milliseconds: 200));
+
+    final slidable =
+        keyListItemContent.currentContext == null
+            ? null
+            : Slidable.of(keyListItemContent.currentContext!);
+
+    if (slidable != null) {
+      slidable.openEndActionPane(duration: const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 360));
+    }
+
+    TutorialCoachMark(
+      targets: [
+        TargetFocus(
+          identify: TutorialIdentifiers.editPoint,
+          keyTarget: keyPointEdit,
+          shape: ShapeLightFocus.RRect,
+          radius: 8,
+          paddingFocus: 6,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: Column(
+                children: [
+                  Text(
+                    TutorialLabels.pointEdit.tr(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        TargetFocus(
+          identify: TutorialIdentifiers.deletePoint,
+          keyTarget: keyPointDelete,
+          shape: ShapeLightFocus.RRect,
+          radius: 8,
+          paddingFocus: 6,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              child: Column(
+                children: [
+                  Text(
+                    TutorialLabels.pointDelete.tr(),
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+      colorShadow: Colors.black54,
+      textSkip: TutorialLabels.skip.tr(),
+      opacityShadow: 0.6,
+      onFinish: () => _navigateToConfigPage(context),
+      onSkip: () {
+        _cancelTutorial();
+        return true;
+      },
+    ).show(context: Overlay.of(context).context);
+  }
+
+  Future<void> _cancelTutorial() async {
+    _cleanTutorialData();
+    await _configsService.updateHasSeenTutorial(_hasSeenTutorial);
+  }
+
+  bool _navigateToConfigPage(BuildContext context) {
+    _cleanTutorialData();
+    context.go('${Routes.configurationsPage}?startTutorial=true');
+    return false;
+  }
+
+  void _cleanTutorialData() {
+    _pointsUI = [];
+    _sessionMinutes = 0;
+    _hasSeenTutorial = true;
+    _tutorialOngoing = false;
+    notifyListeners();
   }
 
   // @override
