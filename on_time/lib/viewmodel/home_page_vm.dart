@@ -7,6 +7,7 @@ import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
+import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/point_modal.dart';
 import 'package:on_time/router/routes.dart';
@@ -31,15 +32,9 @@ class HomePageVM extends ChangeNotifier {
   List<Ponto> _pointsSession =
       []; // points for the session -> its used to update summary
   final ScrollController _scrollController = ScrollController();
-  bool _hasSeenTutorial = false;
-  bool _tutorialOngoing = false;
-  bool _isLoading = false;
 
   HomePageVM(this._pointsService, this._configsService) {
-    getHasSeenTutorialConfig();
-    _today = DatesHelper.getDatetimeToday();
-    timerRunning(true);
-    _getSessionPoints();
+    initPage();
   }
 
   // Public Properties
@@ -59,8 +54,6 @@ class HomePageVM extends ChangeNotifier {
 
   ScrollController get scrollController => _scrollController;
 
-  bool get isLoading => _isLoading;
-
   final GlobalKey keyCheckIn = GlobalKey();
   final GlobalKey keyListItem = GlobalKey();
   final GlobalKey keyListItemContent = GlobalKey();
@@ -68,6 +61,17 @@ class HomePageVM extends ChangeNotifier {
   final GlobalKey keyPointDelete = GlobalKey();
 
   //////////
+
+  void initPage() {
+    _today = DatesHelper.getDatetimeToday();
+    if (!TutorialHelper.hasSeenTutorial) {
+      _preparePointsTutorial();
+      _date = DateTime.now();
+    } else {
+      timerRunning(true);
+      _getSessionPoints();
+    }
+  }
 
   void timerRunning(bool running) {
     if (running) {
@@ -150,7 +154,7 @@ class HomePageVM extends ChangeNotifier {
 
   // just when initializing and change data
   Future<void> _getSessionPoints() async {
-    if (!_hasSeenTutorial) return;
+    if (!TutorialHelper.hasSeenTutorial) return;
 
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
     String sessionId = GenericHelper.getSessionId(sessionDate);
@@ -288,24 +292,14 @@ class HomePageVM extends ChangeNotifier {
     );
   }
 
-  void refreshDayFromCalendarAnalysis(DateTime selectedDay) {
+  void refreshDay(DateTime selectedDay) {
     _date = selectedDay;
     verifyDate();
   }
 
-  void getHasSeenTutorialConfig() async {
-    _isLoading = true;
-    _hasSeenTutorial = await _configsService.hasSeenTutorial();
-    _hasSeenTutorial = false;
-    _isLoading = false;
-    if (!_hasSeenTutorial) {
-      _preparePointsTutorial();
-    }
-  }
-
   void checkTutorial(BuildContext context) async {
-    if (!_hasSeenTutorial && !_tutorialOngoing) {
-      _tutorialOngoing = true;
+    if (!TutorialHelper.hasSeenTutorial && !TutorialHelper.tutorialOngoing) {
+      TutorialHelper.tutorialOngoing = true;
       _prepareFirstFaseTutorial(context);
     }
   }
@@ -326,7 +320,7 @@ class HomePageVM extends ChangeNotifier {
       ),
     );
 
-    notifyListeners();
+    //notifyListeners();
   }
 
   void _prepareFirstFaseTutorial(BuildContext context) {
@@ -452,20 +446,19 @@ class HomePageVM extends ChangeNotifier {
 
   Future<void> _cancelTutorial() async {
     _cleanTutorialData();
-    await _configsService.updateHasSeenTutorial(_hasSeenTutorial);
+    await TutorialHelper.cancelTutorial();
+    initPage();
   }
 
   bool _navigateToConfigPage(BuildContext context) {
     _cleanTutorialData();
-    context.go('${Routes.configurationsPage}?startTutorial=true');
+    context.go(Routes.configurationsPage);
     return false;
   }
 
   void _cleanTutorialData() {
     _pointsUI = [];
     _sessionMinutes = 0;
-    _hasSeenTutorial = true;
-    _tutorialOngoing = false;
     notifyListeners();
   }
 

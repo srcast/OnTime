@@ -36,7 +36,7 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
 
   void goToHomePage(DateTime selectedDay) {
     final index = destinations.indexWhere((d) => d.label == Labels.homeTab);
-    context.read<HomePageVM>().refreshDayFromCalendarAnalysis(selectedDay);
+    context.read<HomePageVM>().refreshDay(selectedDay);
     //setState(() => _currentIndex = index);
     widget.navigationShell.goBranch(index);
   }

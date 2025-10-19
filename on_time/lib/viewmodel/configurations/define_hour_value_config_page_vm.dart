@@ -2,14 +2,16 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/layout/widgets/value_rule_modal.dart';
-import 'package:on_time/router/routes.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
+import 'package:on_time/viewmodel/home_page_vm.dart';
+import 'package:provider/provider.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class DefineHourValueConfigPageVM extends ChangeNotifier {
@@ -18,10 +20,12 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   List<HourValuePolitic> _rules = [];
   double? _baseHourValue = 0;
   double? _originalBaseHourValue = 0;
+  TutorialCoachMark _tutorial = TutorialCoachMark(targets: []);
+  bool _tutorialManualClose = false;
 
   DefineHourValueConfigPageVM(this._configsService) {
-    getHourValuePoliticRules();
-    getHourValueBase();
+    _getHourValuePoliticRules();
+    _getHourValueBase();
   }
 
   // Public Properties
@@ -39,7 +43,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
 
   ///
 
-  Future<void> getHourValueBase() async {
+  Future<void> _getHourValueBase() async {
     _baseHourValue = await _configsService.getHourValueBase();
     _originalBaseHourValue = _baseHourValue;
   }
@@ -48,7 +52,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     if (valueHasChanged) {
       await _configsService.updateHourValueBase(_baseHourValue!);
       _originalBaseHourValue = _baseHourValue;
-      updateUI();
+      _updateUI();
 
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
@@ -62,18 +66,18 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     }
   }
 
-  Future<void> getHourValuePoliticRules() async {
+  Future<void> _getHourValuePoliticRules() async {
     _rules = await _configsService.getHourValuePolitics();
-    updateUI();
+    _updateUI();
   }
 
-  Future<void> setHourValueBase(double val) async {
+  Future<void> _setHourValueBase(double val) async {
     _baseHourValue = val;
     //await saveHourValueBase();
-    updateUI();
+    _updateUI();
   }
 
-  void updateUI() {
+  void _updateUI() {
     notifyListeners();
   }
 
@@ -84,7 +88,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     );
 
     if (result != null) {
-      setHourValueBase(result);
+      _setHourValueBase(result);
     }
   }
 
@@ -115,7 +119,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
         message = HourValueRules.insertRuleMsg.tr();
       }
 
-      getHourValuePoliticRules();
+      _getHourValuePoliticRules();
 
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
@@ -143,7 +147,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     if (response) {
       _configsService.deleteRule(rule);
       _rules.remove(rule);
-      updateUI();
+      _updateUI();
     }
   }
 
@@ -156,7 +160,7 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
       );
 
       if (response) {
-        resetUnsavingChanges();
+        _resetUnsavingChanges();
         context.pop();
       }
     } else {
@@ -164,21 +168,27 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     }
   }
 
-  void resetUnsavingChanges() {
+  void _resetUnsavingChanges() {
     _baseHourValue = _originalBaseHourValue;
   }
 
   void checkTutorial(BuildContext context) {
-    final uri = Uri.parse(GoRouterState.of(context).uri.toString());
-    final startTutorial = uri.queryParameters['startTutorial'] == 'true';
-
-    if (startTutorial) {
-      _startTutorial(context);
+    if (!TutorialHelper.hasSeenTutorial) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        _closeTutorial();
+        _startTutorial(context);
+      });
     }
   }
 
+  void _closeTutorial() {
+    _tutorialManualClose = false;
+    _tutorial.finish();
+    _tutorialManualClose = true;
+  }
+
   void _startTutorial(BuildContext context) {
-    TutorialCoachMark(
+    _tutorial = TutorialCoachMark(
       targets: [
         TargetFocus(
           identify: TutorialIdentifiers.hourValueInput,
@@ -237,12 +247,20 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
         _cancelTutorial(context);
         return true;
       },
-    ).show(context: Overlay.of(context).context);
+    );
+    _tutorial.show(context: Overlay.of(context).context);
   }
 
   Future<void> _cancelTutorial(BuildContext context) async {
-    await _configsService.updateHasSeenTutorial(true);
-    context.pop();
-    context.go(Routes.homePage);
+    if (_tutorialManualClose) {
+      await TutorialHelper.cancelTutorial();
+      context.read<HomePageVM>().initPage();
+
+      final shell = StatefulNavigationShell.of(context);
+      // clean current branch
+      shell.goBranch(2, initialLocation: true);
+      await Future.delayed(const Duration(milliseconds: 300));
+      shell.goBranch(0);
+    }
   }
 }

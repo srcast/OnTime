@@ -44,18 +44,20 @@ class AppRouter {
               GoRoute(
                 path: Routes.configurationsPage,
                 builder: (context, state) => ConfigurationsPage(),
-              ),
-              GoRoute(
-                path: Routes.configDegineHourValuePage,
-                builder: (context, state) => DefineHourValueConfigPage(),
-              ),
-              GoRoute(
-                path: Routes.configConfigurationsPage,
-                builder: (context, state) => ConfigsConfigurationsPage(),
-              ),
-              GoRoute(
-                path: Routes.configInfoPage,
-                builder: (context, state) => InfoConfigPage(),
+                routes: [
+                  GoRoute(
+                    path: Routes.configDegineHourValuePage,
+                    builder: (context, state) => DefineHourValueConfigPage(),
+                  ),
+                  GoRoute(
+                    path: Routes.configConfigurationsPage,
+                    builder: (context, state) => ConfigsConfigurationsPage(),
+                  ),
+                  GoRoute(
+                    path: Routes.configInfoPage,
+                    builder: (context, state) => InfoConfigPage(),
+                  ),
+                ],
               ),
             ],
           ),

@@ -9,7 +9,7 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   final ConfigsService _configsService;
 
   ConfigConfigurationsPageVM(this._configsService) {
-    getConfigs();
+    _getConfigs();
   }
 
   // Public Properties
@@ -30,7 +30,7 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   }
   //
 
-  void getConfigs() async {
+  void _getConfigs() async {
     var configs = await _configsService.getConfigs();
 
     if (configs != null) {

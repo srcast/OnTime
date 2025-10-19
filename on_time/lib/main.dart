@@ -4,6 +4,7 @@ import 'package:device_preview/device_preview.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
 import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
@@ -22,14 +23,14 @@ void main() async {
   setup();
 
   final config = await locator<ConfigsService>().ensureConfigExists();
+  TutorialHelper.hasSeenTutorial = config.hasSeenTutorial;
 
   runApp(
     EasyLocalization(
       supportedLocales: const [Locale('pt', 'PT'), Locale('en'), Locale('fr')],
-      path:
-          'assets/translations', // cria pasta assets/translations/en.json, pt-PT.json, etc.
+      path: 'assets/translations',
       fallbackLocale: const Locale('en'),
-      saveLocale: true, // false porque tu vais gerir pelo ConfigsService
+      saveLocale: true,
       startLocale: GenericHelper.getLocaleFromDBLang(
         GenericHelper.getALanguageOptfromString(config.language),
       ),

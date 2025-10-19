@@ -15,12 +15,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<HomePageVM>();
-
-    if (vm.isLoading) {
-      // control to await for configs from db
-      return const Center(child: CircularProgressIndicator());
-    }
-
     vm.checkTutorial(context);
 
     return SafeArea(

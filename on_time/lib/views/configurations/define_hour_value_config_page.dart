@@ -13,6 +13,7 @@ class DefineHourValueConfigPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<DefineHourValueConfigPageVM>();
+
     vm.checkTutorial(context);
 
     return Scaffold(

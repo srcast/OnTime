@@ -65,18 +65,18 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     super.dispose();
   }
 
-  void openNumericKeyboard(BuildContext context) async {
+  void _openNumericKeyboard(BuildContext context) async {
     final result = await NumericKeyboard.show(
       context,
       value: ruleValue.toString(),
     );
 
     if (result != null) {
-      setHourValueRule(result);
+      _setHourValueRule(result);
     }
   }
 
-  Future<void> setHourValueRule(double val) async {
+  Future<void> _setHourValueRule(double val) async {
     setState(() {
       ruleValue = val;
     });
@@ -100,7 +100,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     }
   }
 
-  void saveCurrentRule() {
+  void _saveCurrentRule() {
     late HourValuePoliticsCompanion savedRule;
     bool canProceed = true;
 
@@ -302,7 +302,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                 ],
 
                 GestureDetector(
-                  onTap: () => openNumericKeyboard(context),
+                  onTap: () => _openNumericKeyboard(context),
                   child: InputDecorator(
                     decoration: InputDecoration(
                       labelText: HourValueRules.hourValue,
@@ -338,7 +338,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                     ),
                     SizedBox(width: 8),
                     ElevatedButton(
-                      onPressed: () => saveCurrentRule(),
+                      onPressed: () => _saveCurrentRule(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.softGreen,
                         shape: RoundedRectangleBorder(

@@ -51,7 +51,7 @@ class AnalysisPageVM extends ChangeNotifier {
         DateTime.now(),
       ); // better controller when advance and go back in date
       _viewMode = mode;
-      handelsStartEndDate();
+      _handelsStartEndDate();
       getData();
     }
   }
@@ -105,7 +105,7 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    handelsStartEndDate();
+    _handelsStartEndDate();
     getData();
   }
 
@@ -128,11 +128,11 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
     }
 
-    handelsStartEndDate();
+    _handelsStartEndDate();
     getData();
   }
 
-  void handelsStartEndDate() {
+  void _handelsStartEndDate() {
     switch (_viewMode) {
       case AnalysisViewMode.week:
         _startDate = _focusedDate.subtract(
@@ -284,17 +284,9 @@ class AnalysisPageVM extends ChangeNotifier {
   }
 
   void goToSelectedDay(BuildContext context, DateTime selectedDay) {
-    context.read<HomePageVM>().refreshDayFromCalendarAnalysis(selectedDay);
-
-    // 2) troca para a aba Home (index 0)
+    context.read<HomePageVM>().refreshDay(selectedDay);
     final shell = StatefulNavigationShell.of(context);
     shell.goBranch(0);
-
-    // GoRouter.of(context).go(Routes.homePage);
-    // Future.delayed(
-    //   const Duration(milliseconds: 100),
-    //   () => GoRouter.of(context).go(Routes.homePage),
-    // );
   }
 
   /*   @override

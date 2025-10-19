@@ -10,14 +10,9 @@ import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class AnalysisPage extends StatefulWidget {
+class AnalysisPage extends StatelessWidget {
   const AnalysisPage({super.key});
 
-  @override
-  State<AnalysisPage> createState() => _AnalysisPageState();
-}
-
-class _AnalysisPageState extends State<AnalysisPage> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<AnalysisPageVM>();

@@ -1,23 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:on_time/database/locator.dart';
+import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/models/config_option.dart';
 import 'package:on_time/router/routes.dart';
-import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
+import 'package:on_time/viewmodel/home_page_vm.dart';
+import 'package:provider/provider.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class ConfigurationsPageVM {
   late List<ConfigOption> _options;
-  late ConfigsService _configsService;
-  bool _tutorialOngoing = false;
 
   ConfigurationsPageVM() {
     _options = configs;
-    _configsService = locator<ConfigsService>();
   }
 
   // public props
@@ -30,14 +27,10 @@ class ConfigurationsPageVM {
   //
 
   void checkTutorial(BuildContext context) async {
-    if (!_tutorialOngoing) {
-      final uri = Uri.parse(GoRouterState.of(context).uri.toString());
-      final startTutorial = uri.queryParameters['startTutorial'] == 'true';
-
-      if (startTutorial) {
-        _tutorialOngoing = true;
-        _startTutorial(context);
-      }
+    if (!TutorialHelper.hasSeenTutorial &&
+        !TutorialHelper.tutorialOngoingConfigsPage) {
+      TutorialHelper.tutorialOngoingConfigsPage = true;
+      _startTutorial(context);
     }
   }
 
@@ -64,36 +57,42 @@ class ConfigurationsPageVM {
       textSkip: TutorialLabels.skip.tr(),
       opacityShadow: 0.6,
       onSkip: () {
-        _cancelTutorial();
+        _cancelTutorial(context);
         return true;
       },
       onFinish: () => _navigateToHourValuePage(context),
     ).show(context: Overlay.of(context).context);
   }
 
-  Future<void> _cancelTutorial() async {
-    _tutorialOngoing = false;
-    await _configsService.updateHasSeenTutorial(true);
+  Future<void> _cancelTutorial(BuildContext context) async {
+    await TutorialHelper.cancelTutorial();
+    context.read<HomePageVM>().initPage();
+    final shell = StatefulNavigationShell.of(context);
+    shell.goBranch(0);
   }
 
   bool _navigateToHourValuePage(BuildContext context) {
-    context.push('${Routes.configDegineHourValuePage}?startTutorial=true');
-    _tutorialOngoing = false;
+    openConfig(context, Labels.configsListHourValue);
+    TutorialHelper.tutorialOngoing = false;
     return false;
   }
 
   void openConfig(BuildContext context, String option) {
     switch (option) {
       case Labels.configsListHourValue:
-        context.push(Routes.configDegineHourValuePage);
+        context.go(
+          '${Routes.configurationsPage}/${Routes.configDegineHourValuePage}',
+        );
         break;
 
       case Labels.configurationsTab:
-        context.push(Routes.configConfigurationsPage);
+        context.go(
+          '${Routes.configurationsPage}/${Routes.configConfigurationsPage}',
+        );
         break;
 
       case Labels.configsInfo:
-        context.push(Routes.configInfoPage);
+        context.go('${Routes.configurationsPage}/${Routes.configInfoPage}');
         break;
 
       case Labels.configsListNotifications:
