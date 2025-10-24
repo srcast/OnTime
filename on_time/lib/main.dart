@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
+import 'package:on_time/helpers/ads_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
@@ -11,14 +14,16 @@ import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
-import 'package:on_time/viewmodel/configurations_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
-import 'package:on_time/views/configurations_page.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  if (Platform.isAndroid || Platform.isIOS) {
+    await AdsHelper.initialize();
+    AdsHelper.loadInterstitialAd();
+  }
 
   setup();
 

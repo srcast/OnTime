@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/ads_helper.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
@@ -107,6 +108,10 @@ class HomePageVM extends ChangeNotifier {
       await _updateCurrentSessionData(sessionIdToUpdate);
 
       _getSessionPoints();
+    }
+
+    if (AdsHelper.isInterstitialReady) {
+      AdsHelper.showInterstitial();
     }
   }
 

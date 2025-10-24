@@ -14,6 +14,7 @@ class InfoConfigPage extends StatefulWidget {
 
 class _InfoConfigPage extends State<InfoConfigPage> {
   String _version = "";
+  int _tapCount = 0;
 
   @override
   void initState() {
@@ -26,6 +27,55 @@ class _InfoConfigPage extends State<InfoConfigPage> {
     setState(() {
       _version = info.version;
     });
+  }
+
+  Future<void> _onSecretTap() async {
+    _tapCount++;
+
+    if (_tapCount == 5) {
+      _tapCount = 0;
+      _showSecretCodeDialog();
+    }
+  }
+
+  Future<void> _showSecretCodeDialog() async {
+    final controller = TextEditingController();
+    var secretCode =
+        '${DateTime.now().minute}${DateTime.now().hour + DateTime.now().minute + 17}';
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+          ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () async {
+                if (controller.text == secretCode) {
+                  Navigator.pop(context);
+                  await _disableAds();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("✅ Anúncios desativados")),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("❌ Código incorreto")),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _disableAds() async {
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.setBool('ads_disabled', true);
   }
 
   @override
@@ -64,12 +114,15 @@ class _InfoConfigPage extends State<InfoConfigPage> {
               style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
             const SizedBox(height: 6),
-            Text(
-              Labels.lastUpdateDate.tr(),
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: context.colors.focusColor,
+            GestureDetector(
+              onTap: _onSecretTap,
+              child: Text(
+                Labels.lastUpdateDate.tr(),
+                style: TextStyle(
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: context.colors.focusColor,
+                ),
               ),
             ),
           ],
