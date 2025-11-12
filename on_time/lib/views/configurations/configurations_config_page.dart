@@ -130,21 +130,44 @@ class ConfigsConfigurationsPage extends StatelessWidget {
     required AppThemeMode groupValue,
     required Function(AppThemeMode) onChanged,
   }) {
-    return RadioListTile<AppThemeMode>(
-      value: value,
-      groupValue: groupValue,
-      onChanged: (val) {
-        if (val != null) onChanged(val);
-      },
-      title: Text(
-        title,
-        style: TextStyle(
-          color: context.colors.defaultText,
-          fontWeight: FontWeight.w500,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        radioTheme: RadioThemeData(
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            // Se estiver selecionado → usa a tua cor
+            if (states.contains(WidgetState.selected)) {
+              return context.colors.focusColor;
+            }
+            // Caso contrário → usa a cor padrão (preta/branca)
+            return null;
+          }),
         ),
       ),
-      activeColor: context.colors.focusColor,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      child: RadioMenuButton<AppThemeMode>(
+        value: value,
+        groupValue: groupValue,
+        onChanged: (val) {
+          if (val != null) onChanged(val);
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: context.colors.defaultText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        // activeColor: context.colors.focusColor,
+      ),
     );
   }
 
@@ -155,21 +178,44 @@ class ConfigsConfigurationsPage extends StatelessWidget {
     required LanguageOptions groupValue,
     required Function(LanguageOptions) onChanged,
   }) {
-    return RadioListTile<LanguageOptions>(
-      value: value,
-      groupValue: groupValue,
-      onChanged: (val) {
-        if (val != null) onChanged(val);
-      },
-      title: Text(
-        title,
-        style: TextStyle(
-          color: context.colors.defaultText,
-          fontWeight: FontWeight.w500,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        radioTheme: RadioThemeData(
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            // Se estiver selecionado → usa a tua cor
+            if (states.contains(WidgetState.selected)) {
+              return context.colors.focusColor;
+            }
+            // Caso contrário → usa a cor padrão (preta/branca)
+            return null;
+          }),
         ),
       ),
-      activeColor: context.colors.focusColor,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      child: RadioMenuButton<LanguageOptions>(
+        value: value,
+        groupValue: groupValue,
+        onChanged: (val) {
+          if (val != null) onChanged(val);
+        },
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+          overlayColor: WidgetStateProperty.all(Colors.transparent),
+          surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: context.colors.defaultText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        // activeColor: context.colors.focusColor,
+      ),
     );
   }
 }

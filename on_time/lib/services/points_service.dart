@@ -45,56 +45,44 @@ class PointsService {
   // }
 
   Future<String> insertPoint(DateTime date) async {
-    try {
-      // verify session with last point
-      DateTime interval = date.add(Duration(hours: -10));
+    // verify session with last point
+    DateTime interval = date.add(Duration(hours: -6));
 
-      var lastPoint =
-          await (db.select(db.pontos)
-                ..where((p) => p.date.isSmallerThanValue(date))
-                ..orderBy([(t) => OrderingTerm.desc(t.date)])
-                ..limit(1))
-              .getSingleOrNull();
-      bool sameSession = false;
-      bool getIn = true;
-      var sessionId = GenericHelper.getSessionId(date);
+    var lastPoint =
+        await (db.select(db.pontos)
+              ..where((p) => p.date.isSmallerThanValue(date))
+              ..orderBy([(t) => OrderingTerm.desc(t.date)])
+              ..limit(1))
+            .getSingleOrNull();
+    bool sameSession = false;
+    bool getIn = true;
+    var sessionId = GenericHelper.getSessionId(date);
 
-      if (lastPoint != null) {
-        // verify if the last point is less than 10 hours ago ant it was get in-> case of same day and when session goes through 00h
-        sameSession =
-            lastPoint.sessionId != sessionId &&
-            !lastPoint.date.isBefore(interval);
+    if (lastPoint != null) {
+      // verify if the last point is less than 6 hours ago ant it was get in-> case of same day and when session goes through 00h
+      sameSession =
+          lastPoint.sessionId != sessionId &&
+          !lastPoint.date.isBefore(interval);
 
-        if (sameSession) {
-          sessionId = lastPoint.sessionId; // aqui para dias diferentes
-          getIn = !lastPoint.getIn;
-        }
+      if (sameSession) {
+        sessionId = lastPoint.sessionId; // aqui para dias diferentes
+        getIn = !lastPoint.getIn;
       }
-
-      await db
-          .into(db.pontos)
-          .insert(
-            PontosCompanion(
-              date: Value(
-                DateTime(
-                  date.year,
-                  date.month,
-                  date.day,
-                  date.hour,
-                  date.minute,
-                ),
-              ), // ignore seconds
-              sessionId: Value(sessionId),
-              getIn: Value(getIn),
-            ),
-          );
-
-      return sessionId;
-    } catch (e, s) {
-      print('Exception details:\n $e');
-      print('Stack trace:\n $s');
-      return '';
     }
+
+    await db
+        .into(db.pontos)
+        .insert(
+          PontosCompanion(
+            date: Value(
+              DateTime(date.year, date.month, date.day, date.hour, date.minute),
+            ), // ignore seconds
+            sessionId: Value(sessionId),
+            getIn: Value(getIn),
+          ),
+        );
+
+    return sessionId;
   }
 
   Future<String> deletePoint(Ponto pointToDelete) async {

@@ -71,5 +71,7 @@
     "tutorial_config_hour_value_option": "Configurar o valor/hora base e algumas regras especiais, assim como dia da semana, hora extra, etc. ",
     "tutorial_hour_Value_input": "Aqui pode definir o valor hora, caso pretenda ter uma ideia do valor acumulado consoante o registo de horas.",
     "tutorial_save_hour_Value": "Caso defina o valor hora, é necessário guardar.",
-    "tutorial_special_rules": "Aqui pode definir o valor hora para regras especiais, tais como em dias da semana, após determinado horário ou após determinadas horas de trabalho no dia."
+    "tutorial_special_rules": "Aqui pode definir o valor hora para regras especiais, tais como em dias da semana, após determinado horário ou após determinadas horas de trabalho no dia.",
+    "banner_ad_error": "Problema ao carregar anúncio.",
+    "ads_disabled": "Anúncios desativados."
 }

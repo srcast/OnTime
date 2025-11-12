@@ -1,12 +1,8 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:on_time/helpers/ads_helper.dart';
 import 'package:on_time/layout/themes.dart';
-import 'package:on_time/utils/ads.dart';
+import 'package:on_time/router/routes.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
@@ -26,8 +22,8 @@ class LayoutScaffold extends StatefulWidget {
 
 class _LayoutScaffoldState extends State<LayoutScaffold> {
   //int _currentIndex = 0;
-  BannerAd? _bannerAd;
-  bool _isBannerReady = false;
+  // BannerAd? _bannerAd; // ads
+  // Timer? _refreshTimer;
 
   late final Map<int, VoidCallback> _onTabReselected = {
     0: () => context.read<HomePageVM>().verifyDate(),
@@ -46,24 +42,36 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
     super.didChangeDependencies();
 
     // Só carrega o banner se ainda não tiver carregado
-    if (_bannerAd == null && (Platform.isAndroid || Platform.isIOS)) {
-      await _loadAdaptiveBanner();
-    }
+    // if (_bannerAd == null && (Platform.isAndroid || Platform.isIOS)) {
+    //   await _loadAdaptiveBanner();
+    // }
   }
 
-  Future<void> _loadAdaptiveBanner() async {
-    _bannerAd = await AdsHelper.getBannerAdd(context);
+  // Future<void> _loadAdaptiveBanner() async {
+  //   _bannerAd?.dispose();
 
-    if (_bannerAd != null) {
-      setState(() {
-        _isBannerReady = true;
-      });
-    }
-  }
+  //   // only get banner in case its not in tutorial mode
+  //   if (TutorialHelper.hasSeenTutorial) {
+  //     var newBanner = await AdsHelper.getBannerAdd(context);
+
+  //     if (mounted) {
+  //       setState(() {
+  //         _bannerAd = newBanner;
+  //       });
+  //     }
+  //   }
+
+  //   _refreshTimer?.cancel();
+  //   _refreshTimer = Timer(const Duration(seconds: 30), () {
+  //     _loadAdaptiveBanner();
+  //   });
+  // }
 
   @override
   void dispose() {
-    _bannerAd?.dispose();
+    // _bannerAd?.dispose();
+    // _refreshTimer?.cancel();
+    // _bannerAd?.dispose();
     super.dispose();
   }
 
@@ -76,9 +84,10 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
 
   void _onDestinationSelected(int index) {
     if (index == widget.navigationShell.currentIndex) {
-      if (index == 2 && Navigator.canPop(context)) {
+      final location = GoRouterState.of(context).uri.toString();
+      if (index == 2 && !location.endsWith(Routes.configurationsPage)) {
         // configurations tab
-        context.pop();
+        widget.navigationShell.goBranch(index, initialLocation: true);
       }
     } else {
       if (widget.navigationShell.currentIndex == 0) {
@@ -146,14 +155,15 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
             ),
           ),
 
-          if (_isBannerReady && _bannerAd != null)
-            ClipRRect(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width, // largura total
-                height: _bannerAd!.size.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              ),
-            ),
+          // _bannerAd != null
+          //     ? ClipRRect(
+          //       child: SizedBox(
+          //         width: MediaQuery.of(context).size.width, // largura total
+          //         height: _bannerAd!.size.height.toDouble(),
+          //         child: AdWidget(ad: _bannerAd!),
+          //       ),
+          //     )
+          //     : Text(Labels.bannerAdError.tr()),
         ],
       ),
     );

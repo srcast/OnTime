@@ -1,7 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:on_time/database/locator.dart';
 import 'package:on_time/layout/themes.dart';
+import 'package:on_time/models/global_data.dart';
+import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -52,17 +55,13 @@ class _InfoConfigPage extends State<InfoConfigPage> {
           ),
           actions: [
             TextButton(
-              child: const Text("OK"),
+              child: Text(Labels.ok.tr()),
               onPressed: () async {
                 if (controller.text == secretCode) {
                   Navigator.pop(context);
                   await _disableAds();
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("✅ Anúncios desativados")),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("❌ Código incorreto")),
+                    SnackBar(content: Text(Labels.adsDisabled.tr())),
                   );
                 }
               },
@@ -74,8 +73,10 @@ class _InfoConfigPage extends State<InfoConfigPage> {
   }
 
   Future<void> _disableAds() async {
-    // final prefs = await SharedPreferences.getInstance();
-    // await prefs.setBool('ads_disabled', true);
+    GlobalData.showInterstitialAds = false;
+    await locator<ConfigsService>().updateShowAds(
+      GlobalData.showInterstitialAds,
+    );
   }
 
   @override

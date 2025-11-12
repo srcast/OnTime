@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
@@ -146,7 +147,10 @@ class HomePage extends StatelessWidget {
                                     ),
 
                                   Slidable(
-                                    key: vm.keyListItem,
+                                    key:
+                                        !TutorialHelper.hasSeenTutorial
+                                            ? vm.keyListItem
+                                            : ValueKey(ponto.id),
                                     endActionPane: ActionPane(
                                       motion: const DrawerMotion(),
                                       extentRatio: 0.4,
@@ -185,7 +189,12 @@ class HomePage extends StatelessWidget {
                                       ],
                                     ),
                                     child: ActivityCard(
-                                      key: vm.keyListItemContent,
+                                      key:
+                                          !TutorialHelper.hasSeenTutorial
+                                              ? vm.keyListItemContent
+                                              : ValueKey(
+                                                'activity_card_${ponto.id}',
+                                              ),
                                       ponto: ponto,
                                       index: index,
                                     ),

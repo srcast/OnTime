@@ -1,87 +1,97 @@
-import 'dart:io';
-
-import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:on_time/utils/ads.dart';
-
 class AdsHelper {
-  static InterstitialAd? _interstitialAd;
-  static bool isInterstitialReady = false;
+  // static InterstitialAd? _interstitialAd;
+  // static bool isInterstitialReady = false;
+  // static Timer? _retryTimer;
+  // static int _retryCount = 0;
 
-  static Future<void> initialize() async {
-    await MobileAds.instance.initialize();
-  }
+  // static Future<void> initialize() async {
+  //   await MobileAds.instance.initialize();
+  // }
 
-  static Future<BannerAd?> getBannerAdd(BuildContext context) async {
-    final width = MediaQuery.of(context).size.width.truncate();
+  // static Future<BannerAd?> getBannerAdd(BuildContext context) async {
+  //   final width = MediaQuery.of(context).size.width.truncate();
 
-    final AnchoredAdaptiveBannerAdSize? size =
-        await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(width);
+  //   final AnchoredAdaptiveBannerAdSize? size =
+  //       await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(width);
 
-    if (size == null) return null;
+  //   if (size == null) return null;
 
-    var bannerAd = BannerAd(
-      adUnitId:
-          Platform.isAndroid ? Ads.bannerUnitIdAndroid : Ads.bannerUnitIdiOS,
-      size: size,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (_) {},
-        onAdFailedToLoad: (ad, error) {
-          debugPrint('Banner failed to load: $error');
-          ad.dispose();
-        },
-      ),
-    )..load();
+  //   final completer = Completer<BannerAd?>();
 
-    return bannerAd;
-  }
+  //   var bannerAd = BannerAd(
+  //     adUnitId:
+  //         Platform.isAndroid ? Ads.bannerUnitIdAndroid : Ads.bannerUnitIdiOS,
+  //     size: size,
+  //     request: const AdRequest(),
+  //     listener: BannerAdListener(
+  //       onAdLoaded: (ad) => completer.complete(ad as BannerAd),
+  //       onAdFailedToLoad: (ad, error) {
+  //         debugPrint('Banner failed to load: $error');
+  //         ad.dispose();
+  //         if (!completer.isCompleted) {
+  //           completer.complete(null);
+  //         }
+  //       },
+  //     ),
+  //   )..load();
 
-  static void loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId:
-          Platform.isAndroid
-              ? Ads.interstitialUnitIdAndroid
-              : Ads.interstitialUnitIdiOS,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          isInterstitialReady = true;
+  //   return completer.future;
+  // }
 
-          // Quando o anúncio é fechado, carregamos outro
-          ad.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              loadInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              ad.dispose();
-              loadInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          debugPrint('Failed to load interstitial ad: $error');
-          isInterstitialReady = false;
-        },
-      ),
-    );
-  }
+  // static void loadInterstitialAd() {
+  //   InterstitialAd.load(
+  //     adUnitId:
+  //         Platform.isAndroid
+  //             ? Ads.interstitialUnitIdAndroid
+  //             : Ads.interstitialUnitIdiOS,
+  //     request: const AdRequest(),
+  //     adLoadCallback: InterstitialAdLoadCallback(
+  //       onAdLoaded: (ad) {
+  //         _interstitialAd = ad;
+  //         isInterstitialReady = true;
 
-  static void showInterstitial() {
-    if (isInterstitialReady && _interstitialAd != null) {
-      _interstitialAd!.show();
-      isInterstitialReady = false;
-      _interstitialAd = null;
-    } else {
-      debugPrint('[AdsHelper] Interstitial ainda não está pronto');
-    }
-  }
+  //         // Quando o anúncio é fechado, carregamos outro
+  //         ad.fullScreenContentCallback = FullScreenContentCallback(
+  //           onAdDismissedFullScreenContent: (ad) {
+  //             ad.dispose();
+  //             _retryTimer?.cancel();
+  //             _retryTimer = Timer(const Duration(seconds: 30), () {
+  //               loadInterstitialAd();
+  //             });
+  //           },
+  //           onAdFailedToShowFullScreenContent: (ad, error) {
+  //             ad.dispose();
+  //             _retryTimer?.cancel();
+  //             _retryTimer = Timer(const Duration(seconds: 30), () {
+  //               loadInterstitialAd();
+  //             });
+  //           },
+  //         );
+  //       },
+  //       onAdFailedToLoad: (error) {
+  //         isInterstitialReady = false;
+  //         _retryCount++;
+  //         final delay = Duration(seconds: (30 * _retryCount).clamp(30, 300));
+  //         _retryTimer?.cancel();
+  //         _retryTimer = Timer(delay, () {
+  //           loadInterstitialAd();
+  //         });
+  //       },
+  //     ),
+  //   );
+  // }
 
-  static void dispose() {
-    _interstitialAd?.dispose();
-    _interstitialAd = null;
-    isInterstitialReady = false;
-  }
+  // static void showInterstitial() {
+  //   if (isInterstitialReady && _interstitialAd != null) {
+  //     _interstitialAd!.show();
+  //     isInterstitialReady = false;
+  //     _interstitialAd = null;
+  //   }
+  // }
+
+  // static void dispose() {
+  //   _interstitialAd?.dispose();
+  //   _interstitialAd = null;
+  //   isInterstitialReady = false;
+  // }
 }

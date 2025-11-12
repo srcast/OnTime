@@ -3,6 +3,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/layout/app_styles.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/utils/colors.dart';
@@ -162,7 +163,10 @@ class _ValueRuleModal extends State<ValueRuleModal> {
     if (!canProceed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(HourValueRules.newEditRuleWarning.tr()),
+          content: Text(
+            HourValueRules.newEditRuleWarning.tr(),
+            style: TextStyle(color: AppColors.white),
+          ),
           backgroundColor: AppColors.snackBarLight,
           behavior: SnackBarBehavior.floating,
           duration: Duration(seconds: 3),

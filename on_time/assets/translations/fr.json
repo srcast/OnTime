@@ -71,5 +71,7 @@
     "tutorial_config_hour_value_option": "Configurer le taux horaire de base et certaines règles spéciales, comme le jour de la semaine, les heures supplémentaires, etc.",
     "tutorial_hour_Value_input": "Ici, vous pouvez définir votre taux horaire pour estimer la valeur cumulée en fonction de vos heures travaillées.",
     "tutorial_save_hour_Value": "Si vous définissez un taux horaire, vous devez l’enregistrer.",
-    "tutorial_special_rules": "Ici, vous pouvez définir des règles spéciales pour le taux horaire, telles que selon le jour de la semaine, après certaines heures ou après une certaine durée de travail."
+    "tutorial_special_rules": "Ici, vous pouvez définir des règles spéciales pour le taux horaire, telles que selon le jour de la semaine, après certaines heures ou après une certaine durée de travail.",
+    "banner_ad_error": "Problème de chargement de l'annonce.",
+    "ads_disabled": "Publicités désactivées."
 }

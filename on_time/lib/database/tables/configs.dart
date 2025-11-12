@@ -7,4 +7,5 @@ class Configurations extends Table {
   TextColumn get language => text().nullable()();
   BoolColumn get hasSeenTutorial =>
       boolean().withDefault(const Constant(false))();
+  BoolColumn get showAds => boolean().withDefault(const Constant(true))();
 }

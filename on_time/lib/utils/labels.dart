@@ -36,6 +36,9 @@ class Labels {
 
   static const theme = 'theme';
   static const language = 'language';
+
+  static const adsDisabled = 'ads_disabled';
+  static const bannerAdError = 'banner_ad_error';
 }
 
 class HourValueRules {

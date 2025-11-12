@@ -1,11 +1,12 @@
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter/services.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
-import 'package:on_time/helpers/ads_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
@@ -20,15 +21,16 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  if (Platform.isAndroid || Platform.isIOS) {
-    await AdsHelper.initialize();
-    AdsHelper.loadInterstitialAd();
-  }
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   setup();
 
   final config = await locator<ConfigsService>().ensureConfigExists();
   TutorialHelper.hasSeenTutorial = config.hasSeenTutorial;
+  //GlobalData.showInterstitialAds = config.showAds; // ads
 
   runApp(
     EasyLocalization(
@@ -54,14 +56,23 @@ void main() async {
             create: (_) => locator<ConfigConfigurationsPageVM>(),
           ),
         ],
-        child: DevicePreview(
-          builder: (context) {
-            return MyApp();
-          },
-        ),
+        child:
+            kReleaseMode
+                ? MyApp()
+                : DevicePreview(
+                  builder: (context) {
+                    return MyApp();
+                  },
+                ),
       ),
     ),
   );
+
+  // ads
+  // if (Platform.isAndroid || Platform.isIOS) {
+  //   await AdsHelper.initialize();
+  //   AdsHelper.loadInterstitialAd();
+  // }
 }
 
 class MyApp extends StatelessWidget {

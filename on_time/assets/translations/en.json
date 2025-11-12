@@ -71,5 +71,7 @@
     "tutorial_config_hour_value_option": "Configure the base hourly rate and special rules such as day of the week, overtime, etc.",
     "tutorial_hour_Value_input": "Here you can set your hourly rate to estimate the accumulated value based on your working hours.",
     "tutorial_save_hour_Value": "If you set an hourly rate, you need to save it.",
-    "tutorial_special_rules": "Here you can define special rules for the hourly rate, such as on specific weekdays, after certain hours or after a given work duration."
+    "tutorial_special_rules": "Here you can define special rules for the hourly rate, such as on specific weekdays, after certain hours or after a given work duration.",
+    "banner_ad_error": "Problem loading ad.",
+    "ads_disabled": "Ads disabled."
 }

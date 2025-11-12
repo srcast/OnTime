@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
     <application
         android:label="OnTime"
         android:name="${applicationName}"
@@ -31,9 +32,15 @@
             android:name="flutterEmbedding"
             android:value="2" />
             <!-- Ads identifier -->
-        <meta-data
+        <!--<meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-3940256099942544~3347511713"/> -->
+        <provider
+            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
+            android:authorities="${applicationId}.com.google.android.gms.ads.MobileAdsInitProvider"
+            android:enabled="false"
+            android:exported="false"
+            tools:replace="android:authorities" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

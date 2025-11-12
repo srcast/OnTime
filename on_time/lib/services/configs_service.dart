@@ -52,12 +52,7 @@ class ConfigsService {
         ..orderBy([(r) => OrderingTerm(expression: r.id)])).get();
 
   Future<void> insertRule(HourValuePoliticsCompanion rule) async {
-    try {
-      await db.into(db.hourValuePolitics).insert(rule);
-    } catch (e, s) {
-      print('Exception details:\n $e');
-      print('Stack trace:\n $s');
-    }
+    await db.into(db.hourValuePolitics).insert(rule);
   }
 
   Future<void> deleteRule(HourValuePolitic ruleToDelete) async {
@@ -104,5 +99,11 @@ class ConfigsService {
     await (db.update(db.configurations)..where(
       (c) => c.id.equals(1),
     )).write(ConfigurationsCompanion(hasSeenTutorial: Value(hasSeenTutorial)));
+  }
+
+  Future<void> updateShowAds(bool showInterstitialAds) async {
+    await (db.update(db.configurations)..where(
+      (c) => c.id.equals(1),
+    )).write(ConfigurationsCompanion(showAds: Value(showInterstitialAds)));
   }
 }
