@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:country_currency_pickers/utils/utils.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:on_time/utils/enums.dart';
 
 extension StringExtensions on String? {
@@ -40,12 +42,36 @@ class GenericHelper {
   }
 
   static String getDeviceLocale() {
-    final deviceLocale = PlatformDispatcher.instance.locale; // locale do SO
+    final deviceLocale = PlatformDispatcher.instance.locale; // OS locale
     final localeStr =
         deviceLocale.countryCode != null
             ? '${deviceLocale.languageCode}_${deviceLocale.countryCode}'
             : deviceLocale.languageCode;
 
     return localeStr;
+  }
+
+  static String getCurrencyFormat(double value, {int decDigits = -1}) {
+    final deviceLocale = PlatformDispatcher.instance.locale; // OS locale
+
+    final country = CountryPickerUtils.getCountryByIsoCode(
+      deviceLocale.countryCode ?? 'PT',
+    );
+
+    String formatted = '';
+    if (decDigits == -1) {
+      formatted = NumberFormat.simpleCurrency(
+        locale: GenericHelper.getDeviceLocale(),
+        name: country.currencyCode ?? 'EUR',
+      ).format(value);
+    } else {
+      formatted = NumberFormat.simpleCurrency(
+        locale: GenericHelper.getDeviceLocale(),
+        name: country.currencyCode ?? 'EUR',
+        decimalDigits: decDigits,
+      ).format(value);
+    }
+
+    return formatted;
   }
 }

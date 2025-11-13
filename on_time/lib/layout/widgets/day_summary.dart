@@ -31,13 +31,11 @@ class DaySummary extends StatelessWidget {
             ),
             summaryRow(
               Labels.hourValue.tr(),
-              '${NumberFormat.simpleCurrency(locale: GenericHelper.getDeviceLocale()).format(hourValue)}/h',
+              '${GenericHelper.getCurrencyFormat(hourValue)}/h',
             ),
             summaryRow(
               Labels.profit.tr(),
-              NumberFormat.simpleCurrency(
-                locale: GenericHelper.getDeviceLocale(),
-              ).format(profit),
+              GenericHelper.getCurrencyFormat(profit),
             ),
           ],
         ),

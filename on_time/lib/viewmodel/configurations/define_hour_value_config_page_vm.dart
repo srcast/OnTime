@@ -16,7 +16,6 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class DefineHourValueConfigPageVM extends ChangeNotifier {
   final ConfigsService _configsService;
-  bool baseValueHasChanged = false;
   List<HourValuePolitic> _rules = [];
   double? _baseHourValue = 0;
   double? _originalBaseHourValue = 0;

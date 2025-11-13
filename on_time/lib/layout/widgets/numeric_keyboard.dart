@@ -112,10 +112,10 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            NumberFormat.simpleCurrency(
-              locale: GenericHelper.getDeviceLocale(),
-              decimalDigits: decPoints,
-            ).format(double.tryParse(_value)),
+            GenericHelper.getCurrencyFormat(
+              double.tryParse(_value) ?? 0,
+              decDigits: decPoints,
+            ),
             style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),

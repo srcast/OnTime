@@ -21,7 +21,7 @@ void setup() {
   locator.registerFactory(() => AnalysisPageVM(locator<PointsService>()));
   locator.registerLazySingleton(
     () => ConfigurationsPageVM(),
-  ); // singleton in order to not loststate when navigating to another pages (important to tutorial)
+  ); // singleton in order to not lost state when navigating to another pages (important to tutorial)
   locator.registerFactory(
     () => ConfigConfigurationsPageVM(locator<ConfigsService>()),
   );

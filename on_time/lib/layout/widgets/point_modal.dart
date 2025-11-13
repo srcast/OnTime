@@ -4,11 +4,10 @@ import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/utils/labels.dart';
 
-// ignore: must_be_immutable
 class PointModal extends StatefulWidget {
-  DateTime date;
-  bool isUpdate;
-  PointModal({super.key, required this.date, this.isUpdate = false});
+  final DateTime date;
+  final bool isUpdate;
+  const PointModal({super.key, required this.date, this.isUpdate = false});
 
   @override
   State<PointModal> createState() => _PointModal();

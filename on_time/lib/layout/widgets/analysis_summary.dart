@@ -30,9 +30,7 @@ class AnalysisSummary extends StatelessWidget {
             ),
             summaryRow(
               Labels.profit.tr(),
-              NumberFormat.simpleCurrency(
-                locale: GenericHelper.getDeviceLocale(),
-              ).format(profit),
+              GenericHelper.getCurrencyFormat(profit),
             ),
           ],
         ),

@@ -13,8 +13,6 @@ class ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //bool getIn = index % 2 == 0;
-
     return Column(
       children: [
         Card(

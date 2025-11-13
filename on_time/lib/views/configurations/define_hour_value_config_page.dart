@@ -58,9 +58,7 @@ class DefineHourValueConfigPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      NumberFormat.simpleCurrency(
-                        locale: GenericHelper.getDeviceLocale(),
-                      ).format(vm.baseHourValue),
+                      GenericHelper.getCurrencyFormat(vm.baseHourValue ?? 0),
                       style: TextStyle(fontSize: 16),
                     ),
                     const Icon(Icons.edit, color: Colors.grey),
@@ -141,12 +139,12 @@ class DefineHourValueConfigPage extends StatelessWidget {
                               Text(
                                 regra.ruleDescription ==
                                         HourValueRules.dayWeekRule
-                                    ? 'Dia: ${regra.dayOffWeek}\nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'
+                                    ? 'Dia: ${regra.dayOffWeek}\nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
                                     : (regra.ruleDescription ==
                                             HourValueRules
                                                 .valueAfterXScheduleRule
-                                        ? 'Após horário: ${regra.afterSchedule!.hour}h ${regra.afterSchedule!.minute < 10 ? '0' : ''}${regra.afterSchedule!.minute}min \nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'
-                                        : 'Após X horas: ${regra.afterMinutesWorked! ~/ 60}h ${regra.afterMinutesWorked! % 60 < 10 ? '0' : ''}${regra.afterMinutesWorked! % 60}min \nValor: ${NumberFormat.simpleCurrency(locale: Localizations.localeOf(context).toString()).format(regra.hourValue)}'),
+                                        ? 'Após horário: ${regra.afterSchedule!.hour}h ${regra.afterSchedule!.minute < 10 ? '0' : ''}${regra.afterSchedule!.minute}min \nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
+                                        : 'Após X horas: ${regra.afterMinutesWorked! ~/ 60}h ${regra.afterMinutesWorked! % 60 < 10 ? '0' : ''}${regra.afterMinutesWorked! % 60}min \nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'),
                               ),
                             ],
                           ),

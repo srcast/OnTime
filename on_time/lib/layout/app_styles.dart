@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 class AppStyles extends ThemeExtension<AppStyles> {
   final Color editPointButton;
   final Color deletePointButton;
-  // final Color cancelButton;
-  // final Color saveButton;
 
   //text
   final Color focusColor;
@@ -22,8 +20,6 @@ class AppStyles extends ThemeExtension<AppStyles> {
   const AppStyles({
     required this.editPointButton,
     required this.deletePointButton,
-    // required this.cancelButton,
-    // required this.saveButton,
     required this.focusColor,
     required this.defaultText,
     required this.actionsText,
@@ -38,8 +34,6 @@ class AppStyles extends ThemeExtension<AppStyles> {
   AppStyles copyWith({
     Color? editPointButton,
     Color? deletePointButton,
-    // Color? cancelButton,
-    // Color? saveButton,
     Color? focusColor,
     Color? defaultText,
     Color? actionsText,
@@ -52,8 +46,6 @@ class AppStyles extends ThemeExtension<AppStyles> {
     return AppStyles(
       editPointButton: editPointButton ?? this.editPointButton,
       deletePointButton: deletePointButton ?? this.deletePointButton,
-      // cancelButton: cancelButton ?? this.cancelButton,
-      // saveButton: saveButton ?? this.saveButton,
       focusColor: focusColor ?? this.focusColor,
       defaultText: defaultText ?? this.defaultText,
       actionsText: actionsText ?? this.actionsText,
@@ -73,8 +65,6 @@ class AppStyles extends ThemeExtension<AppStyles> {
       editPointButton: Color.lerp(editPointButton, other.editPointButton, t)!,
       deletePointButton:
           Color.lerp(deletePointButton, other.deletePointButton, t)!,
-      // cancelButton: Color.lerp(cancelButton, other.cancelButton, t)!,
-      // saveButton: Color.lerp(saveButton, other.saveButton, t)!,
       focusColor: Color.lerp(focusColor, other.focusColor, t)!,
       defaultText: Color.lerp(defaultText, other.defaultText, t)!,
       actionsText: Color.lerp(actionsText, other.actionsText, t)!,

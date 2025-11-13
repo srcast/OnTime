@@ -61,7 +61,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        title = _getWeekRange(_focusedDate); // handles enddate and startdate
+        title = _getWeekRange(_focusedDate); // handles end date and start date
         break;
 
       case AnalysisViewMode.month:

@@ -3,17 +3,15 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/generic_helper.dart';
-import 'package:on_time/layout/app_styles.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/common_objs.dart';
 import 'package:on_time/utils/labels.dart';
 
-// ignore: must_be_immutable
 class ValueRuleModal extends StatefulWidget {
-  HourValuePolitic? currentRule;
-  ValueRuleModal({super.key, this.currentRule});
+  final HourValuePolitic? currentRule;
+  const ValueRuleModal({super.key, this.currentRule});
 
   @override
   State<ValueRuleModal> createState() => _ValueRuleModal();
@@ -309,7 +307,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                   onTap: () => _openNumericKeyboard(context),
                   child: InputDecorator(
                     decoration: InputDecoration(
-                      labelText: HourValueRules.hourValue,
+                      labelText: HourValueRules.hourValue.tr(),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -318,9 +316,7 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          NumberFormat.simpleCurrency(
-                            locale: GenericHelper.getDeviceLocale(),
-                          ).format(ruleValue),
+                          GenericHelper.getCurrencyFormat(ruleValue),
                           style: TextStyle(fontSize: 16),
                         ),
                         const Icon(Icons.edit, color: Colors.grey),

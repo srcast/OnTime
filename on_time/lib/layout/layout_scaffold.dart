@@ -28,7 +28,6 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
   late final Map<int, VoidCallback> _onTabReselected = {
     0: () => context.read<HomePageVM>().verifyDate(),
     1: () => context.read<AnalysisPageVM>().getData(),
-    //2: () => context.read<ConfigurationsPageVM>().cleanSubPagesStack(),
   };
 
   @override
@@ -41,7 +40,7 @@ class _LayoutScaffoldState extends State<LayoutScaffold> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
 
-    // Só carrega o banner se ainda não tiver carregado
+    // only loads banner if its not already loaded
     // if (_bannerAd == null && (Platform.isAndroid || Platform.isIOS)) {
     //   await _loadAdaptiveBanner();
     // }

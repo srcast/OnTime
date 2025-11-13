@@ -42,7 +42,6 @@ class PointsHelper {
     double profit = 0;
 
     // after schedule
-
     final start = sessionPoints[0].date;
     final end = sessionPoints.last.date;
 
