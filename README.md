@@ -5,7 +5,7 @@ Designed for simplicity, accuracy and full offline use, it provides clear insigh
 
 ---
 
-## ✨ Features
+## Features
 
 ### 🕒 Clock In / Clock Out  
 Track your work sessions with a double tap.  
