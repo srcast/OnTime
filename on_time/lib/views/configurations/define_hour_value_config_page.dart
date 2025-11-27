@@ -139,12 +139,12 @@ class DefineHourValueConfigPage extends StatelessWidget {
                               Text(
                                 regra.ruleDescription ==
                                         HourValueRules.dayWeekRule
-                                    ? 'Dia: ${regra.dayOffWeek}\nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
+                                    ? '${HourValueRules.day.tr()}: ${regra.dayOffWeek}\n${HourValueRules.value.tr()}: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
                                     : (regra.ruleDescription ==
                                             HourValueRules
                                                 .valueAfterXScheduleRule
-                                        ? 'Após horário: ${regra.afterSchedule!.hour}h ${regra.afterSchedule!.minute < 10 ? '0' : ''}${regra.afterSchedule!.minute}min \nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
-                                        : 'Após X horas: ${regra.afterMinutesWorked! ~/ 60}h ${regra.afterMinutesWorked! % 60 < 10 ? '0' : ''}${regra.afterMinutesWorked! % 60}min \nValor: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'),
+                                        ? '${HourValueRules.afterSchedule.tr()}: ${regra.afterSchedule!.hour}h ${regra.afterSchedule!.minute < 10 ? '0' : ''}${regra.afterSchedule!.minute}min \n${HourValueRules.value.tr()}: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
+                                        : '${HourValueRules.afterHours.tr()}: ${regra.afterMinutesWorked! ~/ 60}h ${regra.afterMinutesWorked! % 60 < 10 ? '0' : ''}${regra.afterMinutesWorked! % 60}min \n${HourValueRules.value.tr()}: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'),
                               ),
                             ],
                           ),

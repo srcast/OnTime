@@ -17,7 +17,7 @@ class ConfigurationsPageVM {
     _options = configs;
   }
 
-  // public props
+  // public Properties
 
   List<ConfigOption> get options => _options;
 

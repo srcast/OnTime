@@ -241,7 +241,6 @@ class PointsHelper {
       rulesApplied.sort((a, b) => b.afterSchedule!.compareTo(a.afterSchedule!));
       return rulesApplied[0].hourValue!;
     }
-    //}
 
     // after X hours
     int minWorkedSession = PointsHelper.getMinutesWorkedSession(sessionPoints);

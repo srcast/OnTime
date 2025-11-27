@@ -25,16 +25,13 @@ class AnalysisPage extends StatelessWidget {
             Column(
               children: [
                 const SizedBox(height: 8),
-                // Selector (Semana / Mês / Ano)
+                // Selector
                 Container(
                   height: 48,
                   margin: const EdgeInsets.symmetric(horizontal: 24),
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color:
-                        context
-                            .colors
-                            .analysisSelectorBackground, // Fundo claro
+                    color: context.colors.analysisSelectorBackground,
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Row(
@@ -68,7 +65,7 @@ class AnalysisPage extends StatelessWidget {
                         ),
                       ),
 
-                      // month
+                      // Month
                       Expanded(
                         child: GestureDetector(
                           onTap:
@@ -97,7 +94,7 @@ class AnalysisPage extends StatelessWidget {
                         ),
                       ),
 
-                      // year
+                      // Year
                       Expanded(
                         child: GestureDetector(
                           onTap: () => vm.updateViewMode(AnalysisViewMode.year),
@@ -186,8 +183,7 @@ class AnalysisPage extends StatelessWidget {
                               1,
                             ),
                             lastDay: DateTime.utc(vm.focusedDate.year, 12, 31),
-                            focusedDay:
-                                vm.focusedDate, // usa aqui a data que queres focar
+                            focusedDay: vm.focusedDate,
                             calendarFormat: CalendarFormat.month,
                             headerVisible: false,
                             calendarStyle: CalendarStyle(
@@ -246,7 +242,7 @@ class AnalysisPage extends StatelessWidget {
                                             )
                                             : const SizedBox(
                                               height: 19,
-                                            ), // <-- reserva o mesmo espaço
+                                            ), // saves space
                                       ],
                                     ),
                                   ),
@@ -260,7 +256,7 @@ class AnalysisPage extends StatelessWidget {
                         ),
                       ),
                     )
-                    : // case not month
+                    : // case its not month
                     // graph
                     Expanded(
                       flex: 1,
@@ -273,8 +269,6 @@ class AnalysisPage extends StatelessWidget {
                             barTouchData: BarTouchData(
                               enabled: true,
                               touchTooltipData: BarTouchTooltipData(
-                                // tooltipBgColor: AppColors.white,
-                                // tooltipRoundedRadius: 4,
                                 getTooltipItem: (
                                   group,
                                   groupIndex,

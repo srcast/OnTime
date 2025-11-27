@@ -58,6 +58,10 @@ class HourValueRules {
   static const insertRuleMsg = 'insert_rule_msg';
   static const unsavedChangesMsg = 'unsaved_changes_msg';
   static const workStartsAt = 'work_starts_at';
+  static const afterSchedule = 'after_schedule';
+  static const afterHours = 'after_hours';
+  static const day = 'day';
+  static const value = 'value';
 }
 
 class DaysOfWeek {

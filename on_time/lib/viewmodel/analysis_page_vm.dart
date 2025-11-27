@@ -147,7 +147,7 @@ class AnalysisPageVM extends ChangeNotifier {
           _focusedDate.year,
           _focusedDate.month + 1,
           0,
-        ); // obtem o ultimo dia do mes -> 0 vai assumir antes do 1  e assim o dia antes do inicio do proximo mes
+        ); // last day of the month -> 0 forces the day before, so the last day of previous month of month + 1 (month)
         break;
 
       case AnalysisViewMode.year:
@@ -244,7 +244,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
     var sortedEntries =
         _entries.entries.toList()
-          ..sort((a, b) => a.key.compareTo(b.key)); // crescente
+          ..sort((a, b) => a.key.compareTo(b.key)); // asc
 
     // update entries with ordered keys
     _entries = {for (var entry in sortedEntries) entry.key: entry.value};
@@ -258,19 +258,19 @@ class AnalysisPageVM extends ChangeNotifier {
 
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        // Ex: Seg, Ter, Qua...
+        // Mon, Tus, Wed...
         return DateFormat.EEEEE(
           Localizations.localeOf(context).toString(),
         ).format(date);
       case AnalysisViewMode.year:
-        // Ex: Jan, Fev, Mar...
+        // Jan, Feb, Mar...
         return DateFormat.MMM(
           Localizations.localeOf(context).toString(),
         ).format(date);
       default:
         return DateFormat.d(
           Localizations.localeOf(context).toString(),
-        ).format(date); // fallback: dia do mês
+        ).format(date);
     }
   }
 

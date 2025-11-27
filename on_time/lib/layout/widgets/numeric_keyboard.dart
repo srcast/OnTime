@@ -158,7 +158,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
             children: [
               Expanded(
                 child: TextButton(
-                  onPressed: () => _onCancel(), //widget.onCancel,
+                  onPressed: () => _onCancel(),
                   child: Text(
                     Labels.cancel.tr(),
                     style: TextStyle(color: context.colors.actionsText),
@@ -167,7 +167,7 @@ class _NumericKeyboardState extends State<NumericKeyboard> {
               ),
               Expanded(
                 child: TextButton(
-                  onPressed: () => _onSubmit(), //widget.onCancel,
+                  onPressed: () => _onSubmit(),
                   child: Text(
                     Labels.ok.tr(),
                     style: TextStyle(color: context.colors.actionsText),

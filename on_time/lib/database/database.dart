@@ -24,10 +24,6 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
-
-  /*   Future<List<Ponto>> obterTodosOsPontos() {
-    return select(pontos).get();
-  } */
 }
 
 LazyDatabase _openConnection() {

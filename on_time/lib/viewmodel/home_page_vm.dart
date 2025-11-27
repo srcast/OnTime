@@ -323,8 +323,6 @@ class HomePageVM extends ChangeNotifier {
         getIn: true,
       ),
     );
-
-    //notifyListeners();
   }
 
   void _prepareFirstFaseTutorial(BuildContext context) {

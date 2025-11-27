@@ -136,11 +136,9 @@ class ConfigsConfigurationsPage extends StatelessWidget {
           overlayColor: WidgetStateProperty.all(Colors.transparent),
           backgroundColor: WidgetStateProperty.all(Colors.transparent),
           fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
-            // Se estiver selecionado → usa a tua cor
             if (states.contains(WidgetState.selected)) {
               return context.colors.focusColor;
             }
-            // Caso contrário → usa a cor padrão (preta/branca)
             return null;
           }),
         ),
@@ -166,7 +164,6 @@ class ConfigsConfigurationsPage extends StatelessWidget {
             ),
           ),
         ),
-        // activeColor: context.colors.focusColor,
       ),
     );
   }
@@ -184,11 +181,9 @@ class ConfigsConfigurationsPage extends StatelessWidget {
           overlayColor: WidgetStateProperty.all(Colors.transparent),
           backgroundColor: WidgetStateProperty.all(Colors.transparent),
           fillColor: WidgetStateProperty.resolveWith<Color?>((states) {
-            // Se estiver selecionado → usa a tua cor
             if (states.contains(WidgetState.selected)) {
               return context.colors.focusColor;
             }
-            // Caso contrário → usa a cor padrão (preta/branca)
             return null;
           }),
         ),
@@ -214,7 +209,6 @@ class ConfigsConfigurationsPage extends StatelessWidget {
             ),
           ),
         ),
-        // activeColor: context.colors.focusColor,
       ),
     );
   }

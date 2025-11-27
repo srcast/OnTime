@@ -53,7 +53,6 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
       _originalBaseHourValue = _baseHourValue;
       _updateUI();
 
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(Labels.valueSaved.tr()),
@@ -72,7 +71,6 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
 
   Future<void> _setHourValueBase(double val) async {
     _baseHourValue = val;
-    //await saveHourValueBase();
     _updateUI();
   }
 
@@ -109,8 +107,10 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
 
       // update
       if (currentRule != null) {
-        _configsService.updateRule(rule);
-        message = HourValueRules.updateRuleMsg.tr();
+        var res = await _configsService.updateRule(rule);
+        if (res > 0) {
+          message = HourValueRules.updateRuleMsg.tr();
+        }
       }
       // insert
       else {
@@ -120,15 +120,16 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
 
       _getHourValuePoliticRules();
 
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: AppColors.greenDisabled,
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
-      );
+      if (message.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: AppColors.greenDisabled,
+            behavior: SnackBarBehavior.floating,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 

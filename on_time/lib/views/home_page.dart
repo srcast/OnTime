@@ -52,7 +52,7 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(
-                        height: 35, // altura igual para ambos
+                        height: 35, // fixes height
                         child:
                             vm.timerVisible
                                 ? Text(
@@ -74,9 +74,7 @@ class HomePage extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     side: BorderSide(
-                                      color:
-                                          AppColors
-                                              .softGreen, // cor do contorno
+                                      color: AppColors.softGreen,
                                     ),
                                   ),
                                   child: Text(
@@ -97,7 +95,7 @@ class HomePage extends StatelessWidget {
                           ? null
                           : () => vm.changeDate(
                             '+',
-                          ), // timer visible, is today, cant go further on date
+                          ), // timer visible, it means it is today, cant go further on date
                   icon: Icon(Icons.arrow_forward_ios),
                 ),
               ],
@@ -127,7 +125,6 @@ class HomePage extends StatelessWidget {
                                           ? Labels.workBegins.tr()
                                           : Labels.pause.tr())
                                       : '';
-                              //aqui se for mudança de sessao acrescentar fim de dia
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
@@ -218,7 +215,7 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 10),
             FloatingActionButton(
               key: vm.keyCheckIn,
-              backgroundColor: AppColors.softGreen, // verde suave, do design
+              backgroundColor: AppColors.softGreen,
               foregroundColor: AppColors.white,
               elevation: 4,
               shape: RoundedRectangleBorder(
