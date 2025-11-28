@@ -139,7 +139,7 @@ class DefineHourValueConfigPage extends StatelessWidget {
                               Text(
                                 regra.ruleDescription ==
                                         HourValueRules.dayWeekRule
-                                    ? '${HourValueRules.day.tr()}: ${regra.dayOffWeek}\n${HourValueRules.value.tr()}: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
+                                    ? '${HourValueRules.day.tr()}: ${regra.dayOffWeek!.tr()}\n${HourValueRules.value.tr()}: ${GenericHelper.getCurrencyFormat(regra.hourValue ?? 0)}'
                                     : (regra.ruleDescription ==
                                             HourValueRules
                                                 .valueAfterXScheduleRule

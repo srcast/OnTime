@@ -293,8 +293,8 @@ class _ValueRuleModal extends State<ValueRuleModal> {
                         ),
                       ),
                       child: Text(
-                        ruleHour != null
-                            ? ruleHour!.format(context)
+                        workStartAtSchedule != null
+                            ? workStartAtSchedule!.format(context)
                             : HourValueRules.selectSchedule.tr(),
                         style: TextStyle(fontSize: 16),
                       ),

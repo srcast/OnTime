@@ -6,6 +6,8 @@
 build/
 
 .vscode/
+.metadata
+devtools_options.yaml
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 
