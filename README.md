@@ -34,4 +34,15 @@ Changing the language in the app does **not** affect the device language.
 - Flutter (Dart)  
 - Drift (local database)  
 
+## 📸 Presentation
+
+<div style="display: flex; justify-content: space-between; gap: 10px;">
+  <img src="on_time/assets/screenshots/home.png" style="flex: 1; max-width: 100%; height: auto;" />
+  <img src="on_time/assets/screenshots/month.png" style="flex: 1; max-width: 100%; height: auto;" />
+  <img src="on_time/assets/screenshots/week.png" style="flex: 1; max-width: 100%; height: auto;" />
+  <img src="on_time/assets/screenshots/hourly_rate.png" style="flex: 1; max-width: 100%; height: auto;" />
+  <img src="on_time/assets/screenshots/dark.png" style="flex: 1; max-width: 100%; height: auto;" />
+</div>
+
+
 
