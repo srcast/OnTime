@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
@@ -43,13 +44,32 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   ///
 
   Future<void> _getHourValueBase() async {
-    _baseHourValue = await _configsService.getHourValueBase();
-    _originalBaseHourValue = _baseHourValue;
+    try {
+      _baseHourValue = await _configsService.getHourValueBase();
+      _originalBaseHourValue = _baseHourValue;
+    } catch (e, s) {
+      AppFeedback.showError(
+        'DefineHourValueConfigPageVM._getHourValueBase',
+        e,
+        s,
+        label: Labels.loadErrorMsg,
+      );
+    }
   }
 
   Future<void> saveHourValueBase(BuildContext context) async {
     if (valueHasChanged) {
-      await _configsService.updateHourValueBase(_baseHourValue!);
+      try {
+        await _configsService.updateHourValueBase(_baseHourValue!);
+      } catch (e, s) {
+        AppFeedback.showError(
+          'DefineHourValueConfigPageVM.saveHourValueBase',
+          e,
+          s,
+        );
+        return; // keeps the value as unsaved
+      }
+
       _originalBaseHourValue = _baseHourValue;
       _updateUI();
 
@@ -65,7 +85,17 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   }
 
   Future<void> _getHourValuePoliticRules() async {
-    _rules = await _configsService.getHourValuePolitics();
+    try {
+      _rules = await _configsService.getHourValuePolitics();
+    } catch (e, s) {
+      AppFeedback.showError(
+        'DefineHourValueConfigPageVM._getHourValuePoliticRules',
+        e,
+        s,
+        label: Labels.loadErrorMsg,
+      );
+    }
+
     _updateUI();
   }
 
@@ -105,20 +135,28 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     if (rule != null) {
       String message = '';
 
-      // update
-      if (currentRule != null) {
-        var res = await _configsService.updateRule(rule);
-        if (res > 0) {
-          message = HourValueRules.updateRuleMsg.tr();
+      try {
+        // update
+        if (currentRule != null) {
+          var res = await _configsService.updateRule(rule);
+          if (res > 0) {
+            message = HourValueRules.updateRuleMsg.tr();
+          }
         }
-      }
-      // insert
-      else {
-        _configsService.insertRule(rule);
-        message = HourValueRules.insertRuleMsg.tr();
+        // insert
+        else {
+          await _configsService.insertRule(rule);
+          message = HourValueRules.insertRuleMsg.tr();
+        }
+      } catch (e, s) {
+        AppFeedback.showError(
+          'DefineHourValueConfigPageVM.openRuleModal',
+          e,
+          s,
+        );
       }
 
-      _getHourValuePoliticRules();
+      await _getHourValuePoliticRules();
 
       if (message.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -145,9 +183,13 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     );
 
     if (response) {
-      _configsService.deleteRule(rule);
-      _rules.remove(rule);
-      _updateUI();
+      try {
+        await _configsService.deleteRule(rule);
+        _rules.remove(rule);
+        _updateUI();
+      } catch (e, s) {
+        AppFeedback.showError('DefineHourValueConfigPageVM.deleteRule', e, s);
+      }
     }
   }
 

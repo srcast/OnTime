@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/utils/enums.dart';
@@ -34,26 +35,40 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   //
 
   void _getConfigs() async {
-    var configs = await _configsService.getConfigs();
+    try {
+      var configs = await _configsService.getConfigs();
 
-    if (configs != null) {
-      _themeMode = GenericHelper.getAppThemefromString(configs.themeMode);
-      _language = GenericHelper.getALanguageOptfromString(configs.language);
+      if (configs != null) {
+        _themeMode = GenericHelper.getAppThemefromString(configs.themeMode);
+        _language = GenericHelper.getALanguageOptfromString(configs.language);
+      }
+
+      _isLoaded = true;
+      notifyListeners();
+    } catch (e, s) {
+      // not loaded -> keeps the language the app started with
+      AppFeedback.logError('ConfigConfigurationsPageVM._getConfigs', e, s);
     }
-
-    _isLoaded = true;
-    notifyListeners();
   }
 
+  // state only changes after saving -> screen never shows an option that wasn't saved
   void setTheme(AppThemeMode themeMode) async {
-    _themeMode = themeMode;
-    await _configsService.setTheme(themeMode);
-    notifyListeners();
+    try {
+      await _configsService.setTheme(themeMode);
+      _themeMode = themeMode;
+      notifyListeners();
+    } catch (e, s) {
+      AppFeedback.showError('ConfigConfigurationsPageVM.setTheme', e, s);
+    }
   }
 
   void setLanguage(LanguageOptions lang) async {
-    _language = lang;
-    await _configsService.setLanguage(lang);
-    notifyListeners();
+    try {
+      await _configsService.setLanguage(lang);
+      _language = lang;
+      notifyListeners();
+    } catch (e, s) {
+      AppFeedback.showError('ConfigConfigurationsPageVM.setLanguage', e, s);
+    }
   }
 }

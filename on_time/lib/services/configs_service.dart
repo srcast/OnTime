@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/utils/enums.dart';
 
@@ -34,86 +35,60 @@ class ConfigsService {
   }
 
   Future<double?> getHourValueBase() async {
-    try {
-      var config =
-          await (db.selectOnly(db.configurations)
-            ..addColumns([db.configurations.hourValueBase])).getSingleOrNull();
+    var config =
+        await (db.selectOnly(db.configurations)
+          ..addColumns([db.configurations.hourValueBase])).getSingleOrNull();
 
-      return config?.read<double>(db.configurations.hourValueBase);
-    } catch (e, _) {
-      return 0;
-    }
+    return config?.read<double>(db.configurations.hourValueBase);
   }
 
   Future<void> updateHourValueBase(double value) async {
-    try {
-      await (db.update(db.configurations)
-        ..where((c) => c.id.equals(1))) // there is only one record
-      .write(ConfigurationsCompanion(hourValueBase: Value(value)));
-    } catch (e, _) {}
+    await (db.update(db.configurations)
+      ..where((c) => c.id.equals(1))) // there is only one record
+    .write(ConfigurationsCompanion(hourValueBase: Value(value)));
   }
 
   Future<List<HourValuePolitic>> getHourValuePolitics() async {
-    try {
-      return await (db.select(db.hourValuePolitics)
-        ..orderBy([(r) => OrderingTerm(expression: r.id)])).get();
-    } catch (e, _) {
-      return [];
-    }
+    return await (db.select(db.hourValuePolitics)
+      ..orderBy([(r) => OrderingTerm(expression: r.id)])).get();
   }
 
   Future<void> insertRule(HourValuePoliticsCompanion rule) async {
-    try {
-      await db.into(db.hourValuePolitics).insert(rule);
-    } catch (e, _) {}
+    await db.into(db.hourValuePolitics).insert(rule);
   }
 
   Future<void> deleteRule(HourValuePolitic ruleToDelete) async {
-    try {
-      (db.delete(db.hourValuePolitics)
-        ..where((p) => p.id.equals(ruleToDelete.id))).go();
-    } catch (e, _) {}
+    await (db.delete(db.hourValuePolitics)
+      ..where((p) => p.id.equals(ruleToDelete.id))).go();
   }
 
   Future<int> updateRule(HourValuePoliticsCompanion ruleToUpdate) async {
-    try {
-      return await (db.update(db.hourValuePolitics)
-        ..where((p) => p.id.equals(ruleToUpdate.id.value))).write(ruleToUpdate);
-    } catch (e, _) {
-      return 0;
-    }
+    return await (db.update(db.hourValuePolitics)
+      ..where((p) => p.id.equals(ruleToUpdate.id.value))).write(ruleToUpdate);
   }
 
   Future<Configuration?> getConfigs() async {
-    try {
-      return await db.select(db.configurations).getSingleOrNull();
-    } catch (e, _) {
-      return null;
-    }
+    return await db.select(db.configurations).getSingleOrNull();
   }
 
   Future<void> setTheme(AppThemeMode themeMode) async {
-    try {
-      var theme = GenericHelper.getAppThemeAsString(themeMode);
-      final config = await db.select(db.configurations).getSingleOrNull();
-      if (config != null) {
-        await (db.update(db.configurations)..where(
-          (c) => c.id.equals(config.id),
-        )).write(ConfigurationsCompanion(themeMode: Value(theme)));
-      }
-    } catch (e, _) {}
+    var theme = GenericHelper.getAppThemeAsString(themeMode);
+    final config = await db.select(db.configurations).getSingleOrNull();
+    if (config != null) {
+      await (db.update(db.configurations)..where(
+        (c) => c.id.equals(config.id),
+      )).write(ConfigurationsCompanion(themeMode: Value(theme)));
+    }
   }
 
   Future<void> setLanguage(LanguageOptions lang) async {
-    try {
-      var language = GenericHelper.getLanguageOptAsString(lang);
-      final config = await db.select(db.configurations).getSingleOrNull();
-      if (config != null) {
-        await (db.update(db.configurations)..where(
-          (c) => c.id.equals(config.id),
-        )).write(ConfigurationsCompanion(language: Value(language)));
-      }
-    } catch (e, _) {}
+    var language = GenericHelper.getLanguageOptAsString(lang);
+    final config = await db.select(db.configurations).getSingleOrNull();
+    if (config != null) {
+      await (db.update(db.configurations)..where(
+        (c) => c.id.equals(config.id),
+      )).write(ConfigurationsCompanion(language: Value(language)));
+    }
   }
 
   Future<bool> hasSeenTutorial() async {
@@ -121,24 +96,21 @@ class ConfigsService {
       final config = await db.select(db.configurations).getSingleOrNull();
 
       return config != null ? config.hasSeenTutorial : false;
-    } catch (e, _) {
+    } catch (e, s) {
+      AppFeedback.logError('ConfigsService.hasSeenTutorial', e, s);
       return true;
     }
   }
 
   Future<void> updateHasSeenTutorial(bool hasSeenTutorial) async {
-    try {
-      await (db.update(db.configurations)..where((c) => c.id.equals(1))).write(
-        ConfigurationsCompanion(hasSeenTutorial: Value(hasSeenTutorial)),
-      );
-    } catch (e, _) {}
+    await (db.update(db.configurations)..where(
+      (c) => c.id.equals(1),
+    )).write(ConfigurationsCompanion(hasSeenTutorial: Value(hasSeenTutorial)));
   }
 
   Future<void> updateShowAds(bool showInterstitialAds) async {
-    try {
-      await (db.update(db.configurations)..where(
-        (c) => c.id.equals(1),
-      )).write(ConfigurationsCompanion(showAds: Value(showInterstitialAds)));
-    } catch (e, _) {}
+    await (db.update(db.configurations)..where(
+      (c) => c.id.equals(1),
+    )).write(ConfigurationsCompanion(showAds: Value(showInterstitialAds)));
   }
 }

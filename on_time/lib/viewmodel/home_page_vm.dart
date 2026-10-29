@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
@@ -104,11 +105,15 @@ class HomePageVM extends ChangeNotifier {
     if (selectedDateTime != null) {
       _date = selectedDateTime;
 
-      var sessionIdToUpdate = await _pointsService.insertPoint(_date);
-      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await _updateCurrentSessionData(sessionIdToUpdate);
+      try {
+        var sessionIdToUpdate = await _pointsService.insertPoint(_date);
+        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+        await _updateCurrentSessionData(sessionIdToUpdate);
+      } catch (e, s) {
+        AppFeedback.showError('HomePageVM.openPointModal', e, s);
+      }
 
-      _getSessionPoints();
+      _getSessionPoints(); // shows what is really saved
     }
 
     // if (GlobalData.showInterstitialAds && AdsHelper.isInterstitialReady) {
@@ -164,10 +169,26 @@ class HomePageVM extends ChangeNotifier {
 
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
     String sessionId = GenericHelper.getSessionId(sessionDate);
-    _pointsSession = await _pointsService.getPointsSession(sessionId);
-    _pointsUI = await _pointsService.getDayPointsForUI(sessionDate);
 
-    await _updateDaySummary(sessionDate, sessionId);
+    try {
+      _pointsSession = await _pointsService.getPointsSession(sessionId);
+      _pointsUI = await _pointsService.getDayPointsForUI(sessionDate);
+
+      await _updateDaySummary(sessionDate, sessionId);
+    } catch (e, s) {
+      AppFeedback.showError(
+        'HomePageVM._getSessionPoints',
+        e,
+        s,
+        label: Labels.loadErrorMsg,
+      );
+
+      // don't keep showing the points of the previous selected day
+      _pointsUI = [];
+      _pointsSession = [];
+      notifyListeners();
+      return;
+    }
 
     // animates activity list to last position
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -223,9 +244,14 @@ class HomePageVM extends ChangeNotifier {
     );
 
     if (response) {
-      var sessionIdToUpdate = await _pointsService.deletePoint(pointToDelete);
-      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await _updateCurrentSessionData(sessionIdToUpdate);
+      try {
+        var sessionIdToUpdate = await _pointsService.deletePoint(pointToDelete);
+        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+        await _updateCurrentSessionData(sessionIdToUpdate);
+      } catch (e, s) {
+        AppFeedback.showError('HomePageVM.deletePoint', e, s);
+      }
+
       _getSessionPoints();
     }
   }
@@ -242,12 +268,18 @@ class HomePageVM extends ChangeNotifier {
 
     if (dateWithHourUpdate != null) {
       _date = dateWithHourUpdate;
-      var sessionIdToUpdate = await _pointsService.updatePonto(
-        pointToUpdate,
-        dateWithHourUpdate,
-      );
-      await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-      await _updateCurrentSessionData(sessionIdToUpdate);
+
+      try {
+        var sessionIdToUpdate = await _pointsService.updatePonto(
+          pointToUpdate,
+          dateWithHourUpdate,
+        );
+        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
+        await _updateCurrentSessionData(sessionIdToUpdate);
+      } catch (e, s) {
+        AppFeedback.showError('HomePageVM.updatePoint', e, s);
+      }
+
       _getSessionPoints();
     }
   }

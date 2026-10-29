@@ -77,5 +77,7 @@
     "tutorial_save_hour_Value": "If you set an hourly rate, you need to save it.",
     "tutorial_special_rules": "Here you can define special rules for the hourly rate, such as on specific weekdays, after certain hours or after a given work duration.",
     "banner_ad_error": "Problem loading ad.",
-    "ads_disabled": "Ads disabled."
+    "ads_disabled": "Ads disabled.",
+    "save_error_msg": "Could not save. Please try again.",
+    "load_error_msg": "Could not load the data. Please try again."
 }

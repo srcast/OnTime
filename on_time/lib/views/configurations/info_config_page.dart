@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/database/locator.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/models/global_data.dart';
 import 'package:on_time/services/configs_service.dart';
@@ -59,7 +60,12 @@ class _InfoConfigPage extends State<InfoConfigPage> {
               onPressed: () async {
                 if (controller.text == secretCode) {
                   Navigator.pop(context);
-                  await _disableAds();
+                  try {
+                    await _disableAds();
+                  } catch (e, s) {
+                    AppFeedback.showError('InfoConfigPage._disableAds', e, s);
+                    return;
+                  }
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(Labels.adsDisabled.tr())),
                   );

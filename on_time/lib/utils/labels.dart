@@ -37,6 +37,9 @@ class Labels {
   static const theme = 'theme';
   static const language = 'language';
 
+  static const saveErrorMsg = 'save_error_msg';
+  static const loadErrorMsg = 'load_error_msg';
+
   static const adsDisabled = 'ads_disabled';
   static const bannerAdError = 'banner_ad_error';
 }

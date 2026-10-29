@@ -77,5 +77,7 @@
     "tutorial_save_hour_Value": "Caso defina o valor hora, é necessário guardar.",
     "tutorial_special_rules": "Aqui pode definir o valor hora para regras especiais, tais como em dias da semana, após determinado horário ou após determinadas horas de trabalho no dia.",
     "banner_ad_error": "Problema ao carregar anúncio.",
-    "ads_disabled": "Anúncios desativados."
+    "ads_disabled": "Anúncios desativados.",
+    "save_error_msg": "Não foi possível guardar. Tente novamente.",
+    "load_error_msg": "Não foi possível carregar os dados. Tente novamente."
 }

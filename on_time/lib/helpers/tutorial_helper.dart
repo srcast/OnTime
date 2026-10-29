@@ -1,4 +1,5 @@
 import 'package:on_time/database/locator.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/services/configs_service.dart';
 
 class TutorialHelper {
@@ -10,6 +11,10 @@ class TutorialHelper {
     hasSeenTutorial = true;
     tutorialOngoing = false;
     tutorialOngoingConfigsPage = false;
-    await locator<ConfigsService>().updateHasSeenTutorial(hasSeenTutorial);
+    try {
+      await locator<ConfigsService>().updateHasSeenTutorial(hasSeenTutorial);
+    } catch (e, s) {
+      AppFeedback.logError('TutorialHelper.cancelTutorial', e, s);
+    }
   }
 }

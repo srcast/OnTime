@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/services.dart';
 import 'package:on_time/database/locator.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
@@ -17,6 +18,21 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // errors not handled in the view models -> at least they get logged
+  FlutterError.onError = (details) {
+    FlutterError.presentError(details);
+    AppFeedback.logError(
+      'FlutterError',
+      details.exception,
+      details.stack ?? StackTrace.current,
+    );
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    AppFeedback.logError('PlatformDispatcher', error, stack);
+    return true;
+  };
+
   await EasyLocalization.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -85,6 +101,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: context.localizationDelegates,
           builder: DevicePreview.appBuilder,
           routerConfig: AppRouter.router,
+          scaffoldMessengerKey: AppFeedback.scaffoldMessengerKey,
           debugShowCheckedModeBanner: false,
           theme: lightTheme,
           darkTheme: darkTheme,

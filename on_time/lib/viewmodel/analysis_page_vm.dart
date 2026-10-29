@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/services/points_service.dart';
@@ -160,11 +161,21 @@ class AnalysisPageVM extends ChangeNotifier {
   Future<void> getData() async {
     _isLoading = true;
 
-    _entries = await _pointsService.getProfitsAsMap(
-      _viewMode,
-      _startDate,
-      _endDate,
-    );
+    try {
+      _entries = await _pointsService.getProfitsAsMap(
+        _viewMode,
+        _startDate,
+        _endDate,
+      );
+    } catch (e, s) {
+      AppFeedback.showError(
+        'AnalysisPageVM.getData',
+        e,
+        s,
+        label: Labels.loadErrorMsg,
+      );
+      _entries = {}; // don't keep showing the previous period
+    }
 
     if (_viewMode != AnalysisViewMode.month) {
       _prepareGraphEmptyValues();
