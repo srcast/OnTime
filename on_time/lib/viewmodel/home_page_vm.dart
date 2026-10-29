@@ -21,7 +21,7 @@ class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
   final ConfigsService _configsService;
   late DateTime _date; // date selected in screen
-  late Timer _timer;
+  Timer? _timer;
   bool _timerVisible = true;
   late DateTime _today; // current day
   int _sessionMinutes = 0;
@@ -74,6 +74,9 @@ class HomePageVM extends ChangeNotifier {
   }
 
   void timerRunning(bool running) {
+    _timer?.cancel(); // only one timer at a time
+    _timer = null;
+
     if (running) {
       _timerVisible = true;
       _date = DateTime.now();
@@ -84,7 +87,6 @@ class HomePageVM extends ChangeNotifier {
       });
     } else {
       _timerVisible = false;
-      _timer.cancel();
       notifyListeners();
     }
   }
@@ -464,9 +466,10 @@ class HomePageVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  // @override
-  // void dispose() {
-  //   _timer.cancel();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
 }
