@@ -8,10 +8,11 @@ extension StringExtensions on String? {
 }
 
 class GenericHelper {
+  // yyyyMMdd -> month and day must be zero padded, otherwise 2025-01-11 and 2025-11-01 share the same id
   static String getSessionId(DateTime sessionDate) =>
-      sessionDate.year.toString() +
-      sessionDate.month.toString() +
-      sessionDate.day.toString();
+      sessionDate.year.toString().padLeft(4, '0') +
+      sessionDate.month.toString().padLeft(2, '0') +
+      sessionDate.day.toString().padLeft(2, '0');
 
   static String getAppThemeAsString(AppThemeMode theme) =>
       theme.toString().split('.').last;

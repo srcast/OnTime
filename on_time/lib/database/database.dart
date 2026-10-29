@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:on_time/database/migrations/session_id_migration.dart';
 import 'package:on_time/database/tables/configs.dart';
 import 'package:on_time/database/tables/hour_value_politics.dart';
 import 'package:on_time/database/tables/pontos.dart';
@@ -23,7 +24,16 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await transaction(() => SessionIdMigration.run(this));
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection() {
