@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/services.dart';
@@ -53,14 +54,10 @@ void main() async {
             create: (_) => locator<ConfigConfigurationsPageVM>(),
           ),
         ],
-        child: MyApp(),
-        // kReleaseMode
-        //     ? MyApp()
-        //     : DevicePreview(
-        //       builder: (context) {
-        //         return MyApp();
-        //       },
-        //     ),
+        child: DevicePreview(
+          enabled: !kReleaseMode, // only in debug/profile builds
+          builder: (context) => MyApp(),
+        ),
       ),
     ),
   );
