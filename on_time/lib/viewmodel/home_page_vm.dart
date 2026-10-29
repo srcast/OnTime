@@ -23,7 +23,8 @@ class HomePageVM extends ChangeNotifier {
   late DateTime _date; // date selected in screen
   Timer? _timer;
   bool _timerVisible = true;
-  late DateTime _today; // current day
+  // current day -> always calculated, the app can stay open after midnight
+  DateTime get _today => DatesHelper.getDatetimeToday();
   int _sessionMinutes = 0;
   double _hourValue = 0;
   double _sessionProfit = 0;
@@ -63,7 +64,6 @@ class HomePageVM extends ChangeNotifier {
   //////////
 
   void initPage() {
-    _today = DatesHelper.getDatetimeToday();
     if (!TutorialHelper.hasSeenTutorial) {
       _preparePointsTutorial();
       _date = DateTime.now();

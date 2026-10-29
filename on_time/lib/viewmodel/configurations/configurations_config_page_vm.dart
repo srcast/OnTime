@@ -6,6 +6,7 @@ import 'package:on_time/utils/enums.dart';
 class ConfigConfigurationsPageVM extends ChangeNotifier {
   AppThemeMode _themeMode = AppThemeMode.system;
   LanguageOptions _language = LanguageOptions.english;
+  bool _isLoaded = false;
   final ConfigsService _configsService;
 
   ConfigConfigurationsPageVM(this._configsService) {
@@ -16,6 +17,8 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   AppThemeMode get themeMode => _themeMode;
 
   LanguageOptions get language => _language;
+
+  bool get isLoaded => _isLoaded;
 
   ThemeMode get flutterThemeMode {
     return switch (_themeMode) {
@@ -38,6 +41,7 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
       _language = GenericHelper.getALanguageOptfromString(configs.language);
     }
 
+    _isLoaded = true;
     notifyListeners();
   }
 

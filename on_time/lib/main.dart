@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/services.dart';
-import 'package:on_time/database/database.dart';
 import 'package:on_time/database/locator.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
@@ -41,10 +40,6 @@ void main() async {
       ),
       child: MultiProvider(
         providers: [
-          Provider(
-            create: (context) => AppDatabase(),
-            dispose: (context, AppDatabase db) => db.close(),
-          ),
           ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
           ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
           ChangeNotifierProvider(
@@ -74,39 +69,28 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        final vm = ConfigConfigurationsPageVM(locator<ConfigsService>());
-
+    // same instance used by the configurations page (MultiProvider in main)
+    return Consumer<ConfigConfigurationsPageVM>(
+      builder: (context, vm, _) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (vm.appLanguage != null && context.locale != vm.appLanguage) {
+          // before configs are loaded the vm has the default language
+          if (vm.isLoaded && context.locale != vm.appLanguage) {
             context.setLocale(vm.appLanguage);
           }
         });
 
-        return vm;
+        return MaterialApp.router(
+          locale: context.locale,
+          supportedLocales: context.supportedLocales,
+          localizationsDelegates: context.localizationDelegates,
+          builder: DevicePreview.appBuilder,
+          routerConfig: AppRouter.router,
+          debugShowCheckedModeBanner: false,
+          theme: lightTheme,
+          darkTheme: darkTheme,
+          themeMode: vm.flutterThemeMode,
+        );
       },
-      child: Consumer<ConfigConfigurationsPageVM>(
-        builder: (context, vm, _) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (vm.appLanguage != null && context.locale != vm.appLanguage) {
-              context.setLocale(vm.appLanguage);
-            }
-          });
-
-          return MaterialApp.router(
-            locale: context.locale,
-            supportedLocales: context.supportedLocales,
-            localizationsDelegates: context.localizationDelegates,
-            builder: DevicePreview.appBuilder,
-            routerConfig: AppRouter.router,
-            debugShowCheckedModeBanner: false,
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: vm.flutterThemeMode,
-          );
-        },
-      ),
     );
   }
 }
