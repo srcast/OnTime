@@ -86,6 +86,10 @@ void main() {
     await session('202515', DateTime(2025, 1, 5), 180, 12, 99);
     await session('20251115', DateTime(2025, 11, 15), 60, 10, 10);
 
+    // v1 schema had no currency_code (added in v3)
+    await db.customStatement(
+      'ALTER TABLE configurations DROP COLUMN currency_code',
+    );
     await db.customStatement('PRAGMA user_version = 1');
     await db.close();
 
