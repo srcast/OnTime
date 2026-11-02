@@ -34,7 +34,6 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
   Locale get appLanguage {
     return GenericHelper.getLocaleFromDBLang(_language);
   }
-  //
 
   void _getConfigs() async {
     try {

@@ -26,9 +26,7 @@ class AnalysisPageVM extends ChangeNotifier {
   List<BarChartGroupData> _barGroups = [];
   double _maxY = 0;
   double _stepY = 0;
-  int _firstDayOfWeek =
-      DateTime
-          .sunday; // DateTime.weekday convention, set by the view from the locale
+  int _firstDayOfWeek = DateTime.sunday;
 
   AnalysisPageVM(this._pointsService) {
     _focusedDate = DateTime.now();
@@ -50,7 +48,6 @@ class AnalysisPageVM extends ChangeNotifier {
 
   //////////
 
-  // firstDayOfWeekIndex from MaterialLocalizations -> 0 = sunday, 1 = monday (same as the date picker)
   void setFirstDayOfWeek(int firstDayOfWeekIndex) {
     final weekday =
         firstDayOfWeekIndex == 0 ? DateTime.sunday : firstDayOfWeekIndex;

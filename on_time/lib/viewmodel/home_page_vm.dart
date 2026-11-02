@@ -106,9 +106,7 @@ class HomePageVM extends ChangeNotifier {
       _date = selectedDateTime;
 
       try {
-        var sessionIdToUpdate = await _pointsService.insertPoint(_date);
-        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-        await _updateCurrentSessionData(sessionIdToUpdate);
+        await _pointsService.insertPoint(_date);
       } catch (e, s) {
         AppFeedback.showError('HomePageVM.openPointModal', e, s);
       }
@@ -245,9 +243,7 @@ class HomePageVM extends ChangeNotifier {
 
     if (response) {
       try {
-        var sessionIdToUpdate = await _pointsService.deletePoint(pointToDelete);
-        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-        await _updateCurrentSessionData(sessionIdToUpdate);
+        await _pointsService.deletePoint(pointToDelete);
       } catch (e, s) {
         AppFeedback.showError('HomePageVM.deletePoint', e, s);
       }
@@ -270,64 +266,13 @@ class HomePageVM extends ChangeNotifier {
       _date = dateWithHourUpdate;
 
       try {
-        var sessionIdToUpdate = await _pointsService.updatePonto(
-          pointToUpdate,
-          dateWithHourUpdate,
-        );
-        await _pointsService.updateSessionPointsCrono(sessionIdToUpdate);
-        await _updateCurrentSessionData(sessionIdToUpdate);
+        await _pointsService.updatePoint(pointToUpdate, dateWithHourUpdate);
       } catch (e, s) {
         AppFeedback.showError('HomePageVM.updatePoint', e, s);
       }
 
       _getSessionPoints();
     }
-  }
-
-  Future<void> _updateCurrentSessionData(String sessionId) async {
-    var sessionData = await _pointsService.getSessionData(sessionId);
-    _pointsSession = await _pointsService.getPointsSession(sessionId);
-    DateTime day = sessionData != null ? sessionData.day : _date;
-
-    _sessionMinutes = 0;
-    if (_pointsSession.length > 1) {
-      for (int i = 1; i < _pointsSession.length; i += 2) {
-        var outD = _pointsSession[i].date;
-        var inD = _pointsSession[i - 1].date;
-        var dif = outD.difference(inD).inMinutes;
-
-        _sessionMinutes += dif;
-      }
-    }
-
-    // get value in use
-    var rules = await _configsService.getHourValuePolitics();
-    var hourValueBaseFromConfigs = await _configsService.getHourValueBase();
-
-    _hourValue = PointsHelper.getHourValueInUseFromRules(
-      DateTime.now(),
-      day,
-      _pointsSession,
-      rules,
-      hourValueBaseFromConfigs ?? 0,
-    );
-
-    // get profit
-    _sessionProfit = PointsHelper.getSessionProfit(
-      day,
-      hourValueBaseFromConfigs ?? 0,
-      _pointsSession,
-      rules,
-    );
-
-    //update session values
-    await _pointsService.insertUpdateSession(
-      sessionId,
-      day,
-      _sessionMinutes,
-      _hourValue,
-      _sessionProfit,
-    );
   }
 
   void refreshDay(DateTime selectedDay) {

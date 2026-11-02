@@ -14,6 +14,13 @@ class GenericHelper {
       sessionDate.month.toString().padLeft(2, '0') +
       sessionDate.day.toString().padLeft(2, '0');
 
+  // yyyyMMdd -> day of the session
+  static DateTime getDateFromSessionId(String sessionId) => DateTime(
+    int.parse(sessionId.substring(0, 4)),
+    int.parse(sessionId.substring(4, 6)),
+    int.parse(sessionId.substring(6, 8)),
+  );
+
   static String getAppThemeAsString(AppThemeMode theme) =>
       theme.toString().split('.').last;
 

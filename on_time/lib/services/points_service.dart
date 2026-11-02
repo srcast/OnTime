@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
+import 'package:on_time/helpers/points_helper.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 
@@ -40,122 +41,128 @@ class PointsService {
         .get();
   }
 
-  // Future<Ponto?> getLastPointSession(DateTime session) async {
-  //   return await (db.select(db.pontos)
-  //         ..where((p) => p.sessionId.equals(session))
-  //         ..orderBy([
-  //           (p) => OrderingTerm(expression: p.date, mode: OrderingMode.desc),
-  //         ])
-  //         ..limit(1))
-  //       .getSingleOrNull();
-  // }
+  Future<void> insertPoint(DateTime date) {
+    return db.transaction(() async {
+      final pointDate = _withoutSeconds(date);
+      final sessionId = await _sessionIdFor(pointDate);
 
-  Future<String> insertPoint(DateTime date) async {
-    // verify session with last point
-    DateTime interval = date.add(Duration(hours: -6));
+      await db
+          .into(db.pontos)
+          .insert(
+            PontosCompanion.insert(
+              date: pointDate,
+              sessionId: sessionId,
+              getIn: true, // set by _recalculateSession
+            ),
+          );
 
-    var lastPoint =
-        await (db.select(db.pontos)
-              ..where((p) => p.date.isSmallerThanValue(date))
-              ..orderBy([(t) => OrderingTerm.desc(t.date)])
-              ..limit(1))
-            .getSingleOrNull();
-    bool sameSession = false;
-    bool getIn = true;
-    var sessionId = GenericHelper.getSessionId(date);
+      await _recalculateSession(sessionId);
+    });
+  }
 
-    if (lastPoint != null) {
-      // last point of another day less than 6 hours ago -> same session (session going through 00h)
-      sameSession =
-          lastPoint.sessionId != sessionId &&
-          !lastPoint.date.isBefore(interval);
+  Future<void> deletePoint(Ponto pointToDelete) {
+    return db.transaction(() async {
+      await (db.delete(db.pontos)
+        ..where((p) => p.id.equals(pointToDelete.id))).go();
 
-      if (sameSession) {
-        sessionId = lastPoint.sessionId; // for diferent days
-        getIn = !lastPoint.getIn;
+      await _recalculateSession(pointToDelete.sessionId);
+    });
+  }
+
+  Future<void> updatePoint(Ponto pointToUpdate, DateTime newDate) {
+    return db.transaction(() async {
+      final pointDate = _withoutSeconds(newDate);
+      // date may have changed to another day -> session is decided again, like a new point
+      final sessionId = await _sessionIdFor(
+        pointDate,
+        ignorePointId: pointToUpdate.id,
+      );
+
+      await (db.update(db.pontos)
+        ..where((p) => p.id.equals(pointToUpdate.id))).write(
+        PontosCompanion(date: Value(pointDate), sessionId: Value(sessionId)),
+      );
+
+      await _recalculateSession(sessionId);
+      if (sessionId != pointToUpdate.sessionId) {
+        await _recalculateSession(pointToUpdate.sessionId);
       }
-    }
+    });
+  }
 
-    await db
-        .into(db.pontos)
-        .insert(
-          PontosCompanion(
-            date: Value(
-              DateTime(date.year, date.month, date.day, date.hour, date.minute),
-            ), // ignore seconds
-            sessionId: Value(sessionId),
-            getIn: Value(getIn),
-          ),
-        );
+  DateTime _withoutSeconds(DateTime date) =>
+      DateTime(date.year, date.month, date.day, date.hour, date.minute);
+
+  // last point of another day less than 6 hours before -> same session (session going through 00h)
+  // it can be a get in or a get out -> a get out followed by a point within 6h is a pause, not a new work day
+  Future<String> _sessionIdFor(DateTime date, {int? ignorePointId}) async {
+    final sessionId = GenericHelper.getSessionId(date);
+
+    final query =
+        db.select(db.pontos)
+          ..where((p) => p.date.isSmallerThanValue(date))
+          ..orderBy([(p) => OrderingTerm.desc(p.date)])
+          ..limit(1);
+    if (ignorePointId != null) {
+      query.where((p) => p.id.isNotValue(ignorePointId));
+    }
+    final lastPoint = await query.getSingleOrNull();
+
+    if (lastPoint != null &&
+        lastPoint.sessionId != sessionId &&
+        !lastPoint.date.isBefore(date.add(const Duration(hours: -6)))) {
+      return lastPoint.sessionId;
+    }
 
     return sessionId;
   }
 
-  Future<String> deletePoint(Ponto pointToDelete) async {
-    await (db.delete(db.pontos)
-      ..where((p) => p.id.equals(pointToDelete.id))).go();
+  Future<void> _recalculateSession(String sessionId) async {
+    final points = await getPointsSession(sessionId);
 
-    return pointToDelete.sessionId;
-  }
+    if (points.isEmpty) {
+      await (db.delete(db.session)
+        ..where((s) => s.sessionId.equals(sessionId))).go();
+      return;
+    }
 
-  Future<String> updatePonto(Ponto pointToUpdate, DateTime newDate) async {
-    // its possible to be a diferent session -> date may have been changed
-    await (db.update(db.pontos)
-      ..where((p) => p.id.equals(pointToUpdate.id))).write(
-      PontosCompanion(
-        date: Value(
-          DateTime(
-            newDate.year,
-            newDate.month,
-            newDate.day,
-            newDate.hour,
-            newDate.minute,
-          ),
-        ),
-      ),
+    // in / out by chronological order
+    for (int i = 0; i < points.length; i++) {
+      await (db.update(db.pontos)..where(
+        (p) => p.id.equals(points[i].id),
+      )).write(PontosCompanion(getIn: Value(i.isEven)));
+    }
+
+    final configs = await db.select(db.configurations).get();
+    final hourValueBase = configs.firstOrNull?.hourValueBase ?? 0;
+    final rules =
+        await (db.select(db.hourValuePolitics)
+          ..orderBy([(r) => OrderingTerm(expression: r.id)])).get();
+    final day = GenericHelper.getDateFromSessionId(sessionId);
+
+    final minutesWorked = PointsHelper.getMinutesWorkedSession(points);
+    final hourValue = PointsHelper.getHourValueInUseFromRules(
+      DateTime.now(),
+      day,
+      points,
+      rules,
+      hourValueBase,
+    );
+    final profit = PointsHelper.getSessionProfit(
+      day,
+      hourValueBase,
+      points,
+      rules,
     );
 
-    return pointToUpdate.sessionId;
-  }
-
-  Future<void> updateSessionPointsCrono(String sessionId) async {
-    var points =
-        await (db.select(db.pontos)
-              ..where((p) => p.sessionId.equals(sessionId))
-              ..orderBy([
-                (p) => OrderingTerm(expression: p.date, mode: OrderingMode.asc),
-              ]))
-            .get();
-
-    var getIn = true;
-
-    for (var point in points) {
-      await (db.update(db.pontos)..where(
-        (p) => p.id.equals(point.id),
-      )).write(PontosCompanion(getIn: Value(getIn)));
-
-      getIn = !getIn; // change value for next
-    }
-  }
-
-  Future<void> insertUpdateSession(
-    String sessionId,
-    DateTime sessionDate,
-    int minutesWorked,
-    double hourValue,
-    double profit,
-  ) async {
-    final existing =
-        await (db.select(db.session)
-          ..where((s) => s.sessionId.equals(sessionId))).get();
-
-    if (existing.isEmpty) {
+    final existing = await getSessionData(sessionId);
+    if (existing == null) {
       await db
           .into(db.session)
           .insert(
             SessionCompanion.insert(
               sessionId: sessionId,
-              day: sessionDate,
+              day: day,
               minutesWorked: minutesWorked,
               hourValue: Value(hourValue),
               profit: Value(profit),
@@ -166,6 +173,7 @@ class PointsService {
       await (db.update(db.session)
         ..where((s) => s.sessionId.equals(sessionId))).write(
         SessionCompanion(
+          day: Value(day),
           minutesWorked: Value(minutesWorked),
           hourValue: Value(hourValue),
           profit: Value(profit),
