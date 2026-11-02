@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:on_time/layout/themes.dart';
+import 'package:on_time/layout/widgets/currency_picker_dialog.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
@@ -26,101 +27,152 @@ class ConfigsConfigurationsPage extends StatelessWidget {
         elevation: 0,
       ),
       backgroundColor: context.colors.scaffoldBackground,
-      body: Column(
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            Labels.theme.tr(),
-            style: TextStyle(fontSize: 22, color: context.colors.titleText),
-          ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              color: context.colors.scaffoldBackground,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Text(
+              Labels.theme.tr(),
+              style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                _buildThemeOption(
-                  context,
-                  title: AppThemeOptions.automatic.tr(),
-                  value: AppThemeMode.system,
-                  groupValue: vm.themeMode,
-                  onChanged: vm.setTheme,
-                ),
-                _buildThemeOption(
-                  context,
-                  title: AppThemeOptions.light.tr(),
-                  value: AppThemeMode.light,
-                  groupValue: vm.themeMode,
-                  onChanged: vm.setTheme,
-                ),
-                _buildThemeOption(
-                  context,
-                  title: AppThemeOptions.dark.tr(),
-                  value: AppThemeMode.dark,
-                  groupValue: vm.themeMode,
-                  onChanged: vm.setTheme,
-                ),
-              ],
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: context.colors.scaffoldBackground,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _buildThemeOption(
+                    context,
+                    title: AppThemeOptions.automatic.tr(),
+                    value: AppThemeMode.system,
+                    groupValue: vm.themeMode,
+                    onChanged: vm.setTheme,
+                  ),
+                  _buildThemeOption(
+                    context,
+                    title: AppThemeOptions.light.tr(),
+                    value: AppThemeMode.light,
+                    groupValue: vm.themeMode,
+                    onChanged: vm.setTheme,
+                  ),
+                  _buildThemeOption(
+                    context,
+                    title: AppThemeOptions.dark.tr(),
+                    value: AppThemeMode.dark,
+                    groupValue: vm.themeMode,
+                    onChanged: vm.setTheme,
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            Labels.language.tr(),
-            style: TextStyle(fontSize: 22, color: context.colors.titleText),
-          ),
-          SizedBox(height: 10),
-          Container(
-            decoration: BoxDecoration(
-              color: context.colors.scaffoldBackground,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+            const SizedBox(height: 16),
+            Text(
+              Labels.language.tr(),
+              style: TextStyle(fontSize: 22, color: context.colors.titleText),
             ),
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: [
-                _buildLanguageOption(
-                  context,
-                  title: AppLanguageOptions.english.tr(),
-                  value: LanguageOptions.english,
-                  groupValue: vm.language,
-                  onChanged: vm.setLanguage,
-                ),
-                _buildLanguageOption(
-                  context,
-                  title: AppLanguageOptions.portuguese.tr(),
-                  value: LanguageOptions.portuguese,
-                  groupValue: vm.language,
-                  onChanged: vm.setLanguage,
-                ),
-                _buildLanguageOption(
-                  context,
-                  title: AppLanguageOptions.french.tr(),
-                  value: LanguageOptions.french,
-                  groupValue: vm.language,
-                  onChanged: vm.setLanguage,
-                ),
-              ],
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: context.colors.scaffoldBackground,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  _buildLanguageOption(
+                    context,
+                    title: AppLanguageOptions.english.tr(),
+                    value: LanguageOptions.english,
+                    groupValue: vm.language,
+                    onChanged: vm.setLanguage,
+                  ),
+                  _buildLanguageOption(
+                    context,
+                    title: AppLanguageOptions.portuguese.tr(),
+                    value: LanguageOptions.portuguese,
+                    groupValue: vm.language,
+                    onChanged: vm.setLanguage,
+                  ),
+                  _buildLanguageOption(
+                    context,
+                    title: AppLanguageOptions.french.tr(),
+                    value: LanguageOptions.french,
+                    groupValue: vm.language,
+                    onChanged: vm.setLanguage,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Text(
+              Labels.currency.tr(),
+              style: TextStyle(fontSize: 22, color: context.colors.titleText),
+            ),
+            SizedBox(height: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: context.colors.scaffoldBackground,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: ListTile(
+                title: Text(
+                  vm.currencyCode,
+                  style: TextStyle(
+                    color: context.colors.defaultText,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                trailing: Icon(
+                  Icons.chevron_right,
+                  color: context.colors.defaultText,
+                ),
+                onTap: () => _openCurrencyPicker(context, vm),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
+  }
+
+  Future<void> _openCurrencyPicker(
+    BuildContext context,
+    ConfigConfigurationsPageVM vm,
+  ) async {
+    final currencyCode = await CurrencyPickerDialog.show(
+      context,
+      selectedCurrencyCode: vm.currencyCode,
+    );
+
+    if (currencyCode != null) {
+      await vm.setCurrency(currencyCode);
+    }
   }
 
   Widget _buildThemeOption(

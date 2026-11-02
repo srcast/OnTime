@@ -16,6 +16,8 @@ class AnalysisPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<AnalysisPageVM>();
+    // first day of week follows the app language (same as the date picker)
+    vm.setFirstDayOfWeek(MaterialLocalizations.of(context).firstDayOfWeekIndex);
 
     return SafeArea(
       child: Padding(
@@ -177,6 +179,8 @@ class AnalysisPage extends StatelessWidget {
                           width: MediaQuery.of(context).size.width,
                           child: TableCalendar(
                             locale: Localizations.localeOf(context).toString(),
+                            startingDayOfWeek:
+                                StartingDayOfWeek.values[vm.firstDayOfWeek - 1],
                             firstDay: DateTime.utc(
                               vm.focusedDate.year - 5,
                               1,

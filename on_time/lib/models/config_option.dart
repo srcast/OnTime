@@ -9,7 +9,10 @@ class ConfigOption {
 }
 
 final configs = [
-  ConfigOption(label: Labels.configsListHourValue, icon: Icons.euro),
+  ConfigOption(
+    label: Labels.configsListHourValue,
+    icon: Icons.payments_outlined,
+  ),
   ConfigOption(label: Labels.configurationsTab, icon: Icons.settings),
   ConfigOption(label: Labels.configsInfo, icon: Icons.info_outline),
 ];

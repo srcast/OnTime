@@ -1,4 +1,5 @@
 import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/utils/common_objs.dart';
 
 class PointsHelper {
@@ -69,7 +70,7 @@ class PointsHelper {
         );
 
         if (regraDateTime.isBefore(workStartAtTime)) {
-          regraDateTime = regraDateTime.add(const Duration(days: 1));
+          regraDateTime = DatesHelper.addDays(regraDateTime, 1);
         }
 
         if (regraDateTime.isAfter(start) && regraDateTime.isBefore(end)) {
@@ -221,7 +222,7 @@ class PointsHelper {
       );
 
       if (regraDateTime.isBefore(workStartAtTime)) {
-        regraDateTime = regraDateTime.add(const Duration(days: 1));
+        regraDateTime = DatesHelper.addDays(regraDateTime, 1);
       }
 
       if (regraDateTime.isBefore(lastComparisonDate)) {

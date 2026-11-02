@@ -26,6 +26,9 @@ class AnalysisPageVM extends ChangeNotifier {
   List<BarChartGroupData> _barGroups = [];
   double _maxY = 0;
   double _stepY = 0;
+  int _firstDayOfWeek =
+      DateTime
+          .sunday; // DateTime.weekday convention, set by the view from the locale
 
   AnalysisPageVM(this._pointsService) {
     _focusedDate = DateTime.now();
@@ -43,8 +46,22 @@ class AnalysisPageVM extends ChangeNotifier {
   List<BarChartGroupData> get barGroups => _barGroups;
   double get maxY => _maxY;
   double get stepY => _stepY;
+  int get firstDayOfWeek => _firstDayOfWeek;
 
   //////////
+
+  // firstDayOfWeekIndex from MaterialLocalizations -> 0 = sunday, 1 = monday (same as the date picker)
+  void setFirstDayOfWeek(int firstDayOfWeekIndex) {
+    final weekday =
+        firstDayOfWeekIndex == 0 ? DateTime.sunday : firstDayOfWeekIndex;
+    if (weekday == _firstDayOfWeek) return;
+
+    _firstDayOfWeek = weekday;
+    if (_viewMode == AnalysisViewMode.week) {
+      _handelsStartEndDate();
+      getData();
+    }
+  }
 
   void updateViewMode(String mode) {
     if (mode != _viewMode) {
@@ -62,7 +79,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        title = _getWeekRange(_focusedDate); // handles end date and start date
+        title = _getWeekRange();
         break;
 
       case AnalysisViewMode.month:
@@ -79,18 +96,16 @@ class AnalysisPageVM extends ChangeNotifier {
     return title;
   }
 
-  String _getWeekRange(DateTime date) {
-    final int weekday = date.weekday; // 1 = monday, 7 = sunday
-    final DateTime sunday = date.subtract(Duration(days: weekday % 7));
-    final DateTime saturday = sunday.add(const Duration(days: 6));
+  String _getWeekRange() {
+    final format = DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale());
 
-    return '${DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale()).format(sunday)} - ${DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale()).format(saturday)}';
+    return '${format.format(_startDate)} - ${format.format(_endDate)}';
   }
 
   void advanceDate() {
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        _focusedDate = _focusedDate.add(Duration(days: 7));
+        _focusedDate = DatesHelper.addDays(_focusedDate, 7);
         break;
 
       case AnalysisViewMode.month:
@@ -102,7 +117,11 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
 
       case AnalysisViewMode.year:
-        _focusedDate = _focusedDate.add(Duration(days: 365));
+        _focusedDate = DateTime(
+          _focusedDate.year + 1,
+          1,
+          1,
+        ); // only the year matters
         break;
     }
 
@@ -113,7 +132,7 @@ class AnalysisPageVM extends ChangeNotifier {
   void goBackDate() {
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        _focusedDate = _focusedDate.subtract(Duration(days: 7));
+        _focusedDate = DatesHelper.addDays(_focusedDate, -7);
         break;
 
       case AnalysisViewMode.month:
@@ -125,7 +144,11 @@ class AnalysisPageVM extends ChangeNotifier {
         break;
 
       case AnalysisViewMode.year:
-        _focusedDate = _focusedDate.subtract(Duration(days: 365));
+        _focusedDate = DateTime(
+          _focusedDate.year - 1,
+          1,
+          1,
+        ); // only the year matters
         break;
     }
 
@@ -136,10 +159,10 @@ class AnalysisPageVM extends ChangeNotifier {
   void _handelsStartEndDate() {
     switch (_viewMode) {
       case AnalysisViewMode.week:
-        _startDate = _focusedDate.subtract(
-          Duration(days: _focusedDate.weekday % 7),
-        );
-        _endDate = _startDate.add(const Duration(days: 6));
+        // days since the first day of the week
+        final daysFromStart = (_focusedDate.weekday - _firstDayOfWeek + 7) % 7;
+        _startDate = DatesHelper.addDays(_focusedDate, -daysFromStart);
+        _endDate = DatesHelper.addDays(_startDate, 6);
         break;
 
       case AnalysisViewMode.month:
@@ -245,7 +268,7 @@ class AnalysisPageVM extends ChangeNotifier {
 
       switch (_viewMode) {
         case AnalysisViewMode.week:
-          auxInitDate = auxInitDate.add(Duration(days: 1));
+          auxInitDate = DatesHelper.addDays(auxInitDate, 1);
           break;
         case AnalysisViewMode.year:
           auxInitDate = DateTime(auxInitDate.year, auxInitDate.month + 1, 1);

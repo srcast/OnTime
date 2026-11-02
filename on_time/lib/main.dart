@@ -43,6 +43,7 @@ void main() async {
 
   final config = await locator<ConfigsService>().ensureConfigExists();
   TutorialHelper.hasSeenTutorial = config.hasSeenTutorial;
+  GenericHelper.selectedCurrencyCode = config.currencyCode;
   //GlobalData.showInterstitialAds = config.showAds; // ads
 
   runApp(

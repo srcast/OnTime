@@ -79,5 +79,8 @@
     "banner_ad_error": "Problema ao carregar anúncio.",
     "ads_disabled": "Anúncios desativados.",
     "save_error_msg": "Não foi possível guardar. Tente novamente.",
-    "load_error_msg": "Não foi possível carregar os dados. Tente novamente."
+    "load_error_msg": "Não foi possível carregar os dados. Tente novamente.",
+    "currency": "Moeda",
+    "currency_search": "Pesquisar país ou moeda",
+    "currency_not_found": "Nenhuma moeda encontrada."
 }

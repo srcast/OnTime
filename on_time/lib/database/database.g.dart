@@ -799,6 +799,17 @@ class $ConfigurationsTable extends Configurations
     ),
     defaultValue: const Constant(true),
   );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -807,6 +818,7 @@ class $ConfigurationsTable extends Configurations
     language,
     hasSeenTutorial,
     showAds,
+    currencyCode,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -859,6 +871,15 @@ class $ConfigurationsTable extends Configurations
         showAds.isAcceptableOrUnknown(data['show_ads']!, _showAdsMeta),
       );
     }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -895,6 +916,10 @@ class $ConfigurationsTable extends Configurations
             DriftSqlType.bool,
             data['${effectivePrefix}show_ads'],
           )!,
+      currencyCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_code'],
+      ),
     );
   }
 
@@ -911,6 +936,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
   final String? language;
   final bool hasSeenTutorial;
   final bool showAds;
+  final String? currencyCode;
   const Configuration({
     required this.id,
     this.hourValueBase,
@@ -918,6 +944,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     this.language,
     required this.hasSeenTutorial,
     required this.showAds,
+    this.currencyCode,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -934,6 +961,9 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     }
     map['has_seen_tutorial'] = Variable<bool>(hasSeenTutorial);
     map['show_ads'] = Variable<bool>(showAds);
+    if (!nullToAbsent || currencyCode != null) {
+      map['currency_code'] = Variable<String>(currencyCode);
+    }
     return map;
   }
 
@@ -954,6 +984,10 @@ class Configuration extends DataClass implements Insertable<Configuration> {
               : Value(language),
       hasSeenTutorial: Value(hasSeenTutorial),
       showAds: Value(showAds),
+      currencyCode:
+          currencyCode == null && nullToAbsent
+              ? const Value.absent()
+              : Value(currencyCode),
     );
   }
 
@@ -969,6 +1003,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
       language: serializer.fromJson<String?>(json['language']),
       hasSeenTutorial: serializer.fromJson<bool>(json['hasSeenTutorial']),
       showAds: serializer.fromJson<bool>(json['showAds']),
+      currencyCode: serializer.fromJson<String?>(json['currencyCode']),
     );
   }
   @override
@@ -981,6 +1016,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
       'language': serializer.toJson<String?>(language),
       'hasSeenTutorial': serializer.toJson<bool>(hasSeenTutorial),
       'showAds': serializer.toJson<bool>(showAds),
+      'currencyCode': serializer.toJson<String?>(currencyCode),
     };
   }
 
@@ -991,6 +1027,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     Value<String?> language = const Value.absent(),
     bool? hasSeenTutorial,
     bool? showAds,
+    Value<String?> currencyCode = const Value.absent(),
   }) => Configuration(
     id: id ?? this.id,
     hourValueBase:
@@ -999,6 +1036,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     language: language.present ? language.value : this.language,
     hasSeenTutorial: hasSeenTutorial ?? this.hasSeenTutorial,
     showAds: showAds ?? this.showAds,
+    currencyCode: currencyCode.present ? currencyCode.value : this.currencyCode,
   );
   Configuration copyWithCompanion(ConfigurationsCompanion data) {
     return Configuration(
@@ -1014,6 +1052,10 @@ class Configuration extends DataClass implements Insertable<Configuration> {
               ? data.hasSeenTutorial.value
               : this.hasSeenTutorial,
       showAds: data.showAds.present ? data.showAds.value : this.showAds,
+      currencyCode:
+          data.currencyCode.present
+              ? data.currencyCode.value
+              : this.currencyCode,
     );
   }
 
@@ -1025,7 +1067,8 @@ class Configuration extends DataClass implements Insertable<Configuration> {
           ..write('themeMode: $themeMode, ')
           ..write('language: $language, ')
           ..write('hasSeenTutorial: $hasSeenTutorial, ')
-          ..write('showAds: $showAds')
+          ..write('showAds: $showAds, ')
+          ..write('currencyCode: $currencyCode')
           ..write(')'))
         .toString();
   }
@@ -1038,6 +1081,7 @@ class Configuration extends DataClass implements Insertable<Configuration> {
     language,
     hasSeenTutorial,
     showAds,
+    currencyCode,
   );
   @override
   bool operator ==(Object other) =>
@@ -1048,7 +1092,8 @@ class Configuration extends DataClass implements Insertable<Configuration> {
           other.themeMode == this.themeMode &&
           other.language == this.language &&
           other.hasSeenTutorial == this.hasSeenTutorial &&
-          other.showAds == this.showAds);
+          other.showAds == this.showAds &&
+          other.currencyCode == this.currencyCode);
 }
 
 class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
@@ -1058,6 +1103,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
   final Value<String?> language;
   final Value<bool> hasSeenTutorial;
   final Value<bool> showAds;
+  final Value<String?> currencyCode;
   const ConfigurationsCompanion({
     this.id = const Value.absent(),
     this.hourValueBase = const Value.absent(),
@@ -1065,6 +1111,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     this.language = const Value.absent(),
     this.hasSeenTutorial = const Value.absent(),
     this.showAds = const Value.absent(),
+    this.currencyCode = const Value.absent(),
   });
   ConfigurationsCompanion.insert({
     this.id = const Value.absent(),
@@ -1073,6 +1120,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     this.language = const Value.absent(),
     this.hasSeenTutorial = const Value.absent(),
     this.showAds = const Value.absent(),
+    this.currencyCode = const Value.absent(),
   });
   static Insertable<Configuration> custom({
     Expression<int>? id,
@@ -1081,6 +1129,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     Expression<String>? language,
     Expression<bool>? hasSeenTutorial,
     Expression<bool>? showAds,
+    Expression<String>? currencyCode,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1089,6 +1138,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
       if (language != null) 'language': language,
       if (hasSeenTutorial != null) 'has_seen_tutorial': hasSeenTutorial,
       if (showAds != null) 'show_ads': showAds,
+      if (currencyCode != null) 'currency_code': currencyCode,
     });
   }
 
@@ -1099,6 +1149,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     Value<String?>? language,
     Value<bool>? hasSeenTutorial,
     Value<bool>? showAds,
+    Value<String?>? currencyCode,
   }) {
     return ConfigurationsCompanion(
       id: id ?? this.id,
@@ -1107,6 +1158,7 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
       language: language ?? this.language,
       hasSeenTutorial: hasSeenTutorial ?? this.hasSeenTutorial,
       showAds: showAds ?? this.showAds,
+      currencyCode: currencyCode ?? this.currencyCode,
     );
   }
 
@@ -1131,6 +1183,9 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
     if (showAds.present) {
       map['show_ads'] = Variable<bool>(showAds.value);
     }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
     return map;
   }
 
@@ -1142,7 +1197,8 @@ class ConfigurationsCompanion extends UpdateCompanion<Configuration> {
           ..write('themeMode: $themeMode, ')
           ..write('language: $language, ')
           ..write('hasSeenTutorial: $hasSeenTutorial, ')
-          ..write('showAds: $showAds')
+          ..write('showAds: $showAds, ')
+          ..write('currencyCode: $currencyCode')
           ..write(')'))
         .toString();
   }
@@ -2286,6 +2342,7 @@ typedef $$ConfigurationsTableCreateCompanionBuilder =
       Value<String?> language,
       Value<bool> hasSeenTutorial,
       Value<bool> showAds,
+      Value<String?> currencyCode,
     });
 typedef $$ConfigurationsTableUpdateCompanionBuilder =
     ConfigurationsCompanion Function({
@@ -2295,6 +2352,7 @@ typedef $$ConfigurationsTableUpdateCompanionBuilder =
       Value<String?> language,
       Value<bool> hasSeenTutorial,
       Value<bool> showAds,
+      Value<String?> currencyCode,
     });
 
 class $$ConfigurationsTableFilterComposer
@@ -2333,6 +2391,11 @@ class $$ConfigurationsTableFilterComposer
 
   ColumnFilters<bool> get showAds => $composableBuilder(
     column: $table.showAds,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2375,6 +2438,11 @@ class $$ConfigurationsTableOrderingComposer
     column: $table.showAds,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ConfigurationsTableAnnotationComposer
@@ -2407,6 +2475,11 @@ class $$ConfigurationsTableAnnotationComposer
 
   GeneratedColumn<bool> get showAds =>
       $composableBuilder(column: $table.showAds, builder: (column) => column);
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
 }
 
 class $$ConfigurationsTableTableManager
@@ -2452,6 +2525,7 @@ class $$ConfigurationsTableTableManager
                 Value<String?> language = const Value.absent(),
                 Value<bool> hasSeenTutorial = const Value.absent(),
                 Value<bool> showAds = const Value.absent(),
+                Value<String?> currencyCode = const Value.absent(),
               }) => ConfigurationsCompanion(
                 id: id,
                 hourValueBase: hourValueBase,
@@ -2459,6 +2533,7 @@ class $$ConfigurationsTableTableManager
                 language: language,
                 hasSeenTutorial: hasSeenTutorial,
                 showAds: showAds,
+                currencyCode: currencyCode,
               ),
           createCompanionCallback:
               ({
@@ -2468,6 +2543,7 @@ class $$ConfigurationsTableTableManager
                 Value<String?> language = const Value.absent(),
                 Value<bool> hasSeenTutorial = const Value.absent(),
                 Value<bool> showAds = const Value.absent(),
+                Value<String?> currencyCode = const Value.absent(),
               }) => ConfigurationsCompanion.insert(
                 id: id,
                 hourValueBase: hourValueBase,
@@ -2475,6 +2551,7 @@ class $$ConfigurationsTableTableManager
                 language: language,
                 hasSeenTutorial: hasSeenTutorial,
                 showAds: showAds,
+                currencyCode: currencyCode,
               ),
           withReferenceMapper:
               (p0) =>

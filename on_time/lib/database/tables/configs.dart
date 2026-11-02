@@ -8,4 +8,6 @@ class Configurations extends Table {
   BoolColumn get hasSeenTutorial =>
       boolean().withDefault(const Constant(false))();
   BoolColumn get showAds => boolean().withDefault(const Constant(true))();
+  TextColumn get currencyCode =>
+      text().nullable()(); // null -> currency of the device country
 }

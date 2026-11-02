@@ -24,11 +24,15 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase({QueryExecutor? executor}) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (m, from, to) async {
+      // first -> SessionIdMigration reads configurations with the current columns
+      if (from < 3) {
+        await m.addColumn(configurations, configurations.currencyCode);
+      }
       if (from < 2) {
         await transaction(() => SessionIdMigration.run(this));
       }

@@ -36,6 +36,9 @@ class Labels {
 
   static const theme = 'theme';
   static const language = 'language';
+  static const currency = 'currency';
+  static const currencySearch = 'currency_search';
+  static const currencyNotFound = 'currency_not_found';
 
   static const saveErrorMsg = 'save_error_msg';
   static const loadErrorMsg = 'load_error_msg';

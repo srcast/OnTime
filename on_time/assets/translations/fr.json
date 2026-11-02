@@ -79,5 +79,8 @@
     "banner_ad_error": "Problème de chargement de l'annonce.",
     "ads_disabled": "Publicités désactivées.",
     "save_error_msg": "Impossible d'enregistrer. Veuillez réessayer.",
-    "load_error_msg": "Impossible de charger les données. Veuillez réessayer."
+    "load_error_msg": "Impossible de charger les données. Veuillez réessayer.",
+    "currency": "Devise",
+    "currency_search": "Rechercher un pays ou une devise",
+    "currency_not_found": "Aucune devise trouvée."
 }

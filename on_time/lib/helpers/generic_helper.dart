@@ -52,27 +52,47 @@ class GenericHelper {
     return localeStr;
   }
 
+  // chosen by the user in configurations (loaded on start), null -> currency of the device country
+  static String? selectedCurrencyCode;
+
+  static String getCurrencyCode() =>
+      selectedCurrencyCode.isNullOrEmpty
+          ? getDeviceCurrencyCode()
+          : selectedCurrencyCode!;
+
+  static String getDeviceCurrencyCode([Locale? locale]) {
+    final countryCode =
+        (locale ?? PlatformDispatcher.instance.locale).countryCode;
+
+    try {
+      return CountryPickerUtils.getCountryByIsoCode(
+            countryCode ?? 'PT',
+          ).currencyCode ??
+          'EUR';
+    } catch (_) {
+      return 'EUR';
+    }
+  }
+
   static String getCurrencyFormat(double value, {int decDigits = -1}) {
-    final deviceLocale = PlatformDispatcher.instance.locale; // OS locale
+    final currency = getCurrencyCode();
+    final decimalDigits = decDigits == -1 ? null : decDigits;
 
-    final country = CountryPickerUtils.getCountryByIsoCode(
-      deviceLocale.countryCode ?? 'PT',
-    );
-
-    String formatted = '';
-    if (decDigits == -1) {
-      formatted = NumberFormat.simpleCurrency(
+    NumberFormat format;
+    try {
+      format = NumberFormat.simpleCurrency(
         locale: GenericHelper.getDeviceLocale(),
-        name: country.currencyCode ?? 'EUR',
-      ).format(value);
-    } else {
-      formatted = NumberFormat.simpleCurrency(
-        locale: GenericHelper.getDeviceLocale(),
-        name: country.currencyCode ?? 'EUR',
-        decimalDigits: decDigits,
-      ).format(value);
+        name: currency,
+        decimalDigits: decimalDigits,
+      );
+    } catch (_) {
+      // device locale unknown by intl
+      format = NumberFormat.simpleCurrency(
+        name: currency,
+        decimalDigits: decimalDigits,
+      );
     }
 
-    return formatted;
+    return format.format(value);
   }
 }

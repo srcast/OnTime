@@ -5,7 +5,6 @@ import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 
-// errors are not handled here -> the caller (view model) decides what to show to the user
 class PointsService {
   final AppDatabase db;
 
@@ -26,7 +25,13 @@ class PointsService {
             (p) =>
                 p.date.isBiggerOrEqualValue(sessionDate) &
                 p.date.isSmallerOrEqualValue(
-                  sessionDate.add(Duration(hours: 23, minutes: 59)),
+                  DateTime(
+                    sessionDate.year,
+                    sessionDate.month,
+                    sessionDate.day,
+                    23,
+                    59,
+                  ),
                 ),
           )
           ..orderBy([
@@ -60,7 +65,7 @@ class PointsService {
     var sessionId = GenericHelper.getSessionId(date);
 
     if (lastPoint != null) {
-      // verify if the last point is less than 6 hours ago ant it was get in-> case of same day and when session goes through 00h
+      // last point of another day less than 6 hours ago -> same session (session going through 00h)
       sameSession =
           lastPoint.sessionId != sessionId &&
           !lastPoint.date.isBefore(interval);
@@ -231,7 +236,7 @@ class PointsService {
                   variables: [
                     Variable.withDateTime(start),
                     Variable.withDateTime(
-                      end.add(Duration(days: 1)).add(Duration(seconds: -1)),
+                      DatesHelper.addDays(end, 1).add(Duration(seconds: -1)),
                     ), // end of the day
                   ],
                 )
@@ -261,7 +266,7 @@ class PointsService {
                   variables: [
                     Variable.withDateTime(start),
                     Variable.withDateTime(
-                      end.add(Duration(days: 1)).add(Duration(seconds: -1)),
+                      DatesHelper.addDays(end, 1).add(Duration(seconds: -1)),
                     ), // end of the day
                   ],
                 )

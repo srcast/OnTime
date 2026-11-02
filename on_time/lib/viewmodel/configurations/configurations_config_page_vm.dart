@@ -21,6 +21,8 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
 
   bool get isLoaded => _isLoaded;
 
+  String get currencyCode => GenericHelper.getCurrencyCode();
+
   ThemeMode get flutterThemeMode {
     return switch (_themeMode) {
       AppThemeMode.light => ThemeMode.light,
@@ -59,6 +61,17 @@ class ConfigConfigurationsPageVM extends ChangeNotifier {
       notifyListeners();
     } catch (e, s) {
       AppFeedback.showError('ConfigConfigurationsPageVM.setTheme', e, s);
+    }
+  }
+
+  // only the symbol changes, saved values are not converted
+  Future<void> setCurrency(String currencyCode) async {
+    try {
+      await _configsService.setCurrency(currencyCode);
+      GenericHelper.selectedCurrencyCode = currencyCode;
+      notifyListeners();
+    } catch (e, s) {
+      AppFeedback.showError('ConfigConfigurationsPageVM.setCurrency', e, s);
     }
   }
 

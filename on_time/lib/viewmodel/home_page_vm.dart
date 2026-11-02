@@ -135,7 +135,7 @@ class HomePageVM extends ChangeNotifier {
         break;
     }
 
-    _date = _date.add(Duration(days: days));
+    _date = DatesHelper.addDays(_date, days);
 
     verifyDate();
   }

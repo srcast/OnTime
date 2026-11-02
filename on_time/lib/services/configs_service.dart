@@ -91,6 +91,12 @@ class ConfigsService {
     }
   }
 
+  Future<void> setCurrency(String currencyCode) async {
+    await (db.update(db.configurations)..where(
+      (c) => c.id.equals(1),
+    )).write(ConfigurationsCompanion(currencyCode: Value(currencyCode)));
+  }
+
   Future<bool> hasSeenTutorial() async {
     try {
       final config = await db.select(db.configurations).getSingleOrNull();

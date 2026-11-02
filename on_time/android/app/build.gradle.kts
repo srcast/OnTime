@@ -10,7 +10,8 @@ plugins {
 
 // --- Load keystore properties ---
 val keystoreProperties = Properties()
-val keystorePropertiesFile = File("key.properties")
+// android/key.properties -> relative to the project, not to the folder where gradle is run
+val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
@@ -51,8 +52,6 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("release")
         }
     }

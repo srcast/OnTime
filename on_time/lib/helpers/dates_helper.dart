@@ -52,4 +52,19 @@ class DatesHelper {
   static DateTime getSessionFromDate(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
+
+  // calendar days, keeps the time of day
+  // date.add(Duration(days: n)) adds n * 24h -> when DST changes the result is 23:00 of the day before or 01:00
+  static DateTime addDays(DateTime date, int days) {
+    return DateTime(
+      date.year,
+      date.month,
+      date.day + days,
+      date.hour,
+      date.minute,
+      date.second,
+      date.millisecond,
+      date.microsecond,
+    );
+  }
 }

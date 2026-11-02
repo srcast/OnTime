@@ -79,5 +79,8 @@
     "banner_ad_error": "Problem loading ad.",
     "ads_disabled": "Ads disabled.",
     "save_error_msg": "Could not save. Please try again.",
-    "load_error_msg": "Could not load the data. Please try again."
+    "load_error_msg": "Could not load the data. Please try again.",
+    "currency": "Currency",
+    "currency_search": "Search country or currency",
+    "currency_not_found": "No currency found."
 }
