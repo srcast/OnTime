@@ -35,4 +35,15 @@ class AppFeedback {
       ),
     );
   }
+
+  static void showSuccess(String label) {
+    scaffoldMessengerKey.currentState?.showSnackBar(
+      SnackBar(
+        content: Text(label.tr()),
+        backgroundColor: AppColors.greenDisabled,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
 }

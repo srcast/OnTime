@@ -4,11 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
-import 'package:on_time/layout/widgets/dialog.dart';
-import 'package:on_time/layout/widgets/numeric_keyboard.dart';
-import 'package:on_time/layout/widgets/value_rule_modal.dart';
 import 'package:on_time/services/configs_service.dart';
-import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
@@ -24,9 +20,11 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
   bool _tutorialManualClose = false;
 
   DefineHourValueConfigPageVM(this._configsService) {
-    _getHourValuePoliticRules();
-    _getHourValueBase();
+    loaded = Future.wait([_getHourValuePoliticRules(), _getHourValueBase()]);
   }
+
+  // completes when the initial data is loaded
+  late final Future<void> loaded;
 
   // Public Properties
   double? get baseHourValue => _baseHourValue;
@@ -55,33 +53,8 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
         label: Labels.loadErrorMsg,
       );
     }
-  }
 
-  Future<void> saveHourValueBase(BuildContext context) async {
-    if (valueHasChanged) {
-      try {
-        await _configsService.updateHourValueBase(_baseHourValue!);
-      } catch (e, s) {
-        AppFeedback.showError(
-          'DefineHourValueConfigPageVM.saveHourValueBase',
-          e,
-          s,
-        );
-        return; // keeps the value as unsaved
-      }
-
-      _originalBaseHourValue = _baseHourValue;
-      _updateUI();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Labels.valueSaved.tr()),
-          backgroundColor: AppColors.greenDisabled,
-          behavior: SnackBarBehavior.floating,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+    _updateUI();
   }
 
   Future<void> _getHourValuePoliticRules() async {
@@ -99,119 +72,71 @@ class DefineHourValueConfigPageVM extends ChangeNotifier {
     _updateUI();
   }
 
-  Future<void> _setHourValueBase(double val) async {
-    _baseHourValue = val;
-    _updateUI();
-  }
-
   void _updateUI() {
     notifyListeners();
   }
 
-  void openNumericKeyboard(BuildContext context) async {
-    final result = await NumericKeyboard.show(
-      context,
-      value: baseHourValueToSet,
-    );
-
-    if (result != null) {
-      _setHourValueBase(result);
-    }
+  void setBaseHourValue(double value) {
+    _baseHourValue = value;
+    _updateUI();
   }
 
-  Future<void> openRuleModal(
-    BuildContext context,
-    HourValuePolitic? currentRule,
-  ) async {
-    final rule = await showModalBottomSheet<HourValuePoliticsCompanion>(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => ValueRuleModal(currentRule: currentRule),
-    );
+  Future<void> saveHourValueBase() async {
+    if (!valueHasChanged) return;
 
-    if (rule != null) {
-      String message = '';
-
-      try {
-        // update
-        if (currentRule != null) {
-          var res = await _configsService.updateRule(rule);
-          if (res > 0) {
-            message = HourValueRules.updateRuleMsg.tr();
-          }
-        }
-        // insert
-        else {
-          await _configsService.insertRule(rule);
-          message = HourValueRules.insertRuleMsg.tr();
-        }
-      } catch (e, s) {
-        AppFeedback.showError(
-          'DefineHourValueConfigPageVM.openRuleModal',
-          e,
-          s,
-        );
-      }
-
-      await _getHourValuePoliticRules();
-
-      if (message.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: AppColors.greenDisabled,
-            behavior: SnackBarBehavior.floating,
-            duration: Duration(seconds: 2),
-          ),
-        );
-      }
-    }
-  }
-
-  void deleteRule(BuildContext context, HourValuePolitic rule) async {
-    bool response = false;
-
-    response = await DialogPopup.show(
-      context,
-      title: Labels.warning.tr(),
-      message: HourValueRules.deleteRuleMsg.tr(),
-      negativeResponse: Labels.cancel.tr(),
-      positiveResponse: Labels.delete.tr(),
-    );
-
-    if (response) {
-      try {
-        await _configsService.deleteRule(rule);
-        _rules.remove(rule);
-        _updateUI();
-      } catch (e, s) {
-        AppFeedback.showError('DefineHourValueConfigPageVM.deleteRule', e, s);
-      }
-    }
-  }
-
-  void goBack(BuildContext context) async {
-    if (valueHasChanged) {
-      bool response = await DialogPopup.show(
-        context,
-        title: Labels.warning.tr(),
-        message: HourValueRules.unsavedChangesMsg.tr(),
+    try {
+      await _configsService.updateHourValueBase(_baseHourValue!);
+    } catch (e, s) {
+      AppFeedback.showError(
+        'DefineHourValueConfigPageVM.saveHourValueBase',
+        e,
+        s,
       );
+      return; // keeps the value as unsaved
+    }
 
-      if (response) {
-        _resetUnsavingChanges();
-        context.pop();
+    _originalBaseHourValue = _baseHourValue;
+    _updateUI();
+    AppFeedback.showSuccess(Labels.valueSaved);
+  }
+
+  Future<void> saveRule(
+    HourValuePoliticsCompanion rule, {
+    required bool isUpdate,
+  }) async {
+    String message = '';
+
+    try {
+      if (isUpdate) {
+        var res = await _configsService.updateRule(rule);
+        if (res > 0) message = HourValueRules.updateRuleMsg;
+      } else {
+        await _configsService.insertRule(rule);
+        message = HourValueRules.insertRuleMsg;
       }
-    } else {
-      context.pop();
+    } catch (e, s) {
+      AppFeedback.showError('DefineHourValueConfigPageVM.saveRule', e, s);
+    }
+
+    await _getHourValuePoliticRules();
+
+    if (message.isNotEmpty) AppFeedback.showSuccess(message);
+  }
+
+  Future<void> deleteRule(HourValuePolitic rule) async {
+    try {
+      await _configsService.deleteRule(rule);
+      _rules.remove(rule);
+      _updateUI();
+    } catch (e, s) {
+      AppFeedback.showError('DefineHourValueConfigPageVM.deleteRule', e, s);
     }
   }
 
-  void _resetUnsavingChanges() {
+  // leaving the page without saving -> back to the saved value
+  void discardChanges() {
     _baseHourValue = _originalBaseHourValue;
+    _updateUI();
   }
 
   void checkTutorial(BuildContext context) {
