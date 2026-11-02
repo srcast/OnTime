@@ -1,17 +1,70 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/analysis_summary.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
+import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class AnalysisPage extends StatelessWidget {
   const AnalysisPage({super.key});
+
+  String _title(BuildContext context, AnalysisPageVM vm) {
+    switch (vm.viewMode) {
+      case AnalysisViewMode.week:
+        final format = DateFormat(
+          'dd/MM/yyyy',
+          GenericHelper.getDeviceLocale(),
+        );
+        return '${format.format(vm.startDate)} - ${format.format(vm.endDate)}';
+      case AnalysisViewMode.month:
+        return DateFormat.yMMMM(
+          Localizations.localeOf(context).toString(),
+        ).format(vm.focusedDate);
+      default:
+        return vm.focusedDate.year.toString();
+    }
+  }
+
+  List<BarChartGroupData> _barGroups(AnalysisPageVM vm) {
+    return [
+      for (final (index, value) in vm.chartValues.indexed)
+        BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: value.hours,
+              width: 20,
+              color: AppColors.strongBlueLight,
+              borderRadius: BorderRadius.circular(0),
+            ),
+          ],
+        ),
+    ];
+  }
+
+  String _barLabel(BuildContext context, AnalysisPageVM vm, int index) {
+    if (index < 0 || index >= vm.chartValues.length) return '';
+
+    final date = vm.chartValues[index].date;
+    final locale = Localizations.localeOf(context).toString();
+
+    return vm.viewMode == AnalysisViewMode.year
+        ? DateFormat.MMM(locale).format(date) // Jan, Feb, Mar...
+        : DateFormat.EEEEE(locale).format(date); // M, T, W...
+  }
+
+  void _goToSelectedDay(BuildContext context, DateTime selectedDay) {
+    context.read<HomePageVM>().refreshDay(selectedDay);
+    StatefulNavigationShell.of(context).goBranch(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +200,7 @@ class AnalysisPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              vm.getViewModeTitle(context),
+                              _title(context, vm),
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -255,7 +308,7 @@ class AnalysisPage extends StatelessWidget {
                             ),
                             onDaySelected:
                                 (selectedDay, focusedDay) =>
-                                    vm.goToSelectedDay(context, selectedDay),
+                                    _goToSelectedDay(context, selectedDay),
                           ),
                         ),
                       ),
@@ -268,7 +321,7 @@ class AnalysisPage extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: BarChart(
                           BarChartData(
-                            barGroups: vm.barGroups,
+                            barGroups: _barGroups(vm),
                             maxY: vm.maxY,
                             barTouchData: BarTouchData(
                               enabled: true,
@@ -306,10 +359,10 @@ class AnalysisPage extends StatelessWidget {
                                 sideTitles: SideTitles(
                                   showTitles: true,
                                   getTitlesWidget: (value, _) {
-                                    final index = value.toInt();
-                                    final label = vm.getLabelForIndex(
-                                      index,
+                                    final label = _barLabel(
                                       context,
+                                      vm,
+                                      value.toInt(),
                                     );
                                     return Text(
                                       label,

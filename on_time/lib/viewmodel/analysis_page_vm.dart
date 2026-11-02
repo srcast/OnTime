@@ -1,17 +1,12 @@
 import 'dart:async';
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/dates_helper.dart';
-import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/services/points_service.dart';
-import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
-import 'package:on_time/viewmodel/home_page_vm.dart';
-import 'package:provider/provider.dart';
+
+typedef ChartValue = ({DateTime date, double hours});
 
 class AnalysisPageVM extends ChangeNotifier {
   final PointsService _pointsService;
@@ -23,15 +18,14 @@ class AnalysisPageVM extends ChangeNotifier {
   bool _isLoading = false;
   late DateTime _startDate;
   late DateTime _endDate;
-  List<BarChartGroupData> _barGroups = [];
+  List<ChartValue> _chartValues = [];
   double _maxY = 0;
   double _stepY = 0;
   int _firstDayOfWeek = DateTime.sunday;
 
   AnalysisPageVM(this._pointsService) {
     _focusedDate = DateTime.now();
-    updateViewMode(AnalysisViewMode.month);
-    getData();
+    updateViewMode(AnalysisViewMode.month); // already loads the data
   }
 
   // Public Properties
@@ -41,7 +35,9 @@ class AnalysisPageVM extends ChangeNotifier {
   String get viewMode => _viewMode;
   bool get isLoading => _isLoading;
   Map<DateTime, Map<AnalysisMapEntriesEnum, dynamic>> get entries => _entries;
-  List<BarChartGroupData> get barGroups => _barGroups;
+  DateTime get startDate => _startDate;
+  DateTime get endDate => _endDate;
+  List<ChartValue> get chartValues => _chartValues;
   double get maxY => _maxY;
   double get stepY => _stepY;
   int get firstDayOfWeek => _firstDayOfWeek;
@@ -69,34 +65,6 @@ class AnalysisPageVM extends ChangeNotifier {
       _handelsStartEndDate();
       getData();
     }
-  }
-
-  String getViewModeTitle(BuildContext context) {
-    var title = '';
-
-    switch (_viewMode) {
-      case AnalysisViewMode.week:
-        title = _getWeekRange();
-        break;
-
-      case AnalysisViewMode.month:
-        title = DateFormat.yMMMM(
-          Localizations.localeOf(context).toString(),
-        ).format(_focusedDate);
-        break;
-
-      case AnalysisViewMode.year:
-        title = _focusedDate.year.toString();
-        break;
-    }
-
-    return title;
-  }
-
-  String _getWeekRange() {
-    final format = DateFormat('dd/MM/yyyy', GenericHelper.getDeviceLocale());
-
-    return '${format.format(_startDate)} - ${format.format(_endDate)}';
   }
 
   void advanceDate() {
@@ -199,7 +167,9 @@ class AnalysisPageVM extends ChangeNotifier {
 
     if (_viewMode != AnalysisViewMode.month) {
       _prepareGraphEmptyValues();
-      _setBarGroups();
+      _setChartValues();
+    } else {
+      _chartValues = []; // month -> calendar, no chart
     }
 
     _updateDaySummary();
@@ -209,38 +179,26 @@ class AnalysisPageVM extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _setBarGroups() {
-    _barGroups = [];
-    _stepY = 0;
-    _maxY = 0;
+  void _setChartValues() {
     final entriesAux = _entries.entries.toList();
     entriesAux.sort((a, b) => a.key.compareTo(b.key)); // order by date
 
-    _barGroups = List.generate(entriesAux.length, (index) {
-      final entry = entriesAux[index];
-      final minutes = entry.value[AnalysisMapEntriesEnum.minutesWorked] ?? 0;
-      final hours = minutes / 60;
+    _chartValues = [
+      for (final entry in entriesAux)
+        (
+          date: entry.key,
+          hours: (entry.value[AnalysisMapEntriesEnum.minutesWorked] ?? 0) / 60,
+        ),
+    ];
 
-      return BarChartGroupData(
-        x: index,
-        barRods: [
-          BarChartRodData(
-            toY: hours,
-            width: 20,
-            color: AppColors.strongBlueLight,
-            borderRadius: BorderRadius.circular(0),
-          ),
-        ],
-      );
-    });
+    final maxVal = _chartValues.fold<double>(
+      0,
+      (max, v) => v.hours > max ? v.hours : max,
+    );
 
-    final yValues = _barGroups.map((e) => e.barRods.first.toY).toList();
-
-    double maxVal =
-        yValues.isNotEmpty ? yValues.reduce((a, b) => a > b ? a : b) : 0;
-
-    _stepY = (maxVal / 5) % 1 == 0 ? maxVal / 5 : (maxVal / 5) + 1;
-    _maxY = stepY * 5;
+    // 5 steps of whole hours (ex: max 7h -> step 2h, axis until 10h)
+    _stepY = (maxVal / 5).ceilToDouble();
+    _maxY = _stepY * 5;
 
     // prevent error in graph construction
     if (_stepY == 0) {
@@ -281,30 +239,6 @@ class AnalysisPageVM extends ChangeNotifier {
     _entries = {for (var entry in sortedEntries) entry.key: entry.value};
   }
 
-  String getLabelForIndex(int index, BuildContext context) {
-    final entries = _entries.entries.toList();
-    if (index >= entries.length) return '';
-
-    final date = entries[index].key;
-
-    switch (_viewMode) {
-      case AnalysisViewMode.week:
-        // Mon, Tus, Wed...
-        return DateFormat.EEEEE(
-          Localizations.localeOf(context).toString(),
-        ).format(date);
-      case AnalysisViewMode.year:
-        // Jan, Feb, Mar...
-        return DateFormat.MMM(
-          Localizations.localeOf(context).toString(),
-        ).format(date);
-      default:
-        return DateFormat.d(
-          Localizations.localeOf(context).toString(),
-        ).format(date);
-    }
-  }
-
   void _updateDaySummary() {
     _totalMinutes = 0;
     _totalProfit = 0;
@@ -313,16 +247,4 @@ class AnalysisPageVM extends ChangeNotifier {
       _totalProfit += (result[AnalysisMapEntriesEnum.profit] as double);
     });
   }
-
-  void goToSelectedDay(BuildContext context, DateTime selectedDay) {
-    context.read<HomePageVM>().refreshDay(selectedDay);
-    final shell = StatefulNavigationShell.of(context);
-    shell.goBranch(0);
-  }
-
-  /*   @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  } */
 }
