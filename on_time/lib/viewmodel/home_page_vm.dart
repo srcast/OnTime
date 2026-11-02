@@ -9,8 +9,6 @@ import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
-import 'package:on_time/layout/widgets/dialog.dart';
-import 'package:on_time/layout/widgets/point_modal.dart';
 import 'package:on_time/router/routes.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
@@ -33,7 +31,6 @@ class HomePageVM extends ChangeNotifier {
       []; // points of the day -> its used to show on screen day's points. It can has points from diferent sessions
   List<Ponto> _pointsSession =
       []; // points for the session -> its used to update summary
-  final ScrollController _scrollController = ScrollController();
 
   HomePageVM(this._pointsService, this._configsService) {
     initPage();
@@ -53,8 +50,6 @@ class HomePageVM extends ChangeNotifier {
   double get sessionProfit => _sessionProfit;
 
   List<Ponto> get points => _pointsUI;
-
-  ScrollController get scrollController => _scrollController;
 
   final GlobalKey keyCheckIn = GlobalKey();
   final GlobalKey keyListItem = GlobalKey();
@@ -92,31 +87,43 @@ class HomePageVM extends ChangeNotifier {
     }
   }
 
-  Future<void> openPointModal(BuildContext context) async {
-    final selectedDateTime = await showModalBottomSheet<DateTime>(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => PointModal(date: _date),
-    );
+  // actions -> the view gets the values (modal, dialog) and calls these
 
-    if (selectedDateTime != null) {
-      _date = selectedDateTime;
-
-      try {
-        await _pointsService.insertPoint(_date);
-      } catch (e, s) {
-        AppFeedback.showError('HomePageVM.openPointModal', e, s);
-      }
-
-      _getSessionPoints(); // shows what is really saved
+  Future<void> addPoint(DateTime date) async {
+    try {
+      await _pointsService.insertPoint(date);
+    } catch (e, s) {
+      AppFeedback.showError('HomePageVM.addPoint', e, s);
     }
+
+    // shows the day of the point with what is really saved
+    _date = date;
+    await verifyDate();
 
     // if (GlobalData.showInterstitialAds && AdsHelper.isInterstitialReady) {
     //   AdsHelper.showInterstitial();
     // }
+  }
+
+  Future<void> deletePoint(Ponto pointToDelete) async {
+    try {
+      await _pointsService.deletePoint(pointToDelete);
+    } catch (e, s) {
+      AppFeedback.showError('HomePageVM.deletePoint', e, s);
+    }
+
+    await _getSessionPoints();
+  }
+
+  Future<void> updatePoint(Ponto pointToUpdate, DateTime newDate) async {
+    try {
+      await _pointsService.updatePoint(pointToUpdate, newDate);
+    } catch (e, s) {
+      AppFeedback.showError('HomePageVM.updatePoint', e, s);
+    }
+
+    _date = newDate;
+    await verifyDate();
   }
 
   void changeDate(String dir) {
@@ -143,12 +150,12 @@ class HomePageVM extends ChangeNotifier {
     _getSessionPoints();
   }
 
-  void openCalendar(BuildContext context) async {
-    _date = await DatesHelper.pickDate(context, _date);
-    verifyDate();
+  Future<void> selectDate(DateTime date) {
+    _date = date;
+    return verifyDate();
   }
 
-  void verifyDate() {
+  Future<void> verifyDate() {
     if (_date.day == _today.day &&
         _date.month == _today.month &&
         _date.year == _today.year) // if day selected is today
@@ -158,7 +165,7 @@ class HomePageVM extends ChangeNotifier {
       timerRunning(false); // already has notifyListeners
     }
 
-    _getSessionPoints();
+    return _getSessionPoints();
   }
 
   // just when initializing and change data
@@ -185,19 +192,7 @@ class HomePageVM extends ChangeNotifier {
       _pointsUI = [];
       _pointsSession = [];
       notifyListeners();
-      return;
     }
-
-    // animates activity list to last position
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 
   Future<void> _updateDaySummary(DateTime sessionDate, String sessionId) async {
@@ -229,50 +224,6 @@ class HomePageVM extends ChangeNotifier {
     }
 
     notifyListeners();
-  }
-
-  Future<void> deletePoint(BuildContext context, Ponto pointToDelete) async {
-    bool response = false;
-    response = await DialogPopup.show(
-      context,
-      title: Labels.delete.tr(),
-      message: Labels.deletePointMsg.tr(),
-      negativeResponse: Labels.cancel.tr(),
-      positiveResponse: Labels.delete.tr(),
-    );
-
-    if (response) {
-      try {
-        await _pointsService.deletePoint(pointToDelete);
-      } catch (e, s) {
-        AppFeedback.showError('HomePageVM.deletePoint', e, s);
-      }
-
-      _getSessionPoints();
-    }
-  }
-
-  Future<void> updatePoint(BuildContext context, Ponto pointToUpdate) async {
-    final dateWithHourUpdate = await showModalBottomSheet<DateTime>(
-      context: context,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => PointModal(date: pointToUpdate.date, isUpdate: true),
-    );
-
-    if (dateWithHourUpdate != null) {
-      _date = dateWithHourUpdate;
-
-      try {
-        await _pointsService.updatePoint(pointToUpdate, dateWithHourUpdate);
-      } catch (e, s) {
-        AppFeedback.showError('HomePageVM.updatePoint', e, s);
-      }
-
-      _getSessionPoints();
-    }
   }
 
   void refreshDay(DateTime selectedDay) {
@@ -446,7 +397,6 @@ class HomePageVM extends ChangeNotifier {
   @override
   void dispose() {
     _timer?.cancel();
-    _scrollController.dispose();
     super.dispose();
   }
 }

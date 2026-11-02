@@ -1,22 +1,94 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:on_time/database/database.dart';
+import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
+import 'package:on_time/layout/widgets/dialog.dart';
+import 'package:on_time/layout/widgets/point_modal.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final ScrollController _scrollController = ScrollController();
+  List<Ponto>? _lastPointsShown;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // new list of points -> animates list to last position
+  void _scrollToLastPointOnChange(List<Ponto> points) {
+    if (identical(points, _lastPointsShown)) return;
+    _lastPointsShown = points;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<DateTime?> _showPointModal(DateTime date, {bool isUpdate = false}) {
+    return showModalBottomSheet<DateTime>(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => PointModal(date: date, isUpdate: isUpdate),
+    );
+  }
+
+  Future<void> _addPoint(HomePageVM vm) async {
+    final date = await _showPointModal(vm.date);
+    if (date != null) await vm.addPoint(date);
+  }
+
+  Future<void> _updatePoint(HomePageVM vm, Ponto point) async {
+    final date = await _showPointModal(point.date, isUpdate: true);
+    if (date != null) await vm.updatePoint(point, date);
+  }
+
+  Future<void> _deletePoint(HomePageVM vm, Ponto point) async {
+    final confirmed = await DialogPopup.show(
+      context,
+      title: Labels.delete.tr(),
+      message: Labels.deletePointMsg.tr(),
+      negativeResponse: Labels.cancel.tr(),
+      positiveResponse: Labels.delete.tr(),
+    );
+    if (confirmed) await vm.deletePoint(point);
+  }
+
+  Future<void> _openCalendar(HomePageVM vm) async {
+    final date = await DatesHelper.pickDate(context, vm.date);
+    await vm.selectDate(date);
+  }
 
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<HomePageVM>();
     vm.checkTutorial(context);
+    _scrollToLastPointOnChange(vm.points);
 
     return SafeArea(
       child: Padding(
@@ -36,7 +108,7 @@ class HomePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       TextButton(
-                        onPressed: () => vm.openCalendar(context),
+                        onPressed: () => _openCalendar(vm),
                         child: Text(
                           toBeginningOfSentenceCase(
                                 DateFormat(
@@ -112,7 +184,7 @@ class HomePage extends StatelessWidget {
                       : Expanded(
                         child: SlidableAutoCloseBehavior(
                           child: ListView.builder(
-                            controller: vm.scrollController,
+                            controller: _scrollController,
                             itemCount: vm.points.length,
                             itemBuilder: (context, index) {
                               final ponto = vm.points[index];
@@ -155,10 +227,7 @@ class HomePage extends StatelessWidget {
                                         SlidableAction(
                                           key: vm.keyPointEdit,
                                           onPressed:
-                                              (context) => vm.updatePoint(
-                                                context,
-                                                ponto,
-                                              ),
+                                              (_) => _updatePoint(vm, ponto),
                                           backgroundColor:
                                               context.colors.editPointButton,
                                           foregroundColor: AppColors.editButton,
@@ -170,10 +239,7 @@ class HomePage extends StatelessWidget {
                                         SlidableAction(
                                           key: vm.keyPointDelete,
                                           onPressed:
-                                              (context) => vm.deletePoint(
-                                                context,
-                                                ponto,
-                                              ),
+                                              (_) => _deletePoint(vm, ponto),
                                           backgroundColor:
                                               context.colors.deletePointButton,
                                           foregroundColor:
@@ -221,7 +287,7 @@ class HomePage extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              onPressed: () => vm.openPointModal(context),
+              onPressed: () => _addPoint(vm),
               child: Icon(Icons.add, size: 28),
             ),
           ],
