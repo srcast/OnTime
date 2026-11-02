@@ -72,34 +72,10 @@ class ConfigurationsPageVM {
   }
 
   bool _navigateToHourValuePage(BuildContext context) {
-    openConfig(context, Labels.configsListHourValue);
+    context.go(
+      '${Routes.configurationsPage}/${Routes.configDegineHourValuePage}',
+    );
     TutorialHelper.tutorialOngoing = false;
     return false;
-  }
-
-  void openConfig(BuildContext context, String option) {
-    switch (option) {
-      case Labels.configsListHourValue:
-        context.go(
-          '${Routes.configurationsPage}/${Routes.configDegineHourValuePage}',
-        );
-        break;
-
-      case Labels.configurationsTab:
-        context.go(
-          '${Routes.configurationsPage}/${Routes.configConfigurationsPage}',
-        );
-        break;
-
-      case Labels.configsInfo:
-        context.go('${Routes.configurationsPage}/${Routes.configInfoPage}');
-        break;
-
-      case Labels.configsListNotifications:
-        break;
-
-      default:
-        break;
-    }
   }
 }
