@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:on_time/database/locator.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/generic_helper.dart';
-import 'package:on_time/helpers/tutorial_helper.dart';
+import 'package:on_time/tutorial/tutorial_flow.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
@@ -42,7 +42,10 @@ void main() async {
   setup();
 
   final config = await locator<ConfigsService>().ensureConfigExists();
-  TutorialHelper.hasSeenTutorial = config.hasSeenTutorial;
+  final tutorialFlow = TutorialFlow(
+    locator<ConfigsService>(),
+    hasSeenTutorial: config.hasSeenTutorial,
+  );
   GenericHelper.selectedCurrencyCode = config.currencyCode;
   //GlobalData.showInterstitialAds = config.showAds; // ads
 
@@ -57,6 +60,7 @@ void main() async {
       ),
       child: MultiProvider(
         providers: [
+          ChangeNotifierProvider.value(value: tutorialFlow),
           ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
           ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
           ChangeNotifierProvider(

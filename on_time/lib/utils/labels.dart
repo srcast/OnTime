@@ -100,6 +100,7 @@ class AppLanguageOptions {
 
 class TutorialLabels {
   static const skip = 'tutorial_skip';
+  static const replay = 'tutorial_replay';
   static const point = 'tutorial_point';
   static const pointList = 'tutorial_point_list';
   static const pointEdit = 'tutorial_point_edit';

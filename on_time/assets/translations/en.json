@@ -68,6 +68,7 @@
     "language_portuguese": "Português",
     "language_french": "Français",
     "tutorial_skip": "Skip",
+    "tutorial_replay": "Replay tutorial",
     "tutorial_point": "Make a record.",
     "tutorial_point_list": "Record completed. Swipe left on the record to edit or delete it.",
     "tutorial_point_edit": "Edit record.",

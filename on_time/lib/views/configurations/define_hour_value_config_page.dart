@@ -6,6 +6,8 @@ import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/dialog.dart';
 import 'package:on_time/layout/widgets/numeric_keyboard.dart';
 import 'package:on_time/layout/widgets/value_rule_modal.dart';
+import 'package:on_time/tutorial/configurations_tutorials.dart';
+import 'package:on_time/tutorial/tutorial_flow.dart';
 import 'package:on_time/utils/colors.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
@@ -59,6 +61,23 @@ class _DefineHourValueConfigPageState extends State<DefineHourValueConfigPage> {
     if (confirmed) await vm.deleteRule(rule);
   }
 
+  final _tutorialKeys = HourValueTutorialKeys();
+  bool _tutorialStarted = false;
+
+  // tutorial at this page -> shown once, after the page transition
+  void _startTutorialOnce(TutorialFlow tutorial) {
+    if (!tutorial.isAt(TutorialStep.hourValue)) {
+      _tutorialStarted = false;
+      return;
+    }
+    if (_tutorialStarted) return;
+    _tutorialStarted = true;
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) showHourValueTutorial(context, _tutorialKeys, tutorial);
+    });
+  }
+
   // leaving with unsaved value -> asks before discarding it
   Future<void> _confirmLeave(DefineHourValueConfigPageVM vm) async {
     final confirmed = await DialogPopup.show(
@@ -75,8 +94,7 @@ class _DefineHourValueConfigPageState extends State<DefineHourValueConfigPage> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<DefineHourValueConfigPageVM>();
-
-    vm.checkTutorial(context);
+    _startTutorialOnce(context.watch<TutorialFlow>());
 
     // all the ways of leaving go through here:
     // app bar arrow (maybePop), android back button/gesture (also predictive back)
@@ -114,7 +132,7 @@ class _DefineHourValueConfigPageState extends State<DefineHourValueConfigPage> {
               GestureDetector(
                 onTap: () => _openNumericKeyboard(vm),
                 child: Container(
-                  key: vm.keyHourValueInput,
+                  key: _tutorialKeys.hourValueInput,
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -138,7 +156,7 @@ class _DefineHourValueConfigPageState extends State<DefineHourValueConfigPage> {
               ),
               SizedBox(height: 16),
               ElevatedButton(
-                key: vm.keySaveHourValue,
+                key: _tutorialKeys.saveHourValue,
                 onPressed: () => vm.saveHourValueBase(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
@@ -163,7 +181,7 @@ class _DefineHourValueConfigPageState extends State<DefineHourValueConfigPage> {
               ),
               SizedBox(height: 8),
               ElevatedButton(
-                key: vm.keySpecialRules,
+                key: _tutorialKeys.specialRules,
                 onPressed: () => _openRuleModal(vm, null),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.softGreen,

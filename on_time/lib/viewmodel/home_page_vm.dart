@@ -1,20 +1,14 @@
 import 'dart:async';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/dates_helper.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/helpers/points_helper.dart';
-import 'package:on_time/helpers/tutorial_helper.dart';
-import 'package:on_time/router/routes.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
-import 'package:on_time/utils/enums.dart';
 import 'package:on_time/utils/labels.dart';
-import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class HomePageVM extends ChangeNotifier {
   final PointsService _pointsService;
@@ -51,22 +45,11 @@ class HomePageVM extends ChangeNotifier {
 
   List<Ponto> get points => _pointsUI;
 
-  final GlobalKey keyCheckIn = GlobalKey();
-  final GlobalKey keyListItem = GlobalKey();
-  final GlobalKey keyListItemContent = GlobalKey();
-  final GlobalKey keyPointEdit = GlobalKey();
-  final GlobalKey keyPointDelete = GlobalKey();
-
   //////////
 
   void initPage() {
-    if (!TutorialHelper.hasSeenTutorial) {
-      _preparePointsTutorial();
-      _date = DateTime.now();
-    } else {
-      timerRunning(true);
-      _getSessionPoints();
-    }
+    timerRunning(true);
+    _getSessionPoints();
   }
 
   void timerRunning(bool running) {
@@ -170,8 +153,6 @@ class HomePageVM extends ChangeNotifier {
 
   // just when initializing and change data
   Future<void> _getSessionPoints() async {
-    if (!TutorialHelper.hasSeenTutorial) return;
-
     DateTime sessionDate = DatesHelper.getSessionFromDate(_date);
     String sessionId = GenericHelper.getSessionId(sessionDate);
 
@@ -229,169 +210,6 @@ class HomePageVM extends ChangeNotifier {
   void refreshDay(DateTime selectedDay) {
     _date = selectedDay;
     verifyDate();
-  }
-
-  void checkTutorial(BuildContext context) async {
-    if (!TutorialHelper.hasSeenTutorial && !TutorialHelper.tutorialOngoing) {
-      TutorialHelper.tutorialOngoing = true;
-      _prepareFirstFaseTutorial(context);
-    }
-  }
-
-  void _preparePointsTutorial() {
-    _pointsUI.add(
-      Ponto(
-        id: 1,
-        date: DateTime(
-          DateTime.now().year,
-          DateTime.now().month,
-          DateTime.now().day,
-          10,
-          0,
-        ),
-        sessionId: "1",
-        getIn: true,
-      ),
-    );
-  }
-
-  void _prepareFirstFaseTutorial(BuildContext context) {
-    TutorialCoachMark(
-      targets: [
-        TargetFocus(
-          identify: TutorialIdentifiers.checkIn,
-          keyTarget: keyCheckIn,
-          shape: ShapeLightFocus.RRect,
-          radius: 16,
-          alignSkip: Alignment.topRight,
-          contents: [
-            TargetContent(
-              align: ContentAlign.top,
-              child: Text(
-                TutorialLabels.point.tr(),
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
-            ),
-          ],
-        ),
-        TargetFocus(
-          identify: TutorialIdentifiers.listItem,
-          keyTarget: keyListItem,
-          shape: ShapeLightFocus.RRect,
-          radius: 16,
-          contents: [
-            TargetContent(
-              align: ContentAlign.bottom,
-              child: Text(
-                TutorialLabels.pointList.tr(),
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ],
-      colorShadow: Colors.black54,
-      textSkip: TutorialLabels.skip.tr(),
-      opacityShadow: 0.6,
-      onFinish: () => _openSlidableAndShowActions(context),
-      onSkip: () {
-        _cancelTutorial();
-        return true;
-      },
-    ).show(context: Overlay.of(context).context);
-  }
-
-  Future<void> _openSlidableAndShowActions(BuildContext context) async {
-    if (keyListItem.currentContext != null) {
-      await Scrollable.ensureVisible(
-        keyListItem.currentContext!,
-        duration: const Duration(milliseconds: 300),
-        alignment: 0.4,
-      );
-    }
-
-    await Future.delayed(const Duration(milliseconds: 200));
-
-    final slidable =
-        keyListItemContent.currentContext == null
-            ? null
-            : Slidable.of(keyListItemContent.currentContext!);
-
-    if (slidable != null) {
-      slidable.openEndActionPane(duration: const Duration(milliseconds: 300));
-      await Future.delayed(const Duration(milliseconds: 360));
-    }
-
-    TutorialCoachMark(
-      targets: [
-        TargetFocus(
-          identify: TutorialIdentifiers.editPoint,
-          keyTarget: keyPointEdit,
-          shape: ShapeLightFocus.RRect,
-          radius: 8,
-          paddingFocus: 6,
-          contents: [
-            TargetContent(
-              align: ContentAlign.bottom,
-              child: Column(
-                children: [
-                  Text(
-                    TutorialLabels.pointEdit.tr(),
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        TargetFocus(
-          identify: TutorialIdentifiers.deletePoint,
-          keyTarget: keyPointDelete,
-          shape: ShapeLightFocus.RRect,
-          radius: 8,
-          paddingFocus: 6,
-          contents: [
-            TargetContent(
-              align: ContentAlign.bottom,
-              child: Column(
-                children: [
-                  Text(
-                    TutorialLabels.pointDelete.tr(),
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-      colorShadow: Colors.black54,
-      textSkip: TutorialLabels.skip.tr(),
-      opacityShadow: 0.6,
-      onFinish: () => _navigateToConfigPage(context),
-      onSkip: () {
-        _cancelTutorial();
-        return true;
-      },
-    ).show(context: Overlay.of(context).context);
-  }
-
-  Future<void> _cancelTutorial() async {
-    _cleanTutorialData();
-    await TutorialHelper.cancelTutorial();
-    initPage();
-  }
-
-  bool _navigateToConfigPage(BuildContext context) {
-    _cleanTutorialData();
-    context.go(Routes.configurationsPage);
-    return false;
-  }
-
-  void _cleanTutorialData() {
-    _pointsUI = [];
-    _sessionMinutes = 0;
-    notifyListeners();
   }
 
   @override

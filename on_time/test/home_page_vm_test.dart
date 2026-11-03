@@ -2,7 +2,6 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
-import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/services/configs_service.dart';
 import 'package:on_time/services/points_service.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
@@ -17,7 +16,6 @@ void main() {
     db = AppDatabase(executor: NativeDatabase.memory());
     final configsService = ConfigsService(db);
     await configsService.ensureConfigExists();
-    TutorialHelper.hasSeenTutorial = true;
     vm = HomePageVM(PointsService(db), configsService);
   });
 

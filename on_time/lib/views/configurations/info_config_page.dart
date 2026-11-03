@@ -6,8 +6,11 @@ import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/models/global_data.dart';
 import 'package:on_time/services/configs_service.dart';
+import 'package:on_time/tutorial/tutorial_flow.dart';
+import 'package:on_time/tutorial/tutorial_ui.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class InfoConfigPage extends StatefulWidget {
   const InfoConfigPage({super.key});
@@ -132,9 +135,27 @@ class _InfoConfigPage extends State<InfoConfigPage> {
                 ),
               ),
             ),
+            const SizedBox(height: 40),
+            OutlinedButton.icon(
+              onPressed: _replayTutorial,
+              icon: Icon(
+                Icons.school_outlined,
+                color: context.colors.titleText,
+              ),
+              label: Text(
+                TutorialLabels.replay.tr(),
+                style: TextStyle(color: context.colors.titleText),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  // starts again at the home page
+  Future<void> _replayTutorial() async {
+    await context.read<TutorialFlow>().restart();
+    if (mounted) await goHomeAfterTutorial(context);
   }
 }

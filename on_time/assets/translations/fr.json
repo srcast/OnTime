@@ -68,6 +68,7 @@
     "language_portuguese": "Português",
     "language_french": "Français",
     "tutorial_skip": "Passer",
+    "tutorial_replay": "Revoir le tutoriel",
     "tutorial_point": "Enregistrement de pointage.",
     "tutorial_point_list": "Pointage effectué. Faites glisser l’enregistrement vers la gauche pour le modifier ou le supprimer.",
     "tutorial_point_edit": "Modifier l’enregistrement.",

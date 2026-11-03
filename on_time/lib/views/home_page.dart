@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/dates_helper.dart';
-import 'package:on_time/helpers/tutorial_helper.dart';
+import 'package:on_time/tutorial/home_tutorial.dart';
+import 'package:on_time/tutorial/tutorial_flow.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/layout/widgets/activity_card.dart';
 import 'package:on_time/layout/widgets/day_summary.dart';
@@ -24,6 +25,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final ScrollController _scrollController = ScrollController();
   List<Ponto>? _lastPointsShown;
+  final _tutorialKeys = HomeTutorialKeys();
+  final _tutorialPoints = [homeTutorialExamplePoint()];
+  bool _tutorialStarted = false;
+
+  // tutorial at this page -> shown once (not on every build); again if it restarts
+  void _startTutorialOnce(TutorialFlow tutorial) {
+    if (!tutorial.isAt(TutorialStep.home)) {
+      _tutorialStarted = false;
+      return;
+    }
+    if (_tutorialStarted) return;
+    _tutorialStarted = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) showHomeTutorial(context, _tutorialKeys, tutorial);
+    });
+  }
 
   @override
   void dispose() {
@@ -87,8 +105,13 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<HomePageVM>();
-    vm.checkTutorial(context);
-    _scrollToLastPointOnChange(vm.points);
+    final tutorial = context.watch<TutorialFlow>();
+    final isTutorial = tutorial.isAt(TutorialStep.home);
+    _startTutorialOnce(tutorial);
+
+    // tutorial -> example point instead of the saved ones
+    final points = isTutorial ? _tutorialPoints : vm.points;
+    _scrollToLastPointOnChange(points);
 
     return SafeArea(
       child: Padding(
@@ -177,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   SizedBox(height: 10),
 
-                  vm.points.isEmpty
+                  points.isEmpty
                       ? Expanded(
                         child: Center(child: Text(Labels.noPointsDayMsg.tr())),
                       )
@@ -185,15 +208,15 @@ class _HomePageState extends State<HomePage> {
                         child: SlidableAutoCloseBehavior(
                           child: ListView.builder(
                             controller: _scrollController,
-                            itemCount: vm.points.length,
+                            itemCount: points.length,
                             itemBuilder: (context, index) {
-                              final ponto = vm.points[index];
+                              final ponto = points[index];
 
                               final bool showText = ponto.getIn && index > 0;
                               final String textToShow =
                                   showText
                                       ? (ponto.sessionId !=
-                                              vm.points[index - 1].sessionId
+                                              points[index - 1].sessionId
                                           ? Labels.workBegins.tr()
                                           : Labels.pause.tr())
                                       : '';
@@ -217,15 +240,18 @@ class _HomePageState extends State<HomePage> {
 
                                   Slidable(
                                     key:
-                                        !TutorialHelper.hasSeenTutorial
-                                            ? vm.keyListItem
+                                        isTutorial
+                                            ? _tutorialKeys.listItem
                                             : ValueKey(ponto.id),
                                     endActionPane: ActionPane(
                                       motion: const DrawerMotion(),
                                       extentRatio: 0.4,
                                       children: [
                                         SlidableAction(
-                                          key: vm.keyPointEdit,
+                                          key:
+                                              isTutorial
+                                                  ? _tutorialKeys.pointEdit
+                                                  : null,
                                           onPressed:
                                               (_) => _updatePoint(vm, ponto),
                                           backgroundColor:
@@ -237,7 +263,10 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ),
                                         SlidableAction(
-                                          key: vm.keyPointDelete,
+                                          key:
+                                              isTutorial
+                                                  ? _tutorialKeys.pointDelete
+                                                  : null,
                                           onPressed:
                                               (_) => _deletePoint(vm, ponto),
                                           backgroundColor:
@@ -253,8 +282,8 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: ActivityCard(
                                       key:
-                                          !TutorialHelper.hasSeenTutorial
-                                              ? vm.keyListItemContent
+                                          isTutorial
+                                              ? _tutorialKeys.listItemContent
                                               : ValueKey(
                                                 'activity_card_${ponto.id}',
                                               ),
@@ -280,7 +309,7 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 10),
             FloatingActionButton(
-              key: vm.keyCheckIn,
+              key: _tutorialKeys.checkIn,
               backgroundColor: AppColors.softGreen,
               foregroundColor: AppColors.white,
               elevation: 4,

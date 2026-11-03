@@ -5,7 +5,6 @@ import 'package:on_time/services/points_service.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
-import 'package:on_time/viewmodel/configurations_page_vm.dart';
 import 'package:on_time/viewmodel/home_page_vm.dart';
 
 GetIt locator = GetIt.instance;
@@ -19,9 +18,6 @@ void setup() {
     () => DefineHourValueConfigPageVM(locator<ConfigsService>()),
   );
   locator.registerFactory(() => AnalysisPageVM(locator<PointsService>()));
-  locator.registerLazySingleton(
-    () => ConfigurationsPageVM(),
-  ); // singleton in order to not lost state when navigating to another pages (important to tutorial)
   locator.registerFactory(
     () => ConfigConfigurationsPageVM(locator<ConfigsService>()),
   );

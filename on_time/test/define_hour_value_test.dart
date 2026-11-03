@@ -3,9 +3,9 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:on_time/database/database.dart';
-import 'package:on_time/helpers/tutorial_helper.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/services/configs_service.dart';
+import 'package:on_time/tutorial/tutorial_flow.dart';
 import 'package:on_time/utils/labels.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
 import 'package:on_time/views/configurations/define_hour_value_config_page.dart';
@@ -17,7 +17,6 @@ void main() {
   late DefineHourValueConfigPageVM vm;
 
   setUp(() async {
-    TutorialHelper.hasSeenTutorial = true;
     db = AppDatabase(executor: NativeDatabase.memory());
     configsService = ConfigsService(db);
     await configsService.ensureConfigExists();
@@ -87,8 +86,14 @@ void main() {
     // home page -> pushes the hour value page
     Future<void> openPage(WidgetTester tester) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider.value(
-          value: vm,
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: vm),
+            ChangeNotifierProvider(
+              create:
+                  (_) => TutorialFlow(configsService, hasSeenTutorial: true),
+            ),
+          ],
           child: MaterialApp(
             theme: lightTheme,
             home: Builder(
