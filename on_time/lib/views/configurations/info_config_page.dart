@@ -1,7 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:on_time/database/locator.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/models/global_data.dart';
@@ -83,7 +82,7 @@ class _InfoConfigPage extends State<InfoConfigPage> {
 
   Future<void> _disableAds() async {
     GlobalData.showInterstitialAds = false;
-    await locator<ConfigsService>().updateShowAds(
+    await context.read<ConfigsService>().updateShowAds(
       GlobalData.showInterstitialAds,
     );
   }

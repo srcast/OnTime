@@ -3,13 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/services.dart';
-import 'package:on_time/database/locator.dart';
+import 'package:on_time/database/database.dart';
 import 'package:on_time/helpers/app_feedback.dart';
 import 'package:on_time/helpers/generic_helper.dart';
 import 'package:on_time/tutorial/tutorial_flow.dart';
 import 'package:on_time/layout/themes.dart';
 import 'package:on_time/router/app_router.dart';
 import 'package:on_time/services/configs_service.dart';
+import 'package:on_time/services/points_service.dart';
 import 'package:on_time/viewmodel/analysis_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/configurations_config_page_vm.dart';
 import 'package:on_time/viewmodel/configurations/define_hour_value_config_page_vm.dart';
@@ -19,7 +20,6 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // errors not handled in the view models -> at least they get logged
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
     AppFeedback.logError(
@@ -39,11 +39,13 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  setup();
+  final db = AppDatabase();
+  final pointsService = PointsService(db);
+  final configsService = ConfigsService(db);
 
-  final config = await locator<ConfigsService>().ensureConfigExists();
+  final config = await configsService.ensureConfigExists();
   final tutorialFlow = TutorialFlow(
-    locator<ConfigsService>(),
+    configsService,
     hasSeenTutorial: config.hasSeenTutorial,
   );
   GenericHelper.selectedCurrencyCode = config.currencyCode;
@@ -60,14 +62,32 @@ void main() async {
       ),
       child: MultiProvider(
         providers: [
+          // services
+          Provider.value(value: db),
+          Provider.value(value: pointsService),
+          Provider.value(value: configsService),
           ChangeNotifierProvider.value(value: tutorialFlow),
-          ChangeNotifierProvider(create: (_) => locator<HomePageVM>()),
-          ChangeNotifierProvider(create: (_) => locator<AnalysisPageVM>()),
+
+          // view models -> one per page for the whole app (state kept between visits)
           ChangeNotifierProvider(
-            create: (_) => locator<DefineHourValueConfigPageVM>(),
+            create:
+                (context) => HomePageVM(
+                  context.read<PointsService>(),
+                  context.read<ConfigsService>(),
+                ),
           ),
           ChangeNotifierProvider(
-            create: (_) => locator<ConfigConfigurationsPageVM>(),
+            create: (context) => AnalysisPageVM(context.read<PointsService>()),
+          ),
+          ChangeNotifierProvider(
+            create:
+                (context) =>
+                    DefineHourValueConfigPageVM(context.read<ConfigsService>()),
+          ),
+          ChangeNotifierProvider(
+            create:
+                (context) =>
+                    ConfigConfigurationsPageVM(context.read<ConfigsService>()),
           ),
         ],
         child: DevicePreview(
